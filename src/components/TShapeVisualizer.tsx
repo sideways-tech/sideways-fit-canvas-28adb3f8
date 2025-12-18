@@ -19,7 +19,6 @@ const TShapeVisualizer = ({
   breadthScore,
   onDepthTopicChange,
   onDepthScoreChange,
-  onBreadthScoreChange,
 }: TShapeVisualizerProps) => {
   const verticalHeight = Math.max(20, (depthScore / 100) * 180);
   const horizontalWidth = Math.max(40, (breadthScore / 100) * 280);
@@ -32,7 +31,7 @@ const TShapeVisualizer = ({
           {/* Center point marker */}
           <div className="absolute left-1/2 top-8 w-2 h-2 bg-muted-foreground/30 rounded-full -translate-x-1/2" />
           
-          {/* Horizontal Bar (Breadth/Empathy) - Yellow */}
+          {/* Horizontal Bar (Breadth/Empathy) - Yellow - from B & D sections */}
           <motion.div
             className="absolute top-4 left-1/2 h-4 bg-highlighter rounded-sm"
             style={{
@@ -53,7 +52,7 @@ const TShapeVisualizer = ({
 
           {/* Labels */}
           <div className="absolute -left-4 top-2 text-xs text-muted-foreground font-handwritten text-2xl -rotate-12">
-            Empathy →
+            Society →
           </div>
           <div className="absolute left-1/2 bottom-0 text-xs text-muted-foreground font-handwritten text-2xl rotate-6 translate-x-4">
             ↓ Depth
@@ -61,15 +60,15 @@ const TShapeVisualizer = ({
         </div>
       </div>
 
-      {/* Depth Input */}
+      {/* Depth Topic Input */}
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="depth-topic" className="text-sm font-medium">
-            Depth in ONE non-work topic
+            What's their obsession? (Non-work topic)
           </Label>
           <Input
             id="depth-topic"
-            placeholder="e.g., 18th Century Pottery, Carnatic Music, Retro Gaming..."
+            placeholder="e.g., 18th Century Pottery, Carnatic Music, Retro Gaming, Bird Watching..."
             value={depthTopic}
             onChange={(e) => onDepthTopicChange(e.target.value)}
             className="sketch-border-light bg-background"
@@ -97,27 +96,13 @@ const TShapeVisualizer = ({
         </div>
       </div>
 
-      {/* Breadth Input */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">
-          Plugged into Society / Empathy
-        </Label>
+      {/* Breadth indicator (read-only, fed from B & D) */}
+      <div className="p-3 bg-highlighter/10 rounded-lg sketch-border-light">
         <div className="flex justify-between items-center">
-          <HandwrittenLabel className="text-2xl text-muted-foreground">
-            Interest in others' lives & Wide Reading
-          </HandwrittenLabel>
-          <span className="text-sm font-medium tabular-nums">{breadthScore}%</span>
-        </div>
-        <Slider
-          value={[breadthScore]}
-          onValueChange={([value]) => onBreadthScoreChange(value)}
-          max={100}
-          step={5}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Lives in a bubble</span>
-          <span>Knows everyone's story</span>
+          <span className="text-sm text-muted-foreground">
+            Breadth Score (from B & D)
+          </span>
+          <HandwrittenLabel className="text-2xl">{breadthScore}%</HandwrittenLabel>
         </div>
       </div>
 

@@ -7,40 +7,76 @@ import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import DiagnosticSection from "./DiagnosticSection";
 import TShapeVisualizer from "./TShapeVisualizer";
+import ReadingBreadthSection from "./ReadingBreadthSection";
 import HonestyMeter from "./HonestyMeter";
 import ResilienceRating from "./ResilienceRating";
+import AestheticsSection from "./AestheticsSection";
+import IndustryMotivationSection from "./IndustryMotivationSection";
 import VerdictFooter from "./VerdictFooter";
+import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
 type HonestyLevel = "flattery" | "diplomatic" | "honest";
+type MotivationLevel = "unclear" | "practical" | "passionate";
 type Archetype = "vendor" | "birbal" | "work-in-progress";
 
 interface FormState {
   candidateName: string;
   candidateRole: string;
+  // A. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
+  // B. Interested in Others
+  interestedInOthers: number;
+  // C. Honest POV
+  honestyLevel: HonestyLevel | "";
+  // D. Reads Widely
+  readsWidely: number;
+  recentReadExample: string;
+  // E. Depth
   depthTopic: string;
   depthScore: number;
-  breadthScore: number;
-  honestyLevel: HonestyLevel | "";
+  // F. Willingness to Iterate
   resilienceScore: number;
+  // G. Art/Aesthetics
+  aestheticsInterest: number;
+  aestheticsProcessNote: string;
+  // H. Industry Motivation
+  motivationLevel: MotivationLevel | "";
+  motivationReason: string;
 }
 
 const calculateArchetype = (state: FormState): Archetype => {
-  const { diagnosticLevel, depthScore, breadthScore, honestyLevel, resilienceScore } = state;
+  const {
+    diagnosticLevel,
+    interestedInOthers,
+    honestyLevel,
+    readsWidely,
+    depthScore,
+    resilienceScore,
+    aestheticsInterest,
+    motivationLevel,
+  } = state;
 
-  // Vendor: Low diagnostic OR flattery
-  if (diagnosticLevel === "order-taker" || honestyLevel === "flattery") {
+  const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
+
+  // Vendor: Low diagnostic OR flattery OR unclear motivation
+  if (
+    diagnosticLevel === "order-taker" ||
+    honestyLevel === "flattery" ||
+    motivationLevel === "unclear"
+  ) {
     return "vendor";
   }
 
-  // Birbal: High diagnostic AND high depth AND high breadth AND honest
+  // Birbal: High across all key dimensions
   if (
     diagnosticLevel === "diagnostician" &&
     depthScore >= 60 &&
     breadthScore >= 60 &&
     honestyLevel === "honest" &&
-    resilienceScore >= 4
+    resilienceScore >= 4 &&
+    aestheticsInterest >= 50 &&
+    motivationLevel === "passionate"
   ) {
     return "birbal";
   }
@@ -54,14 +90,21 @@ const SidewaysInterviewCanvas = () => {
     candidateName: "",
     candidateRole: "",
     diagnosticLevel: "",
+    interestedInOthers: 30,
+    honestyLevel: "",
+    readsWidely: 30,
+    recentReadExample: "",
     depthTopic: "",
     depthScore: 30,
-    breadthScore: 30,
-    honestyLevel: "",
     resilienceScore: 0,
+    aestheticsInterest: 30,
+    aestheticsProcessNote: "",
+    motivationLevel: "",
+    motivationReason: "",
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
+  const breadthScore = Math.round((formState.interestedInOthers + formState.readsWidely) / 2);
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -91,14 +134,16 @@ const SidewaysInterviewCanvas = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12 space-y-4"
         >
-          <HandwrittenLabel as="h1" className="text-7xl sm:text-8xl">
-            Sideways
-          </HandwrittenLabel>
+          <img
+            src={sidewaysLogo}
+            alt="Sideways"
+            className="h-20 sm:h-24 mx-auto"
+          />
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
             "We like problems that don't come with a drop-down menu."
           </p>
           <div className="pt-4">
-            <h2 className="text-2xl font-semibold">Culture & Talent Assessment</h2>
+            <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
             <p className="text-muted-foreground">The "No Drop-Down Menu" Fit Test</p>
           </div>
         </motion.header>
@@ -129,15 +174,15 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section A: Diagnostic */}
+        {/* Section A: Diagnostic / Clarifying Questions */}
         <SketchCard className="mb-8" delay={0.2}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                A. The Diagnostic Mindset
+                A. Ask Questions (Clarifying Enough?)
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
-                Did they ask 'Why' before 'How'?
+                Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.
               </p>
             </div>
             <DiagnosticSection
@@ -147,42 +192,64 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section B/D/E: T-Shape */}
+        {/* Section B & D: Plugged Into Society */}
+        <SketchCard className="mb-8" delay={0.25}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">
+                B & D. Plugged Into Society
+              </HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">
+                Not living in a bubble — interested in others & reads widely
+              </p>
+            </div>
+            <ReadingBreadthSection
+              interestedInOthers={formState.interestedInOthers}
+              readsWidely={formState.readsWidely}
+              recentReadExample={formState.recentReadExample}
+              onInterestedInOthersChange={(value) => updateField("interestedInOthers", value)}
+              onReadsWidelyChange={(value) => updateField("readsWidely", value)}
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* Section E: T-Shape Depth */}
         <SketchCard className="mb-8" delay={0.3}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                B/D/E. The T-Shaped Profile
+                E. Depth in One Non-Work Topic
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
-                Vertical = Obsession / Horizontal = Empathy
+                The vertical bar of the T — obsessive depth in something outside work
               </p>
             </div>
             <TShapeVisualizer
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
-              breadthScore={formState.breadthScore}
+              breadthScore={breadthScore}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onBreadthScoreChange={(value) => updateField("breadthScore", value)}
+              onBreadthScoreChange={() => {}} // Breadth is now calculated from B & D
             />
           </div>
         </SketchCard>
 
         {/* Section C: Honesty */}
-        <SketchCard className="mb-8" delay={0.4}>
+        <SketchCard className="mb-8" delay={0.35}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                C. The Birbal Quotient
+                C. Honest POV on Our Work
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
-                We need trusted advisors, not yes-men.
+                Has a clear, honest point of view — not just flattery
               </p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">
-                POV on Sideways Work
+                Their take on Sideways work
               </Label>
               <HonestyMeter
                 value={formState.honestyLevel}
@@ -192,15 +259,15 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section F/I: Resilience */}
-        <SketchCard className="mb-8" delay={0.5}>
+        {/* Section F: Willingness to Iterate */}
+        <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                F/I. Resilience & Iteration
+                F. Willingness to Iterate
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
-                Can they work in the Circus?
+                Can they kill their darlings? Work in the Circus?
               </p>
             </div>
             <ResilienceRating
@@ -210,15 +277,55 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
+        {/* Section G: Art & Aesthetics */}
+        <SketchCard className="mb-8" delay={0.45}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">
+                G. Interest in Art & Aesthetics
+              </HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">
+                Process of creation — do they care about how things are made?
+              </p>
+            </div>
+            <AestheticsSection
+              interest={formState.aestheticsInterest}
+              processNote={formState.aestheticsProcessNote}
+              onInterestChange={(value) => updateField("aestheticsInterest", value)}
+              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* Section H: Industry Motivation */}
+        <SketchCard className="mb-8" delay={0.5}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">
+                H. Clear Reason for This Industry
+              </HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">
+                Why creative problem-solving? What's their story?
+              </p>
+            </div>
+            <IndustryMotivationSection
+              level={formState.motivationLevel}
+              reason={formState.motivationReason}
+              onLevelChange={(value) => updateField("motivationLevel", value)}
+              onReasonChange={(value) => updateField("motivationReason", value)}
+            />
+          </div>
+        </SketchCard>
+
         {/* Footer: Verdict */}
-        <SketchCard delay={0.6}>
+        <SketchCard delay={0.55}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
                 The Verdict
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
-                Based on the assessment criteria
+                Based on the T-shaped culture fit criteria
               </p>
             </div>
             <VerdictFooter
@@ -236,10 +343,12 @@ const SidewaysInterviewCanvas = () => {
           transition={{ delay: 0.8 }}
           className="mt-12 text-center text-sm text-muted-foreground"
         >
-          <p>
-            <HandwrittenLabel className="text-2xl">Sideways</HandwrittenLabel>
-            {" "} · Creative Problem Solving Outfit
-          </p>
+          <img
+            src={sidewaysLogo}
+            alt="Sideways"
+            className="h-8 mx-auto mb-2 opacity-50"
+          />
+          <p>Creative Problem Solving Outfit</p>
         </motion.footer>
       </div>
     </div>
