@@ -12,6 +12,7 @@ import HonestyMeter from "./HonestyMeter";
 import ResilienceRating from "./ResilienceRating";
 import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";
+import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
@@ -317,8 +318,33 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
+        {/* Scores Summary */}
+        <SketchCard className="mb-8" delay={0.55}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">
+                Assessment Summary
+              </HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">
+                All scores at a glance
+              </p>
+            </div>
+            <ScoresSummary
+              diagnosticLevel={formState.diagnosticLevel}
+              interestedInOthers={formState.interestedInOthers}
+              readsWidely={formState.readsWidely}
+              depthScore={formState.depthScore}
+              depthTopic={formState.depthTopic}
+              honestyLevel={formState.honestyLevel}
+              resilienceScore={formState.resilienceScore}
+              aestheticsInterest={formState.aestheticsInterest}
+              motivationLevel={formState.motivationLevel}
+            />
+          </div>
+        </SketchCard>
+
         {/* Footer: Verdict */}
-        <SketchCard delay={0.55}>
+        <SketchCard delay={0.6}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
