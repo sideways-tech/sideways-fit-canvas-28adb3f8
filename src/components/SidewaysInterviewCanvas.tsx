@@ -106,6 +106,8 @@ const SidewaysInterviewCanvas = () => {
     honestyLevel: "",
     readsWidely: 30,
     recentReadExample: "",
+    underestimatedTrend: "",
+    ideaSharedOften: "",
     depthTopic: "",
     depthScore: 30,
     resilienceScore: 0,
