@@ -61,30 +61,30 @@ const calculateArchetype = (state: FormState): Archetype => {
     depthScore,
     resilienceScore,
     aestheticsInterest,
-    motivationLevel,
+    motivationLevel
   } = state;
 
   const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
 
   // Vendor: Low diagnostic OR flattery OR unclear motivation
   if (
-    diagnosticLevel === "order-taker" ||
-    honestyLevel === "flattery" ||
-    motivationLevel === "unclear"
-  ) {
+  diagnosticLevel === "order-taker" ||
+  honestyLevel === "flattery" ||
+  motivationLevel === "unclear")
+  {
     return "vendor";
   }
 
   // Birbal: High across all key dimensions
   if (
-    diagnosticLevel === "diagnostician" &&
-    depthScore >= 60 &&
-    breadthScore >= 60 &&
-    honestyLevel === "honest" &&
-    resilienceScore >= 4 &&
-    aestheticsInterest >= 50 &&
-    motivationLevel === "passionate"
-  ) {
+  diagnosticLevel === "diagnostician" &&
+  depthScore >= 60 &&
+  breadthScore >= 60 &&
+  honestyLevel === "honest" &&
+  resilienceScore >= 4 &&
+  aestheticsInterest >= 50 &&
+  motivationLevel === "passionate")
+  {
     return "birbal";
   }
 
@@ -110,20 +110,20 @@ const SidewaysInterviewCanvas = () => {
     aestheticsInterest: 30,
     aestheticsProcessNote: "",
     motivationLevel: "",
-    motivationReason: "",
+    motivationReason: ""
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
   const breadthScore = Math.round((formState.interestedInOthers + formState.readsWidely) / 2);
 
-  const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
+  const updateField = <K extends keyof FormState,>(field: K, value: FormState[K]) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleArchive = () => {
     toast({
       title: "Assessment Archived",
-      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`,
+      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`
     });
   };
 
@@ -131,7 +131,7 @@ const SidewaysInterviewCanvas = () => {
     if (archetype === "vendor") return;
     toast({
       title: "🎪 Invitation Sent!",
-      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`,
+      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`
     });
   };
 
@@ -142,13 +142,13 @@ const SidewaysInterviewCanvas = () => {
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12 space-y-4"
-        >
+          className="text-center mb-12 space-y-4">
+          
           <img
             src={sidewaysLogo}
             alt="Sideways"
-            className="h-20 sm:h-24 mx-auto"
-          />
+            className="h-20 sm:h-24 mx-auto" />
+          
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
             "We like problems that don't come with a drop-down menu."
           </p>
@@ -168,8 +168,8 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="Enter name..."
                 value={formState.candidateName}
                 onChange={(e) => updateField("candidateName", e.target.value)}
-                className="sketch-border-light bg-background"
-              />
+                className="sketch-border-light bg-background" />
+              
             </div>
             <div className="space-y-2">
               <Label htmlFor="candidate-role">Role hiring for</Label>
@@ -178,8 +178,8 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="Position applying for..."
                 value={formState.candidateRole}
                 onChange={(e) => updateField("candidateRole", e.target.value)}
-                className="sketch-border-light bg-background"
-              />
+                className="sketch-border-light bg-background" />
+              
             </div>
             <div className="space-y-2">
               <Label>Department</Label>
@@ -230,8 +230,8 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <BackgroundSection
               backgroundNotes={formState.backgroundNotes}
-              onBackgroundNotesChange={(value) => updateField("backgroundNotes", value)}
-            />
+              onBackgroundNotesChange={(value) => updateField("backgroundNotes", value)} />
+            
           </div>
         </SketchCard>
 
@@ -248,8 +248,8 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <DiagnosticSection
               value={formState.diagnosticLevel}
-              onChange={(value) => updateField("diagnosticLevel", value)}
-            />
+              onChange={(value) => updateField("diagnosticLevel", value)} />
+            
           </div>
         </SketchCard>
 
@@ -260,8 +260,8 @@ const SidewaysInterviewCanvas = () => {
               <HandwrittenLabel as="h3" className="text-4xl">
                 C & E. Plugged Into Society
               </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Not living in a bubble — interested in others & reads widely
+              <p className="text-sm text-muted-foreground">Candidate should be Plugged into the Society and not be living in a bubble. Should ne interested in others & also reads widely
+
               </p>
             </div>
             <ReadingBreadthSection
@@ -270,8 +270,8 @@ const SidewaysInterviewCanvas = () => {
               recentReadExample={formState.recentReadExample}
               onInterestedInOthersChange={(value) => updateField("interestedInOthers", value)}
               onReadsWidelyChange={(value) => updateField("readsWidely", value)}
-              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
-            />
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)} />
+            
           </div>
         </SketchCard>
 
@@ -292,8 +292,8 @@ const SidewaysInterviewCanvas = () => {
               breadthScore={breadthScore}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onBreadthScoreChange={() => {}}
-            />
+              onBreadthScoreChange={() => {}} />
+            
           </div>
         </SketchCard>
 
@@ -314,8 +314,8 @@ const SidewaysInterviewCanvas = () => {
               </Label>
               <HonestyMeter
                 value={formState.honestyLevel}
-                onChange={(value) => updateField("honestyLevel", value)}
-              />
+                onChange={(value) => updateField("honestyLevel", value)} />
+              
             </div>
           </div>
         </SketchCard>
@@ -333,8 +333,8 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <ResilienceRating
               value={formState.resilienceScore}
-              onChange={(value) => updateField("resilienceScore", value)}
-            />
+              onChange={(value) => updateField("resilienceScore", value)} />
+            
           </div>
         </SketchCard>
 
@@ -353,8 +353,8 @@ const SidewaysInterviewCanvas = () => {
               interest={formState.aestheticsInterest}
               processNote={formState.aestheticsProcessNote}
               onInterestChange={(value) => updateField("aestheticsInterest", value)}
-              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
-            />
+              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)} />
+            
           </div>
         </SketchCard>
 
@@ -373,8 +373,8 @@ const SidewaysInterviewCanvas = () => {
               level={formState.motivationLevel}
               reason={formState.motivationReason}
               onLevelChange={(value) => updateField("motivationLevel", value)}
-              onReasonChange={(value) => updateField("motivationReason", value)}
-            />
+              onReasonChange={(value) => updateField("motivationReason", value)} />
+            
           </div>
         </SketchCard>
 
@@ -398,8 +398,8 @@ const SidewaysInterviewCanvas = () => {
               honestyLevel={formState.honestyLevel}
               resilienceScore={formState.resilienceScore}
               aestheticsInterest={formState.aestheticsInterest}
-              motivationLevel={formState.motivationLevel}
-            />
+              motivationLevel={formState.motivationLevel} />
+            
           </div>
         </SketchCard>
 
@@ -417,8 +417,8 @@ const SidewaysInterviewCanvas = () => {
             <VerdictFooter
               archetype={archetype}
               onArchive={handleArchive}
-              onInvite={handleInvite}
-            />
+              onInvite={handleInvite} />
+            
           </div>
         </SketchCard>
 
@@ -427,18 +427,18 @@ const SidewaysInterviewCanvas = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-12 text-center text-sm text-muted-foreground"
-        >
+          className="mt-12 text-center text-sm text-muted-foreground">
+          
           <img
             src={sidewaysLogo}
             alt="Sideways"
-            className="h-8 mx-auto mb-2 opacity-50"
-          />
+            className="h-8 mx-auto mb-2 opacity-50" />
+          
           <p>Creative Problem Solving Outfit</p>
         </motion.footer>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SidewaysInterviewCanvas;
