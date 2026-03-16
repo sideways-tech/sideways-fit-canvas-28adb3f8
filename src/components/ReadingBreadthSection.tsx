@@ -68,7 +68,7 @@ const ReadingBreadthSection = ({
         </div>
       </div>
 
-      {/* 2. Reads Widely + New Curiosity Questions */}
+      {/* 2. Reads Widely */}
       <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-highlighter" />
@@ -100,52 +100,57 @@ const ReadingBreadthSection = ({
           </div>
         </div>
 
-        <div className="space-y-4 pt-2">
-          <div className="space-y-2">
-            <Label htmlFor="recent-read" className="text-xs text-muted-foreground">
-              Recent non-work read mentioned?
-            </Label>
-            <Input
-              id="recent-read"
-              placeholder="E.g., 'Sapiens', a poetry collection, science magazine..."
-              value={recentReadExample}
-              onChange={(e) => onRecentReadExampleChange(e.target.value)}
-              className="sketch-border-light bg-background text-sm" />
-          </div>
-
-          {/* New Questions */}
-          <div className="space-y-2 pt-2 border-t border-border/50">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-highlighter" />
-              <Label className="text-xs font-medium">
-                What's a trend or shift happening in the world right now that you think most people are underestimating?
-              </Label>
-            </div>
-            <Textarea
-              id="underestimated-trend"
-              placeholder="Look for signals: do they notice patterns others miss? Can they connect dots between fields?"
-              value={underestimatedTrend}
-              onChange={(e) => onUnderestimatedTrendChange(e.target.value)}
-              className="sketch-border-light bg-background text-sm min-h-[80px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-highlighter" />
-              <Label className="text-xs font-medium">
-                What's an idea or concept you've come across recently that you've found yourself sharing with others or thinking about often?
-              </Label>
-            </div>
-            <Textarea
-              id="idea-shared"
-              placeholder="Look for intellectual curiosity: do they chase interesting ideas down rabbit holes? Are they a carrier of new thinking?"
-              value={ideaSharedOften}
-              onChange={(e) => onIdeaSharedOftenChange(e.target.value)}
-              className="sketch-border-light bg-background text-sm min-h-[80px]"
-            />
-          </div>
+        <div className="space-y-2 pt-2">
+          <Label htmlFor="recent-read" className="text-xs text-muted-foreground">
+            Recent non-work read mentioned?
+          </Label>
+          <Input
+            id="recent-read"
+            placeholder="E.g., 'Sapiens', a poetry collection, science magazine..."
+            value={recentReadExample}
+            onChange={(e) => onRecentReadExampleChange(e.target.value)}
+            className="sketch-border-light bg-background text-sm" />
         </div>
+      </div>
+
+      {/* 3. Underestimated Trend */}
+      <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-highlighter" />
+          <Label className="text-sm font-medium">
+            3. What's a trend or shift happening in the world right now that you think most people are underestimating?
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Look for signals: do they notice patterns others miss? Can they connect dots between fields?
+        </p>
+        <Textarea
+          id="underestimated-trend"
+          placeholder="Capture their response and your observations here..."
+          value={underestimatedTrend}
+          onChange={(e) => onUnderestimatedTrendChange(e.target.value)}
+          className="sketch-border-light bg-background text-sm min-h-[100px]"
+        />
+      </div>
+
+      {/* 4. Idea Shared Often */}
+      <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
+        <div className="flex items-center gap-2">
+          <Lightbulb className="w-5 h-5 text-highlighter" />
+          <Label className="text-sm font-medium">
+            4. What's an idea or concept you've come across recently that you've found yourself sharing with others or thinking about often?
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Look for intellectual curiosity: do they chase interesting ideas down rabbit holes? Are they a carrier of new thinking?
+        </p>
+        <Textarea
+          id="idea-shared"
+          placeholder="Capture their response and your observations here..."
+          value={ideaSharedOften}
+          onChange={(e) => onIdeaSharedOftenChange(e.target.value)}
+          className="sketch-border-light bg-background text-sm min-h-[100px]"
+        />
       </div>
 
       {/* Combined Breadth Score */}
