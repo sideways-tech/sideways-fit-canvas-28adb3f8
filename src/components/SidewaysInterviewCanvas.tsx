@@ -225,12 +225,38 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section A: Diagnostic / Clarifying Questions */}
+        {/* Section A: Background */}
+        <SketchCard className="mb-8" delay={0.15}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">
+                A. Candidate Background
+              </HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">
+                Understanding who they are beyond the résumé
+              </p>
+            </div>
+            <BackgroundSection
+              grewUp={formState.bgGrewUp}
+              education={formState.bgEducation}
+              family={formState.bgFamily}
+              currentCity={formState.bgCurrentCity}
+              weekendActivities={formState.bgWeekendActivities}
+              onGrewUpChange={(value) => updateField("bgGrewUp", value)}
+              onEducationChange={(value) => updateField("bgEducation", value)}
+              onFamilyChange={(value) => updateField("bgFamily", value)}
+              onCurrentCityChange={(value) => updateField("bgCurrentCity", value)}
+              onWeekendActivitiesChange={(value) => updateField("bgWeekendActivities", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* Section B: Diagnostic / Clarifying Questions */}
         <SketchCard className="mb-8" delay={0.2}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                A. Ask Questions (Clarifying Enough?)
+                B. Ask Questions (Clarifying Enough?)
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.
@@ -243,12 +269,12 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section B & D: Plugged Into Society */}
+        {/* Section C & E: Plugged Into Society */}
         <SketchCard className="mb-8" delay={0.25}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                B & D. Plugged Into Society
+                C & E. Plugged Into Society
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Not living in a bubble — interested in others & reads widely
@@ -265,12 +291,12 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section E: T-Shape Depth */}
+        {/* Section F: T-Shape Depth */}
         <SketchCard className="mb-8" delay={0.3}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                E. Depth in One Non-Work Topic
+                F. Depth in One Non-Work Topic
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 The vertical bar of the T — obsessive depth in something outside work
@@ -282,17 +308,17 @@ const SidewaysInterviewCanvas = () => {
               breadthScore={breadthScore}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onBreadthScoreChange={() => {}} // Breadth is now calculated from B & D
+              onBreadthScoreChange={() => {}}
             />
           </div>
         </SketchCard>
 
-        {/* Section C: Honesty */}
+        {/* Section D: Honesty */}
         <SketchCard className="mb-8" delay={0.35}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                C. Honest POV on Our Work
+                D. Honest POV on Our Work
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Has a clear, honest point of view — not just flattery
@@ -310,12 +336,12 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section F: Willingness to Iterate */}
+        {/* Section G: Willingness to Iterate */}
         <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                F. Willingness to Iterate
+                G. Willingness to Iterate
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Can they kill their darlings? Work in the Circus?
@@ -328,12 +354,12 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section G: Art & Aesthetics */}
+        {/* Section H: Art & Aesthetics */}
         <SketchCard className="mb-8" delay={0.45}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                G. Interest in Art & Aesthetics
+                H. Interest in Art & Aesthetics
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Process of creation — do they care about how things are made?
@@ -348,12 +374,12 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section H: Industry Motivation */}
+        {/* Section I: Industry Motivation */}
         <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                H. Clear Reason for This Industry
+                I. Clear Reason for This Industry
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Why creative problem-solving? What's their story?
