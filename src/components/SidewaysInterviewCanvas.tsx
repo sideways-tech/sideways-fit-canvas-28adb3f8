@@ -253,7 +253,7 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section C & E: Plugged Into Society */}
+        {/* Section C & E: Societal Awareness and Intellectual Habits */}
         <SketchCard className="mb-8" delay={0.25}>
           <div className="space-y-4">
             <div className="space-y-1">
