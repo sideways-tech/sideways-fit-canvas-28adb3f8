@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
+import BackgroundSection from "./BackgroundSection";
 import DiagnosticSection from "./DiagnosticSection";
 import TShapeVisualizer from "./TShapeVisualizer";
 import ReadingBreadthSection from "./ReadingBreadthSection";
