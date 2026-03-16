@@ -12,7 +12,7 @@ const BackgroundSection = ({
 }: BackgroundSectionProps) => {
   return (
     <div className="space-y-2">
-      <Label>Where did they grow up, education, family, city, what do they do on weekends?</Label>
+      <Label>The human behind the résumé — roots, education, family, city, and what Sundays look like.</Label>
       <Textarea
         placeholder="Capture their story — background, upbringing, education, family, where they live, weekend routines, interests..."
         value={backgroundNotes}
