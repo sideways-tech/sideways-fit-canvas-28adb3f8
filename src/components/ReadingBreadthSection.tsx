@@ -1,37 +1,46 @@
 import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { BookOpen, Users, Globe } from "lucide-react";
+import { BookOpen, Users, Globe, TrendingUp, Lightbulb } from "lucide-react";
 
 interface ReadingBreadthSectionProps {
   interestedInOthers: number;
   readsWidely: number;
   recentReadExample: string;
+  underestimatedTrend: string;
+  ideaSharedOften: string;
   onInterestedInOthersChange: (value: number) => void;
   onReadsWidelyChange: (value: number) => void;
   onRecentReadExampleChange: (value: string) => void;
+  onUnderestimatedTrendChange: (value: string) => void;
+  onIdeaSharedOftenChange: (value: string) => void;
 }
 
 const ReadingBreadthSection = ({
   interestedInOthers,
   readsWidely,
   recentReadExample,
+  underestimatedTrend,
+  ideaSharedOften,
   onInterestedInOthersChange,
   onReadsWidelyChange,
-  onRecentReadExampleChange
+  onRecentReadExampleChange,
+  onUnderestimatedTrendChange,
+  onIdeaSharedOftenChange
 }: ReadingBreadthSectionProps) => {
   const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
 
   return (
     <div className="space-y-6">
-      {/* B. Interested in Other People's Lives */}
+      {/* 1. Interested in Other People's Lives */}
       <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            B. Interested in Other People's Lives
+            1. Interested in Other People's Lives
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -59,12 +68,12 @@ const ReadingBreadthSection = ({
         </div>
       </div>
 
-      {/* D. Reads Widely */}
+      {/* 2. Reads Widely + New Curiosity Questions */}
       <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            D. Reads Widely (Beyond Their Domain)
+            2. Reads Widely (Beyond Their Domain)
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -91,17 +100,51 @@ const ReadingBreadthSection = ({
           </div>
         </div>
 
-        <div className="space-y-2 pt-2">
-          <Label htmlFor="recent-read" className="text-xs text-muted-foreground">
-            Recent non-work read mentioned?
-          </Label>
-          <Input
-            id="recent-read"
-            placeholder="E.g., 'Sapiens', a poetry collection, science magazine..."
-            value={recentReadExample}
-            onChange={(e) => onRecentReadExampleChange(e.target.value)}
-            className="sketch-border-light bg-background text-sm" />
-          
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label htmlFor="recent-read" className="text-xs text-muted-foreground">
+              Recent non-work read mentioned?
+            </Label>
+            <Input
+              id="recent-read"
+              placeholder="E.g., 'Sapiens', a poetry collection, science magazine..."
+              value={recentReadExample}
+              onChange={(e) => onRecentReadExampleChange(e.target.value)}
+              className="sketch-border-light bg-background text-sm" />
+          </div>
+
+          {/* New Questions */}
+          <div className="space-y-2 pt-2 border-t border-border/50">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-highlighter" />
+              <Label className="text-xs font-medium">
+                What's a trend or shift happening in the world right now that you think most people are underestimating?
+              </Label>
+            </div>
+            <Textarea
+              id="underestimated-trend"
+              placeholder="Look for signals: do they notice patterns others miss? Can they connect dots between fields?"
+              value={underestimatedTrend}
+              onChange={(e) => onUnderestimatedTrendChange(e.target.value)}
+              className="sketch-border-light bg-background text-sm min-h-[80px]"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="w-4 h-4 text-highlighter" />
+              <Label className="text-xs font-medium">
+                What's an idea or concept you've come across recently that you've found yourself sharing with others or thinking about often?
+              </Label>
+            </div>
+            <Textarea
+              id="idea-shared"
+              placeholder="Look for intellectual curiosity: do they chase interesting ideas down rabbit holes? Are they a carrier of new thinking?"
+              value={ideaSharedOften}
+              onChange={(e) => onIdeaSharedOftenChange(e.target.value)}
+              className="sketch-border-light bg-background text-sm min-h-[80px]"
+            />
+          </div>
         </div>
       </div>
 
