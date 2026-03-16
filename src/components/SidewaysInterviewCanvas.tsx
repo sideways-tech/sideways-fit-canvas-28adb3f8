@@ -39,6 +39,8 @@ interface FormState {
   // E. Reads Widely
   readsWidely: number;
   recentReadExample: string;
+  underestimatedTrend: string;
+  ideaSharedOften: string;
   // F. Depth
   depthTopic: string;
   depthScore: number;
@@ -104,6 +106,8 @@ const SidewaysInterviewCanvas = () => {
     honestyLevel: "",
     readsWidely: 30,
     recentReadExample: "",
+    underestimatedTrend: "",
+    ideaSharedOften: "",
     depthTopic: "",
     depthScore: 30,
     resilienceScore: 0,
@@ -267,9 +271,14 @@ const SidewaysInterviewCanvas = () => {
               interestedInOthers={formState.interestedInOthers}
               readsWidely={formState.readsWidely}
               recentReadExample={formState.recentReadExample}
+              underestimatedTrend={formState.underestimatedTrend}
+              ideaSharedOften={formState.ideaSharedOften}
               onInterestedInOthersChange={(value) => updateField("interestedInOthers", value)}
               onReadsWidelyChange={(value) => updateField("readsWidely", value)}
-              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)} />
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+              onUnderestimatedTrendChange={(value) => updateField("underestimatedTrend", value)}
+              onIdeaSharedOftenChange={(value) => updateField("ideaSharedOften", value)}
+            />
             
           </div>
         </SketchCard>
