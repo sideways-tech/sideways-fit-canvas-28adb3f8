@@ -271,9 +271,14 @@ const SidewaysInterviewCanvas = () => {
               interestedInOthers={formState.interestedInOthers}
               readsWidely={formState.readsWidely}
               recentReadExample={formState.recentReadExample}
+              underestimatedTrend={formState.underestimatedTrend}
+              ideaSharedOften={formState.ideaSharedOften}
               onInterestedInOthersChange={(value) => updateField("interestedInOthers", value)}
               onReadsWidelyChange={(value) => updateField("readsWidely", value)}
-              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)} />
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+              onUnderestimatedTrendChange={(value) => updateField("underestimatedTrend", value)}
+              onIdeaSharedOftenChange={(value) => updateField("ideaSharedOften", value)}
+            />
             
           </div>
         </SketchCard>
