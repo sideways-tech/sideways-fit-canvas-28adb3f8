@@ -29,11 +29,7 @@ interface FormState {
   department: string;
   hiringLevel: string;
   // A. Background
-  bgGrewUp: string;
-  bgEducation: string;
-  bgFamily: string;
-  bgCurrentCity: string;
-  bgWeekendActivities: string;
+  backgroundNotes: string;
   // B. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
   // C. Interested in Others
