@@ -260,8 +260,7 @@ const SidewaysInterviewCanvas = () => {
               <HandwrittenLabel as="h3" className="text-4xl">
                 C & E. Societal Awareness and Intellectual Habits
               </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Candidate should be Plugged into the Society and not be living in a bubble. Should ne interested in others & also reads widely
-
+              <p className="text-sm text-muted-foreground">Candidate should have Societal Awareness and Intellectual Habits. Should be interested in others & also reads widely
               </p>
             </div>
             <ReadingBreadthSection
