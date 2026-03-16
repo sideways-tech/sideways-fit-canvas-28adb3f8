@@ -39,6 +39,8 @@ interface FormState {
   // E. Reads Widely
   readsWidely: number;
   recentReadExample: string;
+  underestimatedTrend: string;
+  ideaSharedOften: string;
   // F. Depth
   depthTopic: string;
   depthScore: number;
