@@ -20,7 +20,7 @@ const ReadingBreadthSection = ({
   recentReadExample,
   onInterestedInOthersChange,
   onReadsWidelyChange,
-  onRecentReadExampleChange,
+  onRecentReadExampleChange
 }: ReadingBreadthSectionProps) => {
   const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
 
@@ -31,7 +31,7 @@ const ReadingBreadthSection = ({
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            1. Interested in Other People's Lives
+            B. Interested in Other People's Lives
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -50,8 +50,8 @@ const ReadingBreadthSection = ({
             onValueChange={([value]) => onInterestedInOthersChange(value)}
             max={100}
             step={5}
-            className="w-full"
-          />
+            className="w-full" />
+          
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Self-focused</span>
             <span>Asks about everyone's story</span>
@@ -64,7 +64,7 @@ const ReadingBreadthSection = ({
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            2. Reads Widely (Beyond Their Domain)
+            D. Reads Widely (Beyond Their Domain)
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -83,8 +83,8 @@ const ReadingBreadthSection = ({
             onValueChange={([value]) => onReadsWidelyChange(value)}
             max={100}
             step={5}
-            className="w-full"
-          />
+            className="w-full" />
+          
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Reads only work stuff</span>
             <span>Voracious & varied reader</span>
@@ -100,8 +100,8 @@ const ReadingBreadthSection = ({
             placeholder="E.g., 'Sapiens', a poetry collection, science magazine..."
             value={recentReadExample}
             onChange={(e) => onRecentReadExampleChange(e.target.value)}
-            className="sketch-border-light bg-background text-sm"
-          />
+            className="sketch-border-light bg-background text-sm" />
+          
         </div>
       </div>
 
@@ -109,22 +109,22 @@ const ReadingBreadthSection = ({
       <div className="flex items-center justify-between p-3 bg-highlighter/10 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-highlighter" />
-          <span className="text-sm font-medium">Societal Awareness Score</span>
+          <span className="text-sm font-medium">Societal Awareness & Intellectual Habits Score
+
+          </span>
         </div>
-        <HandwrittenLabel 
-          className={`text-3xl ${
-            breadthScore >= 70 
-              ? "text-hire" 
-              : breadthScore >= 40 
-                ? "text-highlighter" 
-                : "text-muted-foreground"
-          }`}
-        >
+        <HandwrittenLabel className={`text-3xl ${breadthScore >= 70 ?
+        "text-hire" :
+        breadthScore >= 40 ?
+        "text-highlighter" :
+        "text-muted-foreground"}`
+        }>
+          
           {breadthScore}%
         </HandwrittenLabel>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ReadingBreadthSection;
