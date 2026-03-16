@@ -253,15 +253,14 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section C & E: Plugged Into Society */}
+        {/* Section C & E: Societal Awareness and Intellectual Habits */}
         <SketchCard className="mb-8" delay={0.25}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                C & E. Plugged Into Society
+                C & E. Societal Awareness and Intellectual Habits
               </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Candidate should be Plugged into the Society and not be living in a bubble. Should ne interested in others & also reads widely
-
+              <p className="text-sm text-muted-foreground">Candidate should have Societal Awareness and Intellectual Habits. Should be interested in others & also reads widely
               </p>
             </div>
             <ReadingBreadthSection

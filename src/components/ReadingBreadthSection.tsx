@@ -31,7 +31,7 @@ const ReadingBreadthSection = ({
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            B. Interested in Other People's Lives
+            1. Interested in Other People's Lives
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -64,7 +64,7 @@ const ReadingBreadthSection = ({
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            D. Reads Widely (Beyond Their Domain)
+            2. Reads Widely (Beyond Their Domain)
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -109,7 +109,7 @@ const ReadingBreadthSection = ({
       <div className="flex items-center justify-between p-3 bg-highlighter/10 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-highlighter" />
-          <span className="text-sm font-medium">Plugged Into Society Score</span>
+          <span className="text-sm font-medium">Societal Awareness Score</span>
         </div>
         <HandwrittenLabel 
           className={`text-3xl ${
