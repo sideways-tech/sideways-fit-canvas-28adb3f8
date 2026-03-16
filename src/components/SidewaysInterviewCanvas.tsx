@@ -222,7 +222,7 @@ const SidewaysInterviewCanvas = () => {
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">
-                A. Candidate Background
+                A. Candidate's Background
               </HandwrittenLabel>
               <p className="text-sm text-muted-foreground">
                 Understanding who they are beyond the résumé
