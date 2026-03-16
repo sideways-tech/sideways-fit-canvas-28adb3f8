@@ -177,6 +177,39 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
+            <div className="space-y-2">
+              <Label>Department</Label>
+              <Select value={formState.department} onValueChange={(value) => updateField("department", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select department..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strategy">Strategy</SelectItem>
+                  <SelectItem value="creative">Creative</SelectItem>
+                  <SelectItem value="copy">Copy</SelectItem>
+                  <SelectItem value="tech-ux">Tech / UX</SelectItem>
+                  <SelectItem value="product-design">Product Design</SelectItem>
+                  <SelectItem value="servicing">Servicing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Hiring Level</Label>
+              <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select level..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="L1">L1</SelectItem>
+                  <SelectItem value="L2">L2</SelectItem>
+                  <SelectItem value="L3">L3</SelectItem>
+                  <SelectItem value="L4">L4</SelectItem>
+                  <SelectItem value="L5">L5</SelectItem>
+                  <SelectItem value="L6">L6</SelectItem>
+                  <SelectItem value="L7">L7</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </SketchCard>
 
