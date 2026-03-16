@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
@@ -24,6 +25,8 @@ type Archetype = "vendor" | "birbal" | "work-in-progress";
 interface FormState {
   candidateName: string;
   candidateRole: string;
+  department: string;
+  hiringLevel: string;
   // A. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
   // B. Interested in Others
@@ -90,6 +93,8 @@ const SidewaysInterviewCanvas = () => {
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
     candidateRole: "",
+    department: "",
+    hiringLevel: "",
     diagnosticLevel: "",
     interestedInOthers: 30,
     honestyLevel: "",
@@ -171,6 +176,39 @@ const SidewaysInterviewCanvas = () => {
                 onChange={(e) => updateField("candidateRole", e.target.value)}
                 className="sketch-border-light bg-background"
               />
+            </div>
+            <div className="space-y-2">
+              <Label>Department</Label>
+              <Select value={formState.department} onValueChange={(value) => updateField("department", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select department..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strategy">Strategy</SelectItem>
+                  <SelectItem value="creative">Creative</SelectItem>
+                  <SelectItem value="copy">Copy</SelectItem>
+                  <SelectItem value="tech-ux">Tech / UX</SelectItem>
+                  <SelectItem value="product-design">Product Design</SelectItem>
+                  <SelectItem value="servicing">Servicing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Hiring Level</Label>
+              <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select level..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="L1">L1</SelectItem>
+                  <SelectItem value="L2">L2</SelectItem>
+                  <SelectItem value="L3">L3</SelectItem>
+                  <SelectItem value="L4">L4</SelectItem>
+                  <SelectItem value="L5">L5</SelectItem>
+                  <SelectItem value="L6">L6</SelectItem>
+                  <SelectItem value="L7">L7</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </SketchCard>
