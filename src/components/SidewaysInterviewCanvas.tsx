@@ -25,6 +25,8 @@ type Archetype = "vendor" | "birbal" | "work-in-progress";
 interface FormState {
   candidateName: string;
   candidateRole: string;
+  department: string;
+  hiringLevel: string;
   // A. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
   // B. Interested in Others
