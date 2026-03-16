@@ -163,7 +163,7 @@ const SidewaysInterviewCanvas = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="candidate-role">Role</Label>
+              <Label htmlFor="candidate-role">Role hiring for</Label>
               <Input
                 id="candidate-role"
                 placeholder="Position applying for..."
