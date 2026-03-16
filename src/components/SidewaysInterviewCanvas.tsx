@@ -28,24 +28,30 @@ interface FormState {
   candidateRole: string;
   department: string;
   hiringLevel: string;
-  // A. Diagnostic
+  // A. Background
+  bgGrewUp: string;
+  bgEducation: string;
+  bgFamily: string;
+  bgCurrentCity: string;
+  bgWeekendActivities: string;
+  // B. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
-  // B. Interested in Others
+  // C. Interested in Others
   interestedInOthers: number;
-  // C. Honest POV
+  // D. Honest POV
   honestyLevel: HonestyLevel | "";
-  // D. Reads Widely
+  // E. Reads Widely
   readsWidely: number;
   recentReadExample: string;
-  // E. Depth
+  // F. Depth
   depthTopic: string;
   depthScore: number;
-  // F. Willingness to Iterate
+  // G. Willingness to Iterate
   resilienceScore: number;
-  // G. Art/Aesthetics
+  // H. Art/Aesthetics
   aestheticsInterest: number;
   aestheticsProcessNote: string;
-  // H. Industry Motivation
+  // I. Industry Motivation
   motivationLevel: MotivationLevel | "";
   motivationReason: string;
 }
