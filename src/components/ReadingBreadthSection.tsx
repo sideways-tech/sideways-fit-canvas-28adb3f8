@@ -109,7 +109,7 @@ const ReadingBreadthSection = ({
       <div className="flex items-center justify-between p-3 bg-highlighter/10 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-highlighter" />
-          <span className="text-sm font-medium">Plugged Into Society Score</span>
+          <span className="text-sm font-medium">Societal Awareness Score</span>
         </div>
         <HandwrittenLabel 
           className={`text-3xl ${
