@@ -29,11 +29,7 @@ interface FormState {
   department: string;
   hiringLevel: string;
   // A. Background
-  bgGrewUp: string;
-  bgEducation: string;
-  bgFamily: string;
-  bgCurrentCity: string;
-  bgWeekendActivities: string;
+  backgroundNotes: string;
   // B. Diagnostic
   diagnosticLevel: DiagnosticLevel | "";
   // C. Interested in Others
@@ -102,11 +98,7 @@ const SidewaysInterviewCanvas = () => {
     candidateRole: "",
     department: "",
     hiringLevel: "",
-    bgGrewUp: "",
-    bgEducation: "",
-    bgFamily: "",
-    bgCurrentCity: "",
-    bgWeekendActivities: "",
+    backgroundNotes: "",
     diagnosticLevel: "",
     interestedInOthers: 30,
     honestyLevel: "",
@@ -237,16 +229,8 @@ const SidewaysInterviewCanvas = () => {
               </p>
             </div>
             <BackgroundSection
-              grewUp={formState.bgGrewUp}
-              education={formState.bgEducation}
-              family={formState.bgFamily}
-              currentCity={formState.bgCurrentCity}
-              weekendActivities={formState.bgWeekendActivities}
-              onGrewUpChange={(value) => updateField("bgGrewUp", value)}
-              onEducationChange={(value) => updateField("bgEducation", value)}
-              onFamilyChange={(value) => updateField("bgFamily", value)}
-              onCurrentCityChange={(value) => updateField("bgCurrentCity", value)}
-              onWeekendActivitiesChange={(value) => updateField("bgWeekendActivities", value)}
+              backgroundNotes={formState.backgroundNotes}
+              onBackgroundNotesChange={(value) => updateField("backgroundNotes", value)}
             />
           </div>
         </SketchCard>
