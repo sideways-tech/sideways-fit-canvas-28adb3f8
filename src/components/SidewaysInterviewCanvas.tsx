@@ -14,6 +14,7 @@ import ReadingBreadthSection from "./ReadingBreadthSection";
 import SidewaysWorkSection from "./SidewaysWorkSection";
 import ProfessionalDeepDiveSection from "./ProfessionalDeepDiveSection";
 import TShapeVisualizer from "./TShapeVisualizer";
+import TShapeDepthSection from "./TShapeDepthSection";
 import ResilienceRating from "./ResilienceRating";
 import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";

@@ -87,8 +87,8 @@ const ScoresSummary = ({
   articulationSkill,
   portfolioQuality,
   problemSolvingApproach,
+  professionalBreadth,
 }: ScoresSummaryProps) => {
-  const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
   const professionalAvg = Math.round(
     (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
   );
