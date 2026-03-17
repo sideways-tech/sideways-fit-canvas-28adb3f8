@@ -397,7 +397,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.6}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">J. Clear Reason for This Industry</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">I. Clear Reason for This Industry</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Why creative problem-solving? What's their story?</p>
             </div>
             <IndustryMotivationSection
