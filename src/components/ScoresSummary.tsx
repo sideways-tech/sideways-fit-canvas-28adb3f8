@@ -11,7 +11,11 @@ import {
   Shield,
   Star,
   Palette,
-  Heart
+  Heart,
+  Wrench,
+  Mic,
+  Briefcase,
+  Puzzle,
 } from "lucide-react";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician" | "";
@@ -28,6 +32,10 @@ interface ScoresSummaryProps {
   resilienceScore: number;
   aestheticsInterest: number;
   motivationLevel: MotivationLevel;
+  depthOfCraft: number;
+  articulationSkill: number;
+  portfolioQuality: number;
+  problemSolvingApproach: number;
 }
 
 type Status = "excellent" | "good" | "needs-work" | "not-assessed";
@@ -42,28 +50,26 @@ interface ScoreItem {
 
 const getStatusColor = (status: Status) => {
   switch (status) {
-    case "excellent":
-      return "text-hire bg-hire/10 border-hire/30";
-    case "good":
-      return "text-highlighter bg-highlighter/10 border-highlighter/30";
-    case "needs-work":
-      return "text-reject bg-reject/10 border-reject/30";
-    case "not-assessed":
-      return "text-muted-foreground bg-muted/50 border-border";
+    case "excellent": return "text-hire bg-hire/10 border-hire/30";
+    case "good": return "text-highlighter bg-highlighter/10 border-highlighter/30";
+    case "needs-work": return "text-reject bg-reject/10 border-reject/30";
+    case "not-assessed": return "text-muted-foreground bg-muted/50 border-border";
   }
 };
 
 const getStatusIcon = (status: Status) => {
   switch (status) {
-    case "excellent":
-      return CheckCircle2;
-    case "good":
-      return AlertCircle;
-    case "needs-work":
-      return XCircle;
-    case "not-assessed":
-      return HelpCircle;
+    case "excellent": return CheckCircle2;
+    case "good": return AlertCircle;
+    case "needs-work": return XCircle;
+    case "not-assessed": return HelpCircle;
   }
+};
+
+const getScoreStatus = (score: number): Status => {
+  if (score >= 70) return "excellent";
+  if (score >= 40) return "good";
+  return "needs-work";
 };
 
 const ScoresSummary = ({
@@ -76,8 +82,15 @@ const ScoresSummary = ({
   resilienceScore,
   aestheticsInterest,
   motivationLevel,
+  depthOfCraft,
+  articulationSkill,
+  portfolioQuality,
+  problemSolvingApproach,
 }: ScoresSummaryProps) => {
   const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
+  const professionalAvg = Math.round(
+    (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
+  );
 
   const getDiagnosticStatus = (): Status => {
     if (!diagnosticLevel) return "not-assessed";
@@ -91,12 +104,6 @@ const ScoresSummary = ({
     if (diagnosticLevel === "diagnostician") return "Diagnostician ✓";
     if (diagnosticLevel === "clarifier") return "Clarifier";
     return "Order Taker";
-  };
-
-  const getScoreStatus = (score: number): Status => {
-    if (score >= 70) return "excellent";
-    if (score >= 40) return "good";
-    return "needs-work";
   };
 
   const getHonestyStatus = (): Status => {
@@ -135,62 +142,18 @@ const ScoresSummary = ({
   };
 
   const scores: ScoreItem[] = [
-    {
-      label: "Diagnostic Mindset",
-      section: "B",
-      status: getDiagnosticStatus(),
-      value: getDiagnosticValue(),
-      icon: Lightbulb,
-    },
-    {
-      label: "Interested in Others",
-      section: "C",
-      status: getScoreStatus(interestedInOthers),
-      value: `${interestedInOthers}%`,
-      icon: Users,
-    },
-    {
-      label: "Reads Widely",
-      section: "E",
-      status: getScoreStatus(readsWidely),
-      value: `${readsWidely}%`,
-      icon: BookOpen,
-    },
-    {
-      label: "Depth (Non-Work)",
-      section: "F",
-      status: depthTopic ? getScoreStatus(depthScore) : "not-assessed",
-      value: depthTopic ? `${depthScore}%` : "No topic",
-      icon: Lightbulb,
-    },
-    {
-      label: "Honest POV",
-      section: "D",
-      status: getHonestyStatus(),
-      value: getHonestyValue(),
-      icon: Shield,
-    },
-    {
-      label: "Willingness to Iterate",
-      section: "G",
-      status: getResilienceStatus(),
-      value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`,
-      icon: Star,
-    },
-    {
-      label: "Art & Aesthetics",
-      section: "H",
-      status: getScoreStatus(aestheticsInterest),
-      value: `${aestheticsInterest}%`,
-      icon: Palette,
-    },
-    {
-      label: "Industry Motivation",
-      section: "I",
-      status: getMotivationStatus(),
-      value: getMotivationValue(),
-      icon: Heart,
-    },
+    { label: "Diagnostic Mindset", section: "B", status: getDiagnosticStatus(), value: getDiagnosticValue(), icon: Lightbulb },
+    { label: "Interested in Others", section: "C", status: getScoreStatus(interestedInOthers), value: `${interestedInOthers}%`, icon: Users },
+    { label: "Reads Widely", section: "D", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
+    { label: "Honest POV", section: "E", status: getHonestyStatus(), value: getHonestyValue(), icon: Shield },
+    { label: "Depth of Craft", section: "F", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
+    { label: "Articulation & Presentation", section: "F", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
+    { label: "Portfolio Quality", section: "F", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
+    { label: "Problem-Solving", section: "F", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
+    { label: "Depth (Non-Work)", section: "G", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
+    { label: "Willingness to Iterate", section: "H", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
+    { label: "Art & Aesthetics", section: "I", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
+    { label: "Industry Motivation", section: "J", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
   ];
 
   const excellentCount = scores.filter((s) => s.status === "excellent").length;
@@ -220,17 +183,13 @@ const ScoresSummary = ({
         <div className="flex items-center justify-between mb-3">
           <HandwrittenLabel className="text-2xl">T-Shape Profile</HandwrittenLabel>
           <span className={`text-sm font-medium ${
-            depthScore >= 60 && breadthScore >= 60 
-              ? "text-hire" 
-              : depthScore >= 40 && breadthScore >= 40 
-                ? "text-highlighter" 
-                : "text-muted-foreground"
+            depthScore >= 60 && breadthScore >= 60 ? "text-hire" 
+            : depthScore >= 40 && breadthScore >= 40 ? "text-highlighter" 
+            : "text-muted-foreground"
           }`}>
-            {depthScore >= 60 && breadthScore >= 60 
-              ? "Strong T" 
-              : depthScore >= 40 && breadthScore >= 40 
-                ? "Emerging" 
-                : "Developing"}
+            {depthScore >= 60 && breadthScore >= 60 ? "Strong T" 
+            : depthScore >= 40 && breadthScore >= 40 ? "Emerging" 
+            : "Developing"}
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -240,12 +199,7 @@ const ScoresSummary = ({
               <span>{depthScore}%</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-ink"
-                initial={{ width: 0 }}
-                animate={{ width: `${depthScore}%` }}
-                transition={{ duration: 0.5 }}
-              />
+              <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${depthScore}%` }} transition={{ duration: 0.5 }} />
             </div>
           </div>
           <div className="flex-1">
@@ -254,14 +208,21 @@ const ScoresSummary = ({
               <span>{breadthScore}%</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-highlighter"
-                initial={{ width: 0 }}
-                animate={{ width: `${breadthScore}%` }}
-                transition={{ duration: 0.5 }}
-              />
+              <motion.div className="h-full bg-highlighter" initial={{ width: 0 }} animate={{ width: `${breadthScore}%` }} transition={{ duration: 0.5 }} />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Professional Deep Dive Summary */}
+      <div className="p-4 bg-muted/20 rounded-lg sketch-border-light">
+        <div className="flex items-center justify-between mb-3">
+          <HandwrittenLabel className="text-2xl">Professional Deep Dive</HandwrittenLabel>
+          <span className={`text-sm font-medium ${
+            professionalAvg >= 70 ? "text-hire" : professionalAvg >= 40 ? "text-highlighter" : "text-muted-foreground"
+          }`}>
+            {professionalAvg}%
+          </span>
         </div>
       </div>
 
@@ -270,10 +231,9 @@ const ScoresSummary = ({
         {scores.map((score, index) => {
           const StatusIcon = getStatusIcon(score.status);
           const Icon = score.icon;
-          
           return (
             <motion.div
-              key={score.section}
+              key={`${score.section}-${score.label}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
@@ -295,22 +255,10 @@ const ScoresSummary = ({
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground pt-2">
-        <div className="flex items-center gap-1">
-          <CheckCircle2 className="w-3 h-3 text-hire" />
-          <span>Excellent</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <AlertCircle className="w-3 h-3 text-highlighter" />
-          <span>Good</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <XCircle className="w-3 h-3 text-reject" />
-          <span>Needs Work</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <HelpCircle className="w-3 h-3 text-muted-foreground" />
-          <span>Not Assessed</span>
-        </div>
+        <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-hire" /><span>Excellent</span></div>
+        <div className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-highlighter" /><span>Good</span></div>
+        <div className="flex items-center gap-1"><XCircle className="w-3 h-3 text-reject" /><span>Needs Work</span></div>
+        <div className="flex items-center gap-1"><HelpCircle className="w-3 h-3 text-muted-foreground" /><span>Not Assessed</span></div>
       </div>
     </div>
   );
