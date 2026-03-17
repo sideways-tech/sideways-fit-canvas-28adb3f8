@@ -367,7 +367,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">H. Willingness to Iterate</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">G. Willingness to Iterate</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Can they kill their darlings? Work in the Circus?</p>
             </div>
             <ResilienceRating
