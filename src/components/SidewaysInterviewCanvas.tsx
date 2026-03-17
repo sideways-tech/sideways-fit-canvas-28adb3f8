@@ -337,12 +337,18 @@ const SidewaysInterviewCanvas = () => {
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
               problemSolvingApproach={formState.problemSolvingApproach}
+              professionalBreadth={formState.professionalBreadth}
               professionalDiveNotes={formState.professionalDiveNotes}
               onDepthOfCraftChange={(value) => updateField("depthOfCraft", value)}
               onArticulationSkillChange={(value) => updateField("articulationSkill", value)}
               onPortfolioQualityChange={(value) => updateField("portfolioQuality", value)}
               onProblemSolvingApproachChange={(value) => updateField("problemSolvingApproach", value)}
+              onProfessionalBreadthChange={(value) => updateField("professionalBreadth", value)}
               onNotesChange={(value) => updateField("professionalDiveNotes", value)}
+            />
+            <TShapeVisualizer
+              depthScore={formState.depthOfCraft}
+              breadthScore={formState.professionalBreadth}
             />
           </div>
         </SketchCard>
