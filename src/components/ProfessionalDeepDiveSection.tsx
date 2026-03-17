@@ -130,7 +130,7 @@ const ProfessionalDeepDiveSection = ({
 
       {/* Average Score */}
       <div className="flex items-center justify-between p-3 bg-highlighter/10 rounded-lg sketch-border-light">
-        <span className="text-sm font-medium">Professional Deep Dive Score</span>
+        <span className="text-sm font-medium">Experience Deep Dive Score</span>
         <HandwrittenLabel
           className={`text-3xl ${
             avgScore >= 70 ? "text-hire" : avgScore >= 40 ? "text-highlighter" : "text-muted-foreground"
