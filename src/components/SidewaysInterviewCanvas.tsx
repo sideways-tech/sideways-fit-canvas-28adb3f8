@@ -327,7 +327,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">F. Experience Deep Dive</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">E. Experience Deep Dive</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Ask them to walk you through their best professional work. This is where they present — portfolio pieces, case studies, demos, or slides. Let them lead. Watch for how they frame problems, explain decisions, and own outcomes.</p>
             </div>
             <ProfessionalDeepDiveSection
