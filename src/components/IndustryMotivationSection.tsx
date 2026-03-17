@@ -127,7 +127,7 @@ const IndustryMotivationSection = ({
       <div className="space-y-3">
         <Label htmlFor="motivation-reason" className="text-sm font-medium flex items-center gap-2">
           <Target className="w-4 h-4 text-muted-foreground" />
-          Their Story
+          Their Industry Story
         </Label>
         <p className="text-xs text-muted-foreground">
           Capture their specific reason for choosing this industry/role
