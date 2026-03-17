@@ -196,7 +196,7 @@ const IndustryMotivationSection = ({
 
         <div className="space-y-2 pt-2">
           <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-            What specifically about Sideways appeals to them?
+            What specifically about Sideways appeals to them? Any Indian / international examples they found inspirational?
           </Label>
           <Textarea
             id="sideways-reason"
