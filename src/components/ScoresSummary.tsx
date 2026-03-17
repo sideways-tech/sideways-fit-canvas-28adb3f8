@@ -16,6 +16,7 @@ import {
   Mic,
   Briefcase,
   Puzzle,
+  Compass,
 } from "lucide-react";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician" | "";
