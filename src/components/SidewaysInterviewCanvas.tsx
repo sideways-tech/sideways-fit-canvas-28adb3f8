@@ -98,8 +98,8 @@ const calculateArchetype = (state: FormState): Archetype => {
   // Birbal: High across all key dimensions
   if (
     diagnosticLevel === "diagnostician" &&
-    depthScore >= 60 &&
-    breadthScore >= 60 &&
+    depthOfCraft >= 60 &&
+    state.professionalBreadth >= 60 &&
     honestyLevel === "honest" &&
     resilienceScore >= 4 &&
     aestheticsInterest >= 50 &&
