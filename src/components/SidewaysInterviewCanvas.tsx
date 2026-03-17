@@ -409,14 +409,18 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.6}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">I. Clear Reason for This Industry</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Why creative problem-solving? What's their story?</p>
+              <HandwrittenLabel as="h3" className="text-4xl">I. Clear Reason for This Industry and Sideways</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Why this industry, and why Sideways specifically?</p>
             </div>
             <IndustryMotivationSection
               level={formState.motivationLevel}
               reason={formState.motivationReason}
               onLevelChange={(value) => updateField("motivationLevel", value)}
               onReasonChange={(value) => updateField("motivationReason", value)}
+              sidewaysLevel={formState.sidewaysMotivationLevel}
+              sidewaysReason={formState.sidewaysMotivationReason}
+              onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
+              onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
             />
           </div>
         </SketchCard>
