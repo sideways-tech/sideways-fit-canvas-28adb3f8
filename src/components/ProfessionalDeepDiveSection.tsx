@@ -133,7 +133,7 @@ const ProfessionalDeepDiveSection = ({
 
       {/* Notes */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium">Interviewer notes on demo / portfolio</Label>
+        <Label className="text-sm font-medium">Interviewer notes on this section including demo / portfolio</Label>
         <Textarea
           placeholder="Key observations, standout moments, red flags..."
           value={professionalDiveNotes}
