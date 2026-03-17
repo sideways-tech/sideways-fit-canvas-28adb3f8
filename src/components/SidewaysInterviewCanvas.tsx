@@ -14,6 +14,7 @@ import ReadingBreadthSection from "./ReadingBreadthSection";
 import SidewaysWorkSection from "./SidewaysWorkSection";
 import ProfessionalDeepDiveSection from "./ProfessionalDeepDiveSection";
 import TShapeVisualizer from "./TShapeVisualizer";
+import TShapeDepthSection from "./TShapeDepthSection";
 import ResilienceRating from "./ResilienceRating";
 import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";
@@ -50,6 +51,7 @@ interface FormState {
   articulationSkill: number;
   portfolioQuality: number;
   problemSolvingApproach: number;
+  professionalBreadth: number;
   professionalDiveNotes: string;
   // G. Depth in Non-Work Topic
   depthTopic: string;
@@ -80,7 +82,7 @@ const calculateArchetype = (state: FormState): Archetype => {
     problemSolvingApproach,
   } = state;
 
-  const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
+  const breadthScore = state.professionalBreadth;
   const professionalAvg = Math.round(
     (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
   );
@@ -97,8 +99,8 @@ const calculateArchetype = (state: FormState): Archetype => {
   // Birbal: High across all key dimensions
   if (
     diagnosticLevel === "diagnostician" &&
-    depthScore >= 60 &&
-    breadthScore >= 60 &&
+    depthOfCraft >= 60 &&
+    state.professionalBreadth >= 60 &&
     honestyLevel === "honest" &&
     resilienceScore >= 4 &&
     aestheticsInterest >= 50 &&
@@ -130,6 +132,7 @@ const SidewaysInterviewCanvas = () => {
     articulationSkill: 30,
     portfolioQuality: 30,
     problemSolvingApproach: 30,
+    professionalBreadth: 30,
     professionalDiveNotes: "",
     depthTopic: "",
     depthScore: 30,
@@ -141,7 +144,7 @@ const SidewaysInterviewCanvas = () => {
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
-  const breadthScore = Math.round((formState.interestedInOthers + formState.readsWidely) / 2);
+  const breadthScore = formState.professionalBreadth;
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -335,30 +338,34 @@ const SidewaysInterviewCanvas = () => {
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
               problemSolvingApproach={formState.problemSolvingApproach}
+              professionalBreadth={formState.professionalBreadth}
               professionalDiveNotes={formState.professionalDiveNotes}
               onDepthOfCraftChange={(value) => updateField("depthOfCraft", value)}
               onArticulationSkillChange={(value) => updateField("articulationSkill", value)}
               onPortfolioQualityChange={(value) => updateField("portfolioQuality", value)}
               onProblemSolvingApproachChange={(value) => updateField("problemSolvingApproach", value)}
+              onProfessionalBreadthChange={(value) => updateField("professionalBreadth", value)}
               onNotesChange={(value) => updateField("professionalDiveNotes", value)}
+            />
+            <TShapeVisualizer
+              depthScore={formState.depthOfCraft}
+              breadthScore={formState.professionalBreadth}
             />
           </div>
         </SketchCard>
 
-        {/* G. T-Shape Depth */}
+        {/* F. Depth in Non-Work Topic */}
         <SketchCard className="mb-8" delay={0.45}>
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">F. Depth in One Non-Work Topic</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">The vertical bar of the T — obsessive depth in something outside work</p>
+              <p className="text-sm text-muted-foreground">A bonus curiosity signal — do they go deep on something outside work? This doesn't drive the T-Shape score, but reveals intellectual depth and passion.</p>
             </div>
-            <TShapeVisualizer
+            <TShapeDepthSection
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
-              breadthScore={breadthScore}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onBreadthScoreChange={() => {}}
             />
           </div>
         </SketchCard>
@@ -430,6 +437,7 @@ const SidewaysInterviewCanvas = () => {
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
               problemSolvingApproach={formState.problemSolvingApproach}
+              professionalBreadth={formState.professionalBreadth}
             />
           </div>
         </SketchCard>

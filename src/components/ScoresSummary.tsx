@@ -16,6 +16,7 @@ import {
   Mic,
   Briefcase,
   Puzzle,
+  Compass,
 } from "lucide-react";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician" | "";
@@ -36,6 +37,7 @@ interface ScoresSummaryProps {
   articulationSkill: number;
   portfolioQuality: number;
   problemSolvingApproach: number;
+  professionalBreadth: number;
 }
 
 type Status = "excellent" | "good" | "needs-work" | "not-assessed";
@@ -86,8 +88,8 @@ const ScoresSummary = ({
   articulationSkill,
   portfolioQuality,
   problemSolvingApproach,
+  professionalBreadth,
 }: ScoresSummaryProps) => {
-  const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
   const professionalAvg = Math.round(
     (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
   );
@@ -144,16 +146,17 @@ const ScoresSummary = ({
   const scores: ScoreItem[] = [
     { label: "Diagnostic Mindset", section: "B", status: getDiagnosticStatus(), value: getDiagnosticValue(), icon: Lightbulb },
     { label: "Interested in Others", section: "C", status: getScoreStatus(interestedInOthers), value: `${interestedInOthers}%`, icon: Users },
-    { label: "Reads Widely", section: "D", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
-    { label: "Honest POV", section: "E", status: getHonestyStatus(), value: getHonestyValue(), icon: Shield },
-    { label: "Depth of Craft", section: "F", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
-    { label: "Articulation & Presentation", section: "F", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
-    { label: "Portfolio Quality", section: "F", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
-    { label: "Problem-Solving", section: "F", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
-    { label: "Depth (Non-Work)", section: "G", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
-    { label: "Willingness to Iterate", section: "H", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
-    { label: "Art & Aesthetics", section: "I", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
-    { label: "Industry Motivation", section: "J", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
+    { label: "Reads Widely", section: "C", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
+    { label: "Honest POV", section: "D", status: getHonestyStatus(), value: getHonestyValue(), icon: Shield },
+    { label: "Depth of Craft", section: "E", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
+    { label: "Professional Breadth", section: "E", status: getScoreStatus(professionalBreadth), value: `${professionalBreadth}%`, icon: Compass },
+    { label: "Articulation & Presentation", section: "E", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
+    { label: "Portfolio Quality", section: "E", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
+    { label: "Problem-Solving", section: "E", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
+    { label: "Depth (Non-Work)", section: "F", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
+    { label: "Willingness to Iterate", section: "G", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
+    { label: "Art & Aesthetics", section: "H", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
+    { label: "Industry Motivation", section: "I", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
   ];
 
   const excellentCount = scores.filter((s) => s.status === "excellent").length;
@@ -183,32 +186,32 @@ const ScoresSummary = ({
         <div className="flex items-center justify-between mb-3">
           <HandwrittenLabel className="text-2xl">T-Shape Profile</HandwrittenLabel>
           <span className={`text-sm font-medium ${
-            depthScore >= 60 && breadthScore >= 60 ? "text-hire" 
-            : depthScore >= 40 && breadthScore >= 40 ? "text-highlighter" 
+            depthOfCraft >= 60 && professionalBreadth >= 60 ? "text-hire" 
+            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "text-highlighter" 
             : "text-muted-foreground"
           }`}>
-            {depthScore >= 60 && breadthScore >= 60 ? "Strong T" 
-            : depthScore >= 40 && breadthScore >= 40 ? "Emerging" 
+            {depthOfCraft >= 60 && professionalBreadth >= 60 ? "Strong T" 
+            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "Emerging" 
             : "Developing"}
           </span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-muted-foreground">Depth</span>
-              <span>{depthScore}%</span>
+              <span className="text-muted-foreground">Depth of Craft</span>
+              <span>{depthOfCraft}%</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${depthScore}%` }} transition={{ duration: 0.5 }} />
+              <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${depthOfCraft}%` }} transition={{ duration: 0.5 }} />
             </div>
           </div>
           <div className="flex-1">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-muted-foreground">Breadth</span>
-              <span>{breadthScore}%</span>
+              <span className="text-muted-foreground">Prof. Breadth</span>
+              <span>{professionalBreadth}%</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div className="h-full bg-highlighter" initial={{ width: 0 }} animate={{ width: `${breadthScore}%` }} transition={{ duration: 0.5 }} />
+              <motion.div className="h-full bg-highlighter" initial={{ width: 0 }} animate={{ width: `${professionalBreadth}%` }} transition={{ duration: 0.5 }} />
             </div>
           </div>
         </div>

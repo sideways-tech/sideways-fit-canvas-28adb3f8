@@ -2,18 +2,20 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { Wrench, Mic, Briefcase, Puzzle } from "lucide-react";
+import { Wrench, Mic, Briefcase, Puzzle, Compass } from "lucide-react";
 
 interface ProfessionalDeepDiveSectionProps {
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
   problemSolvingApproach: number;
+  professionalBreadth: number;
   professionalDiveNotes: string;
   onDepthOfCraftChange: (value: number) => void;
   onArticulationSkillChange: (value: number) => void;
   onPortfolioQualityChange: (value: number) => void;
   onProblemSolvingApproachChange: (value: number) => void;
+  onProfessionalBreadthChange: (value: number) => void;
   onNotesChange: (value: string) => void;
 }
 
@@ -25,6 +27,14 @@ const sliders = [
     icon: Wrench,
     low: "Surface-level",
     high: "Deep expertise",
+  },
+  {
+    key: "professionalBreadth" as const,
+    label: "Breadth of Professional Interests",
+    description: "Beyond their core role, how curious are they about adjacent disciplines? A client servicing person interested in copy, art direction, typography. A designer who understands strategy, production, media.",
+    icon: Compass,
+    low: "Stays in their lane",
+    high: "Cross-disciplinary curiosity",
   },
   {
     key: "articulationSkill" as const,
@@ -57,11 +67,13 @@ const ProfessionalDeepDiveSection = ({
   articulationSkill,
   portfolioQuality,
   problemSolvingApproach,
+  professionalBreadth,
   professionalDiveNotes,
   onDepthOfCraftChange,
   onArticulationSkillChange,
   onPortfolioQualityChange,
   onProblemSolvingApproachChange,
+  onProfessionalBreadthChange,
   onNotesChange,
 }: ProfessionalDeepDiveSectionProps) => {
   const values: Record<string, number> = {
@@ -69,6 +81,7 @@ const ProfessionalDeepDiveSection = ({
     articulationSkill,
     portfolioQuality,
     problemSolvingApproach,
+    professionalBreadth,
   };
 
   const handlers: Record<string, (v: number) => void> = {
@@ -76,6 +89,7 @@ const ProfessionalDeepDiveSection = ({
     articulationSkill: onArticulationSkillChange,
     portfolioQuality: onPortfolioQualityChange,
     problemSolvingApproach: onProblemSolvingApproachChange,
+    professionalBreadth: onProfessionalBreadthChange,
   };
 
   const avgScore = Math.round(
