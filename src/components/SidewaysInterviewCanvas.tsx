@@ -297,14 +297,8 @@ const SidewaysInterviewCanvas = () => {
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">D. Interests & Passions</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Let them speak for ~5 minutes. What lights them up outside of work?</p>
+              <p className="text-sm text-muted-foreground">Give them the floor for ~5 minutes. What do they geek out about outside of work? Hobbies, side projects, obsessions, rabbit holes — anything that reveals how they think and what they care about when no one's asking.</p>
             </div>
-            <ReadingBreadthSection
-              readsWidely={formState.readsWidely}
-              recentReadExample={formState.recentReadExample}
-              onReadsWidelyChange={(value) => updateField("readsWidely", value)}
-              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
-            />
             <div className="space-y-2">
               <Label className="text-sm font-medium">General notes on their passions & interests</Label>
               <Textarea
@@ -314,6 +308,12 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background text-sm min-h-[100px]"
               />
             </div>
+            <ReadingBreadthSection
+              readsWidely={formState.readsWidely}
+              recentReadExample={formState.recentReadExample}
+              onReadsWidelyChange={(value) => updateField("readsWidely", value)}
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+            />
           </div>
         </SketchCard>
 
