@@ -29,6 +29,7 @@ type Archetype = "vendor" | "birbal" | "work-in-progress";
 interface FormState {
   candidateName: string;
   candidateRole: string;
+  interviewerName: string;
   department: string;
   hiringLevel: string;
   // A. Background
@@ -114,6 +115,7 @@ const SidewaysInterviewCanvas = () => {
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
     candidateRole: "",
+    interviewerName: "",
     department: "",
     hiringLevel: "",
     backgroundNotes: "",
@@ -234,6 +236,16 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="L7">L7</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="interviewer-name">Interviewer Name</Label>
+              <Input
+                id="interviewer-name"
+                placeholder="Who is conducting this interview..."
+                value={formState.interviewerName}
+                onChange={(e) => updateField("interviewerName", e.target.value)}
+                className="sketch-border-light bg-background"
+              />
             </div>
           </div>
         </SketchCard>
