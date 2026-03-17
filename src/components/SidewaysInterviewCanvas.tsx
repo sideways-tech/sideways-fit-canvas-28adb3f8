@@ -272,25 +272,13 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* B. Diagnostic */}
+        {/* ACT 1: THE PERSON */}
+
+        {/* B. Interests, Passions & Aesthetics — merge C + H */}
         <SketchCard className="mb-8" delay={0.2}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">B. Ask Questions (Clarifying Enough?)</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.</p>
-            </div>
-            <DiagnosticSection
-              value={formState.diagnosticLevel}
-              onChange={(value) => updateField("diagnosticLevel", value)}
-            />
-          </div>
-        </SketchCard>
-
-        {/* C. Interests & Passions */}
-        <SketchCard className="mb-8" delay={0.25}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">C. Interests & Passions</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">B. Interests, Passions & Aesthetics</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Give them the floor for ~5 minutes. What do they geek out about outside of work? Hobbies, side projects, obsessions, rabbit holes — anything that reveals how they think and what they care about when no one's asking.</p>
             </div>
             <TShapeDepthSection
@@ -309,6 +297,12 @@ const SidewaysInterviewCanvas = () => {
               value={formState.interestedInOthers}
               onChange={(value) => updateField("interestedInOthers", value)}
             />
+            <AestheticsSection
+              interest={formState.aestheticsInterest}
+              processNote={formState.aestheticsProcessNote}
+              onInterestChange={(value) => updateField("aestheticsInterest", value)}
+              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
+            />
             <div className="space-y-2">
               <Label className="text-sm font-medium">General notes on their passions & interests</Label>
               <Textarea
@@ -321,27 +315,27 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* E. Sideways & Our Work */}
-        <SketchCard className="mb-8" delay={0.35}>
+        {/* ACT 2: THE PROFESSIONAL */}
+
+        {/* C. Diagnostic Mindset */}
+        <SketchCard className="mb-8" delay={0.3}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">D. Sideways & Our Work</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Have they done their homework? And can they be honest about it?</p>
+              <HandwrittenLabel as="h3" className="text-4xl">C. Diagnostic Mindset</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.</p>
             </div>
-            <SidewaysWorkSection
-              sidewaysWebsiteFeedback={formState.sidewaysWebsiteFeedback}
-              honestyLevel={formState.honestyLevel}
-              onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
-              onHonestyChange={(value) => updateField("honestyLevel", value)}
+            <DiagnosticSection
+              value={formState.diagnosticLevel}
+              onChange={(value) => updateField("diagnosticLevel", value)}
             />
           </div>
         </SketchCard>
 
-        {/* F. Professional Deep Dive */}
+        {/* D. Experience Deep Dive + Resilience — merge E + G */}
         <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">E. Experience Deep Dive</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">D. Experience Deep Dive</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Ask them to walk you through their best professional work. This is where they present — portfolio pieces, case studies, demos, or slides. Let them lead. Watch for how they frame problems, explain decisions, and own outcomes.</p>
             </div>
             <ProfessionalDeepDiveSection
@@ -362,17 +356,6 @@ const SidewaysInterviewCanvas = () => {
               depthScore={formState.depthOfCraft}
               breadthScore={formState.professionalBreadth}
             />
-          </div>
-        </SketchCard>
-
-
-        {/* H. Willingness to Iterate */}
-        <SketchCard className="mb-8" delay={0.5}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">G. Willingness to Iterate</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Can they kill their darlings? Work in the Circus?</p>
-            </div>
             <ResilienceRating
               value={formState.resilienceScore}
               onChange={(value) => updateField("resilienceScore", value)}
@@ -380,28 +363,14 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* I. Art & Aesthetics */}
-        <SketchCard className="mb-8" delay={0.55}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">H. Interest in Art & Aesthetics</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Process of creation — do they care about how things are made?</p>
-            </div>
-            <AestheticsSection
-              interest={formState.aestheticsInterest}
-              processNote={formState.aestheticsProcessNote}
-              onInterestChange={(value) => updateField("aestheticsInterest", value)}
-              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
-            />
-          </div>
-        </SketchCard>
+        {/* ACT 3: THE FIT */}
 
-        {/* J. Industry Motivation */}
-        <SketchCard className="mb-8" delay={0.6}>
+        {/* E. Why This Industry & Why Sideways — merge D + I */}
+        <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">I. Clear Reason for This Industry and Sideways</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Why this industry, and why Sideways specifically?</p>
+              <HandwrittenLabel as="h3" className="text-4xl">E. Why This Industry & Why Sideways</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Why this industry, why Sideways — and can they be honest about it?</p>
             </div>
             <IndustryMotivationSection
               level={formState.motivationLevel}
@@ -412,6 +381,12 @@ const SidewaysInterviewCanvas = () => {
               sidewaysReason={formState.sidewaysMotivationReason}
               onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
+            />
+            <SidewaysWorkSection
+              sidewaysWebsiteFeedback={formState.sidewaysWebsiteFeedback}
+              honestyLevel={formState.honestyLevel}
+              onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
+              onHonestyChange={(value) => updateField("honestyLevel", value)}
             />
           </div>
         </SketchCard>
