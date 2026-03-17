@@ -131,6 +131,7 @@ const SidewaysInterviewCanvas = () => {
     articulationSkill: 30,
     portfolioQuality: 30,
     problemSolvingApproach: 30,
+    professionalBreadth: 30,
     professionalDiveNotes: "",
     depthTopic: "",
     depthScore: 30,
