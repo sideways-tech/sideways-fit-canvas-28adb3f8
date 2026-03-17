@@ -293,15 +293,6 @@ const SidewaysInterviewCanvas = () => {
               <HandwrittenLabel as="h3" className="text-4xl">C. Interests & Passions</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Give them the floor for ~5 minutes. What do they geek out about outside of work? Hobbies, side projects, obsessions, rabbit holes — anything that reveals how they think and what they care about when no one's asking.</p>
             </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">General notes on their passions & interests</Label>
-              <Textarea
-                placeholder="What do they get excited about? Hobbies, obsessions, side projects..."
-                value={formState.interestsPassionsNotes}
-                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
-                className="sketch-border-light bg-background text-sm min-h-[100px]"
-              />
-            </div>
             <TShapeDepthSection
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
@@ -318,6 +309,15 @@ const SidewaysInterviewCanvas = () => {
               value={formState.interestedInOthers}
               onChange={(value) => updateField("interestedInOthers", value)}
             />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">General notes on their passions & interests</Label>
+              <Textarea
+                placeholder="What do they get excited about? Hobbies, obsessions, side projects..."
+                value={formState.interestsPassionsNotes}
+                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
+                className="sketch-border-light bg-background text-sm min-h-[100px]"
+              />
+            </div>
           </div>
         </SketchCard>
 
