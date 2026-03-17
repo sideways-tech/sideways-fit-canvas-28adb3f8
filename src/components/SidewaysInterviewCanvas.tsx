@@ -302,6 +302,12 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background text-sm min-h-[100px]"
               />
             </div>
+            <TShapeDepthSection
+              depthTopic={formState.depthTopic}
+              depthScore={formState.depthScore}
+              onDepthTopicChange={(value) => updateField("depthTopic", value)}
+              onDepthScoreChange={(value) => updateField("depthScore", value)}
+            />
             <ReadingBreadthSection
               readsWidely={formState.readsWidely}
               recentReadExample={formState.recentReadExample}
