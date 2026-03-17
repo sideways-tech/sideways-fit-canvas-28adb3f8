@@ -143,7 +143,7 @@ const SidewaysInterviewCanvas = () => {
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
-  const breadthScore = Math.round((formState.interestedInOthers + formState.readsWidely) / 2);
+  const breadthScore = formState.professionalBreadth;
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
