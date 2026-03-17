@@ -10,7 +10,7 @@ interface InterestedInOthersSectionProps {
 
 const InterestedInOthersSection = ({ value, onChange }: InterestedInOthersSectionProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
       <div className="flex items-center gap-2">
         <Users className="w-5 h-5 text-highlighter" />
         <Label className="text-sm font-medium">
