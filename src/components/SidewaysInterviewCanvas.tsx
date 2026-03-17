@@ -349,7 +349,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.45}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">G. Depth in One Non-Work Topic</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">F. Depth in One Non-Work Topic</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">The vertical bar of the T — obsessive depth in something outside work</p>
             </div>
             <TShapeVisualizer
