@@ -50,6 +50,7 @@ interface FormState {
   articulationSkill: number;
   portfolioQuality: number;
   problemSolvingApproach: number;
+  professionalBreadth: number;
   professionalDiveNotes: string;
   // G. Depth in Non-Work Topic
   depthTopic: string;

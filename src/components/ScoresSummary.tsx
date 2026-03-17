@@ -36,6 +36,7 @@ interface ScoresSummaryProps {
   articulationSkill: number;
   portfolioQuality: number;
   problemSolvingApproach: number;
+  professionalBreadth: number;
 }
 
 type Status = "excellent" | "good" | "needs-work" | "not-assessed";
