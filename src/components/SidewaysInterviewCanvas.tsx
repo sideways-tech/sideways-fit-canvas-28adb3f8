@@ -25,6 +25,7 @@ import sidewaysLogo from "@/assets/sideways-logo.png";
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
 type HonestyLevel = "flattery" | "diplomatic" | "honest";
 type MotivationLevel = "unclear" | "practical" | "passionate";
+type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
 type Archetype = "vendor" | "birbal" | "work-in-progress";
 
 interface FormState {
