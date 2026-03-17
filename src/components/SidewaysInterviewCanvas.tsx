@@ -181,7 +181,7 @@ const SidewaysInterviewCanvas = () => {
         >
           <img src={sidewaysLogo} alt="Sideways" className="h-20 sm:h-24 mx-auto" />
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
-            "We like problems that don't come with a drop-down menu."
+            "We like people who can't be summed up in a résumé bullet."
           </p>
           <div className="pt-4">
             <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
