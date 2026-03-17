@@ -115,6 +115,7 @@ const SidewaysInterviewCanvas = () => {
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
     candidateRole: "",
+    interviewerName: "",
     department: "",
     hiringLevel: "",
     backgroundNotes: "",
