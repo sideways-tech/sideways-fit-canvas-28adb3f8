@@ -81,7 +81,7 @@ const calculateArchetype = (state: FormState): Archetype => {
     problemSolvingApproach,
   } = state;
 
-  const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
+  const breadthScore = state.professionalBreadth;
   const professionalAvg = Math.round(
     (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
   );
