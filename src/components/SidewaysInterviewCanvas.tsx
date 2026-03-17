@@ -278,25 +278,11 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* C. Interested in Other People's Lives */}
+        {/* C. Interests & Passions */}
         <SketchCard className="mb-8" delay={0.25}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">C. Interested in Other People's Lives</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Empathy check — do they look beyond their own world?</p>
-            </div>
-            <InterestedInOthersSection
-              value={formState.interestedInOthers}
-              onChange={(value) => updateField("interestedInOthers", value)}
-            />
-          </div>
-        </SketchCard>
-
-        {/* D. Interests & Passions */}
-        <SketchCard className="mb-8" delay={0.3}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">D. Interests & Passions</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">C. Interests & Passions</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Give them the floor for ~5 minutes. What do they geek out about outside of work? Hobbies, side projects, obsessions, rabbit holes — anything that reveals how they think and what they care about when no one's asking.</p>
             </div>
             <div className="space-y-2">
@@ -313,6 +299,10 @@ const SidewaysInterviewCanvas = () => {
               recentReadExample={formState.recentReadExample}
               onReadsWidelyChange={(value) => updateField("readsWidely", value)}
               onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+            />
+            <InterestedInOthersSection
+              value={formState.interestedInOthers}
+              onChange={(value) => updateField("interestedInOthers", value)}
             />
           </div>
         </SketchCard>
