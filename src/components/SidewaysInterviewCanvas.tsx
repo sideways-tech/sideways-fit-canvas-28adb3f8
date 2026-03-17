@@ -65,6 +65,8 @@ interface FormState {
   // J. Industry Motivation
   motivationLevel: MotivationLevel | "";
   motivationReason: string;
+  sidewaysMotivationLevel: SidewaysMotivationLevel | "";
+  sidewaysMotivationReason: string;
 }
 
 const calculateArchetype = (state: FormState): Archetype => {
