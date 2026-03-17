@@ -144,6 +144,8 @@ const SidewaysInterviewCanvas = () => {
     aestheticsProcessNote: "",
     motivationLevel: "",
     motivationReason: "",
+    sidewaysMotivationLevel: "",
+    sidewaysMotivationReason: "",
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
