@@ -436,6 +436,7 @@ const SidewaysInterviewCanvas = () => {
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
               problemSolvingApproach={formState.problemSolvingApproach}
+              professionalBreadth={formState.professionalBreadth}
             />
           </div>
         </SketchCard>
