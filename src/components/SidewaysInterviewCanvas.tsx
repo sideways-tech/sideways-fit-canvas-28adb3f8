@@ -365,21 +365,6 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* F. Depth in Non-Work Topic */}
-        <SketchCard className="mb-8" delay={0.45}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">F. Depth in One Non-Work Topic</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">A bonus curiosity signal — do they go deep on something outside work? This doesn't drive the T-Shape score, but reveals intellectual depth and passion.</p>
-            </div>
-            <TShapeDepthSection
-              depthTopic={formState.depthTopic}
-              depthScore={formState.depthScore}
-              onDepthTopicChange={(value) => updateField("depthTopic", value)}
-              onDepthScoreChange={(value) => updateField("depthScore", value)}
-            />
-          </div>
-        </SketchCard>
 
         {/* H. Willingness to Iterate */}
         <SketchCard className="mb-8" delay={0.5}>
