@@ -2,15 +2,18 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import BackgroundSection from "./BackgroundSection";
 import DiagnosticSection from "./DiagnosticSection";
-import TShapeVisualizer from "./TShapeVisualizer";
+import InterestedInOthersSection from "./InterestedInOthersSection";
 import ReadingBreadthSection from "./ReadingBreadthSection";
-import HonestyMeter from "./HonestyMeter";
+import SidewaysWorkSection from "./SidewaysWorkSection";
+import ProfessionalDeepDiveSection from "./ProfessionalDeepDiveSection";
+import TShapeVisualizer from "./TShapeVisualizer";
 import ResilienceRating from "./ResilienceRating";
 import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";
@@ -34,22 +37,28 @@ interface FormState {
   diagnosticLevel: DiagnosticLevel | "";
   // C. Interested in Others
   interestedInOthers: number;
-  // D. Honest POV
-  honestyLevel: HonestyLevel | "";
-  // E. Reads Widely
+  // D. Interests & Passions
   readsWidely: number;
   recentReadExample: string;
-  underestimatedTrend: string;
-  ideaSharedOften: string;
-  // F. Depth
+  interestsPassionsNotes: string;
+  // E. Sideways & Our Work
+  sidewaysWebsiteFeedback: string;
+  honestyLevel: HonestyLevel | "";
+  // F. Professional Deep Dive
+  depthOfCraft: number;
+  articulationSkill: number;
+  portfolioQuality: number;
+  problemSolvingApproach: number;
+  professionalDiveNotes: string;
+  // G. Depth in Non-Work Topic
   depthTopic: string;
   depthScore: number;
-  // G. Willingness to Iterate
+  // H. Willingness to Iterate
   resilienceScore: number;
-  // H. Art/Aesthetics
+  // I. Art & Aesthetics
   aestheticsInterest: number;
   aestheticsProcessNote: string;
-  // I. Industry Motivation
+  // J. Industry Motivation
   motivationLevel: MotivationLevel | "";
   motivationReason: string;
 }
@@ -63,34 +72,41 @@ const calculateArchetype = (state: FormState): Archetype => {
     depthScore,
     resilienceScore,
     aestheticsInterest,
-    motivationLevel
+    motivationLevel,
+    depthOfCraft,
+    articulationSkill,
+    portfolioQuality,
+    problemSolvingApproach,
   } = state;
 
   const breadthScore = Math.round((interestedInOthers + readsWidely) / 2);
+  const professionalAvg = Math.round(
+    (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
+  );
 
   // Vendor: Low diagnostic OR flattery OR unclear motivation
   if (
-  diagnosticLevel === "order-taker" ||
-  honestyLevel === "flattery" ||
-  motivationLevel === "unclear")
-  {
+    diagnosticLevel === "order-taker" ||
+    honestyLevel === "flattery" ||
+    motivationLevel === "unclear"
+  ) {
     return "vendor";
   }
 
   // Birbal: High across all key dimensions
   if (
-  diagnosticLevel === "diagnostician" &&
-  depthScore >= 60 &&
-  breadthScore >= 60 &&
-  honestyLevel === "honest" &&
-  resilienceScore >= 4 &&
-  aestheticsInterest >= 50 &&
-  motivationLevel === "passionate")
-  {
+    diagnosticLevel === "diagnostician" &&
+    depthScore >= 60 &&
+    breadthScore >= 60 &&
+    honestyLevel === "honest" &&
+    resilienceScore >= 4 &&
+    aestheticsInterest >= 50 &&
+    motivationLevel === "passionate" &&
+    professionalAvg >= 60
+  ) {
     return "birbal";
   }
 
-  // Work in Progress: Everything else
   return "work-in-progress";
 };
 
@@ -103,31 +119,36 @@ const SidewaysInterviewCanvas = () => {
     backgroundNotes: "",
     diagnosticLevel: "",
     interestedInOthers: 30,
-    honestyLevel: "",
     readsWidely: 30,
     recentReadExample: "",
-    underestimatedTrend: "",
-    ideaSharedOften: "",
+    interestsPassionsNotes: "",
+    sidewaysWebsiteFeedback: "",
+    honestyLevel: "",
+    depthOfCraft: 30,
+    articulationSkill: 30,
+    portfolioQuality: 30,
+    problemSolvingApproach: 30,
+    professionalDiveNotes: "",
     depthTopic: "",
     depthScore: 30,
     resilienceScore: 0,
     aestheticsInterest: 30,
     aestheticsProcessNote: "",
     motivationLevel: "",
-    motivationReason: ""
+    motivationReason: "",
   });
 
   const archetype = useMemo(() => calculateArchetype(formState), [formState]);
   const breadthScore = Math.round((formState.interestedInOthers + formState.readsWidely) / 2);
 
-  const updateField = <K extends keyof FormState,>(field: K, value: FormState[K]) => {
+  const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleArchive = () => {
     toast({
       title: "Assessment Archived",
-      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`
+      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`,
     });
   };
 
@@ -135,7 +156,7 @@ const SidewaysInterviewCanvas = () => {
     if (archetype === "vendor") return;
     toast({
       title: "🎪 Invitation Sent!",
-      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`
+      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`,
     });
   };
 
@@ -146,13 +167,9 @@ const SidewaysInterviewCanvas = () => {
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12 space-y-4">
-          
-          <img
-            src={sidewaysLogo}
-            alt="Sideways"
-            className="h-20 sm:h-24 mx-auto" />
-          
+          className="text-center mb-12 space-y-4"
+        >
+          <img src={sidewaysLogo} alt="Sideways" className="h-20 sm:h-24 mx-auto" />
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
             "We like problems that don't come with a drop-down menu."
           </p>
@@ -172,8 +189,8 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="Enter name..."
                 value={formState.candidateName}
                 onChange={(e) => updateField("candidateName", e.target.value)}
-                className="sketch-border-light bg-background" />
-              
+                className="sketch-border-light bg-background"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="candidate-role">Role hiring for</Label>
@@ -182,8 +199,8 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="Position applying for..."
                 value={formState.candidateRole}
                 onChange={(e) => updateField("candidateRole", e.target.value)}
-                className="sketch-border-light bg-background" />
-              
+                className="sketch-border-light bg-background"
+              />
             </div>
             <div className="space-y-2">
               <Label>Department</Label>
@@ -221,78 +238,117 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* Section A: Background */}
+        {/* A. Background */}
         <SketchCard className="mb-8" delay={0.15}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                A. Candidate's Background
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Understanding who they are beyond the résumé
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">A. Candidate's Background</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Understanding who they are beyond the résumé</p>
             </div>
             <BackgroundSection
               backgroundNotes={formState.backgroundNotes}
-              onBackgroundNotesChange={(value) => updateField("backgroundNotes", value)} />
-            
+              onBackgroundNotesChange={(value) => updateField("backgroundNotes", value)}
+            />
           </div>
         </SketchCard>
 
-        {/* Section B: Diagnostic / Clarifying Questions */}
+        {/* B. Diagnostic */}
         <SketchCard className="mb-8" delay={0.2}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                B. Ask Questions (Clarifying Enough?)
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">B. Ask Questions (Clarifying Enough?)</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.</p>
             </div>
             <DiagnosticSection
               value={formState.diagnosticLevel}
-              onChange={(value) => updateField("diagnosticLevel", value)} />
-            
+              onChange={(value) => updateField("diagnosticLevel", value)}
+            />
           </div>
         </SketchCard>
 
-        {/* Section C & E: Societal Awareness and Intellectual Habits */}
+        {/* C. Interested in Other People's Lives */}
         <SketchCard className="mb-8" delay={0.25}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                C & E. Societal Awareness and Intellectual Habits
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Candidate should have Societal Awareness and Intellectual Habits. Should be interested in others & also reads widely
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">C. Interested in Other People's Lives</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Empathy check — do they look beyond their own world?</p>
             </div>
-            <ReadingBreadthSection
-              interestedInOthers={formState.interestedInOthers}
-              readsWidely={formState.readsWidely}
-              recentReadExample={formState.recentReadExample}
-              underestimatedTrend={formState.underestimatedTrend}
-              ideaSharedOften={formState.ideaSharedOften}
-              onInterestedInOthersChange={(value) => updateField("interestedInOthers", value)}
-              onReadsWidelyChange={(value) => updateField("readsWidely", value)}
-              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
-              onUnderestimatedTrendChange={(value) => updateField("underestimatedTrend", value)}
-              onIdeaSharedOftenChange={(value) => updateField("ideaSharedOften", value)}
+            <InterestedInOthersSection
+              value={formState.interestedInOthers}
+              onChange={(value) => updateField("interestedInOthers", value)}
             />
-            
           </div>
         </SketchCard>
 
-        {/* Section F: T-Shape Depth */}
+        {/* D. Interests & Passions */}
         <SketchCard className="mb-8" delay={0.3}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                F. Depth in One Non-Work Topic
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                The vertical bar of the T — obsessive depth in something outside work
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">D. Interests & Passions</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Let them speak for ~5 minutes. What lights them up outside of work?</p>
+            </div>
+            <ReadingBreadthSection
+              readsWidely={formState.readsWidely}
+              recentReadExample={formState.recentReadExample}
+              onReadsWidelyChange={(value) => updateField("readsWidely", value)}
+              onRecentReadExampleChange={(value) => updateField("recentReadExample", value)}
+            />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">General notes on their passions & interests</Label>
+              <Textarea
+                placeholder="What do they get excited about? Hobbies, obsessions, side projects..."
+                value={formState.interestsPassionsNotes}
+                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
+                className="sketch-border-light bg-background text-sm min-h-[100px]"
+              />
+            </div>
+          </div>
+        </SketchCard>
+
+        {/* E. Sideways & Our Work */}
+        <SketchCard className="mb-8" delay={0.35}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">E. Sideways & Our Work</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Have they done their homework? And can they be honest about it?</p>
+            </div>
+            <SidewaysWorkSection
+              sidewaysWebsiteFeedback={formState.sidewaysWebsiteFeedback}
+              honestyLevel={formState.honestyLevel}
+              onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
+              onHonestyChange={(value) => updateField("honestyLevel", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* F. Professional Deep Dive */}
+        <SketchCard className="mb-8" delay={0.4}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">F. Professional Deep Dive</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Time to see the craft up close — demos, portfolio, slides, case studies</p>
+            </div>
+            <ProfessionalDeepDiveSection
+              depthOfCraft={formState.depthOfCraft}
+              articulationSkill={formState.articulationSkill}
+              portfolioQuality={formState.portfolioQuality}
+              problemSolvingApproach={formState.problemSolvingApproach}
+              professionalDiveNotes={formState.professionalDiveNotes}
+              onDepthOfCraftChange={(value) => updateField("depthOfCraft", value)}
+              onArticulationSkillChange={(value) => updateField("articulationSkill", value)}
+              onPortfolioQualityChange={(value) => updateField("portfolioQuality", value)}
+              onProblemSolvingApproachChange={(value) => updateField("problemSolvingApproach", value)}
+              onNotesChange={(value) => updateField("professionalDiveNotes", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* G. T-Shape Depth */}
+        <SketchCard className="mb-8" delay={0.45}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">G. Depth in One Non-Work Topic</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">The vertical bar of the T — obsessive depth in something outside work</p>
             </div>
             <TShapeVisualizer
               depthTopic={formState.depthTopic}
@@ -300,102 +356,63 @@ const SidewaysInterviewCanvas = () => {
               breadthScore={breadthScore}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onBreadthScoreChange={() => {}} />
-            
+              onBreadthScoreChange={() => {}}
+            />
           </div>
         </SketchCard>
 
-        {/* Section D: Honesty */}
-        <SketchCard className="mb-8" delay={0.35}>
+        {/* H. Willingness to Iterate */}
+        <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                D. Honest POV on Our Work
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Has a clear, honest point of view — not just flattery
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Their take on Sideways work
-              </Label>
-              <HonestyMeter
-                value={formState.honestyLevel}
-                onChange={(value) => updateField("honestyLevel", value)} />
-              
-            </div>
-          </div>
-        </SketchCard>
-
-        {/* Section G: Willingness to Iterate */}
-        <SketchCard className="mb-8" delay={0.4}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                G. Willingness to Iterate
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Can they kill their darlings? Work in the Circus?
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">H. Willingness to Iterate</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Can they kill their darlings? Work in the Circus?</p>
             </div>
             <ResilienceRating
               value={formState.resilienceScore}
-              onChange={(value) => updateField("resilienceScore", value)} />
-            
+              onChange={(value) => updateField("resilienceScore", value)}
+            />
           </div>
         </SketchCard>
 
-        {/* Section H: Art & Aesthetics */}
-        <SketchCard className="mb-8" delay={0.45}>
+        {/* I. Art & Aesthetics */}
+        <SketchCard className="mb-8" delay={0.55}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                H. Interest in Art & Aesthetics
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Process of creation — do they care about how things are made?
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">I. Interest in Art & Aesthetics</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Process of creation — do they care about how things are made?</p>
             </div>
             <AestheticsSection
               interest={formState.aestheticsInterest}
               processNote={formState.aestheticsProcessNote}
               onInterestChange={(value) => updateField("aestheticsInterest", value)}
-              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)} />
-            
+              onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
+            />
           </div>
         </SketchCard>
 
-        {/* Section I: Industry Motivation */}
-        <SketchCard className="mb-8" delay={0.5}>
+        {/* J. Industry Motivation */}
+        <SketchCard className="mb-8" delay={0.6}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                I. Clear Reason for This Industry
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Why creative problem-solving? What's their story?
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">J. Clear Reason for This Industry</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Why creative problem-solving? What's their story?</p>
             </div>
             <IndustryMotivationSection
               level={formState.motivationLevel}
               reason={formState.motivationReason}
               onLevelChange={(value) => updateField("motivationLevel", value)}
-              onReasonChange={(value) => updateField("motivationReason", value)} />
-            
+              onReasonChange={(value) => updateField("motivationReason", value)}
+            />
           </div>
         </SketchCard>
 
         {/* Scores Summary */}
-        <SketchCard className="mb-8" delay={0.55}>
+        <SketchCard className="mb-8" delay={0.65}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                Assessment Summary
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                All scores at a glance
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">Assessment Summary</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">All scores at a glance</p>
             </div>
             <ScoresSummary
               diagnosticLevel={formState.diagnosticLevel}
@@ -406,27 +423,23 @@ const SidewaysInterviewCanvas = () => {
               honestyLevel={formState.honestyLevel}
               resilienceScore={formState.resilienceScore}
               aestheticsInterest={formState.aestheticsInterest}
-              motivationLevel={formState.motivationLevel} />
-            
+              motivationLevel={formState.motivationLevel}
+              depthOfCraft={formState.depthOfCraft}
+              articulationSkill={formState.articulationSkill}
+              portfolioQuality={formState.portfolioQuality}
+              problemSolvingApproach={formState.problemSolvingApproach}
+            />
           </div>
         </SketchCard>
 
         {/* Footer: Verdict */}
-        <SketchCard delay={0.6}>
+        <SketchCard delay={0.7}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">
-                The Verdict
-              </HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">
-                Based on the T-shaped culture fit criteria
-              </p>
+              <HandwrittenLabel as="h3" className="text-4xl">The Verdict</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Based on the T-shaped culture fit criteria</p>
             </div>
-            <VerdictFooter
-              archetype={archetype}
-              onArchive={handleArchive}
-              onInvite={handleInvite} />
-            
+            <VerdictFooter archetype={archetype} onArchive={handleArchive} onInvite={handleInvite} />
           </div>
         </SketchCard>
 
@@ -435,18 +448,14 @@ const SidewaysInterviewCanvas = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-12 text-center text-sm text-muted-foreground">
-          
-          <img
-            src={sidewaysLogo}
-            alt="Sideways"
-            className="h-8 mx-auto mb-2 opacity-50" />
-          
+          className="mt-12 text-center text-sm text-muted-foreground"
+        >
+          <img src={sidewaysLogo} alt="Sideways" className="h-8 mx-auto mb-2 opacity-50" />
           <p>Creative Problem Solving Outfit</p>
         </motion.footer>
       </div>
-    </div>);
-
+    </div>
+  );
 };
 
 export default SidewaysInterviewCanvas;
