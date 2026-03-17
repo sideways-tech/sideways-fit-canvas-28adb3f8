@@ -41,7 +41,7 @@ const TShapeVisualizer = ({
           />
 
           {/* Labels */}
-          <div className="absolute -left-4 top-2 text-xs text-muted-foreground font-handwritten text-2xl -rotate-12">
+          <div className="absolute -left-4 top-2 text-muted-foreground font-handwritten text-3xl -rotate-12">
             Breadth →
           </div>
           <div className="absolute left-1/2 bottom-0 text-xs text-muted-foreground font-handwritten text-2xl rotate-6 translate-x-4">
