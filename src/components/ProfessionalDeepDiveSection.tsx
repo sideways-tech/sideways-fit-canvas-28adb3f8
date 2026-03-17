@@ -46,7 +46,7 @@ const sliders = [
   },
   {
     key: "portfolioQuality" as const,
-    label: "Portfolio / Demo Quality",
+    label: "Portfolio Quality",
     description: "Quality of the work they chose to show — slides, demos, case studies",
     icon: Briefcase,
     low: "Underwhelming",
