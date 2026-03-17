@@ -237,6 +237,16 @@ const SidewaysInterviewCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="interviewer-name">Interviewer Name</Label>
+              <Input
+                id="interviewer-name"
+                placeholder="Who is conducting this interview..."
+                value={formState.interviewerName}
+                onChange={(e) => updateField("interviewerName", e.target.value)}
+                className="sketch-border-light bg-background"
+              />
+            </div>
           </div>
         </SketchCard>
 
