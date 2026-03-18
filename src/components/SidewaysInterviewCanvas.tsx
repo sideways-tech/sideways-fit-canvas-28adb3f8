@@ -34,6 +34,8 @@ interface FormState {
   interviewerName: string;
   department: string;
   hiringLevel: string;
+  education: string;
+  candidateWebsite: string;
   backgroundNotes: string;
   diagnosticLevel: DiagnosticLevel | "";
   interestedInOthers: number;
@@ -144,6 +146,8 @@ const SidewaysInterviewCanvas = () => {
     interviewerName: "",
     department: "",
     hiringLevel: "",
+    education: "",
+    candidateWebsite: "",
     backgroundNotes: "",
     diagnosticLevel: "",
     interestedInOthers: 30,
@@ -265,6 +269,30 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="L7">L7</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Education</Label>
+              <Select value={formState.education} onValueChange={(value) => updateField("education", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select education..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="graduate">Graduate</SelectItem>
+                  <SelectItem value="pg-1year">Post-Graduate (1 year)</SelectItem>
+                  <SelectItem value="pg-2years">Post-Graduate (2 years)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="candidate-website">Portfolio / Website</Label>
+              <Input
+                id="candidate-website"
+                type="url"
+                placeholder="https://..."
+                value={formState.candidateWebsite}
+                onChange={(e) => updateField("candidateWebsite", e.target.value)}
+                className="sketch-border-light bg-background"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="interviewer-name">Interviewer Name</Label>
