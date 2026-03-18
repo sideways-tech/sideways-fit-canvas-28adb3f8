@@ -326,7 +326,7 @@ const SidewaysInterviewCanvas = () => {
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
             {/* Row 1 */}
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-name">Candidate Name</Label>
+              <Label htmlFor="candidate-name">Candidate's Name</Label>
               <Input
                 id="candidate-name"
                 placeholder="Enter name..."
