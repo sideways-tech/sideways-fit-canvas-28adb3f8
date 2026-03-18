@@ -107,19 +107,6 @@ const HonestyMeter = ({ value, onChange }: HonestyMeterProps) => {
         })}
       </RadioGroup>
 
-      {/* Birbal Badge */}
-      {value === "honest" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2 p-3 bg-hire/10 rounded-lg sketch-border-light"
-        >
-          <Shield className="w-5 h-5 text-hire" />
-          <HandwrittenLabel className="text-3xl text-hire">
-            Birbal Potential Detected!
-          </HandwrittenLabel>
-        </motion.div>
-      )}
     </div>
   );
 };
