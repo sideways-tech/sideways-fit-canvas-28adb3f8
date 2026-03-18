@@ -151,6 +151,7 @@ const SidewaysInterviewCanvas = () => {
     candidateName: "",
     candidateRole: "",
     interviewerName: "",
+    interviewerEmail: "",
     interviewRound: "1",
     department: "",
     hiringLevel: "",
