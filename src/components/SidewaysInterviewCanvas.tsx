@@ -447,8 +447,8 @@ const SidewaysInterviewCanvas = () => {
               </div>
             </div>
 
-            {/* CV Upload - full width */}
-            <div className="sm:col-span-2 pt-1">
+            {/* CV Upload - right column */}
+            <div className="sm:col-start-2 pt-1">
               <CvUpload
                 candidateName={formState.candidateName}
                 onUploadComplete={(path) => setCvFilePath(path)}
