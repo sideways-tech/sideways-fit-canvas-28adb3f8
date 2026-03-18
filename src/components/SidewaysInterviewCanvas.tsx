@@ -411,19 +411,32 @@ const SidewaysInterviewCanvas = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label>Interview Round</Label>
-              <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
-                <SelectTrigger className="sketch-border-light bg-background">
-                  <SelectValue placeholder="Select round..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Round 1</SelectItem>
-                  <SelectItem value="2">Round 2</SelectItem>
-                  <SelectItem value="3">Round 3</SelectItem>
-                  <SelectItem value="4">Round 4</SelectItem>
-                  <SelectItem value="5">Round 5</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="interviewer-email">Interviewer Email</Label>
+              <Input
+                id="interviewer-email"
+                type="email"
+                placeholder="interviewer@sideways.com"
+                value={formState.interviewerEmail}
+                onChange={(e) => updateField("interviewerEmail", e.target.value)}
+                className="sketch-border-light bg-background"
+              />
+            </div>
+            <div className="space-y-2 flex items-end gap-3">
+              <div className="flex-1">
+                <Label>Round</Label>
+                <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
+                  <SelectTrigger className="sketch-border-light bg-background h-9 w-20 rounded-full text-center text-sm">
+                    <SelectValue placeholder="R" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                    <SelectItem value="5">5</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="sm:col-span-2">
               <CvUpload
