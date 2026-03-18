@@ -22,6 +22,7 @@ import {
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician" | "";
 type HonestyLevel = "flattery" | "diplomatic" | "honest" | "";
 type MotivationLevel = "unclear" | "practical" | "passionate" | "";
+type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific" | "";
 
 interface ScoresSummaryProps {
   diagnosticLevel: DiagnosticLevel;
