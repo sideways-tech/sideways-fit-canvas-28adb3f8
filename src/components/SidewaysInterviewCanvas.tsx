@@ -184,7 +184,7 @@ const SidewaysInterviewCanvas = () => {
   };
 
   const handleInvite = () => {
-    if (archetype === "vendor") return;
+    if (verdict === "strong-no" || verdict === "lean-no") return;
     toast({
       title: "🎪 Invitation Sent!",
       description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`,
