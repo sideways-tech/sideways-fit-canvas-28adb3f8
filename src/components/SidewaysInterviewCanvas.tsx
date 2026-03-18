@@ -323,8 +323,9 @@ const SidewaysInterviewCanvas = () => {
 
         {/* Candidate Info */}
         <SketchCard className="mb-8" delay={0.1}>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
+            {/* Row 1 */}
+            <div className="space-y-1.5">
               <Label htmlFor="candidate-name">Candidate Name</Label>
               <Input
                 id="candidate-name"
@@ -334,7 +335,7 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="candidate-role">Role hiring for</Label>
               <Input
                 id="candidate-role"
@@ -344,10 +345,12 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
-            <div className="space-y-2">
+
+            {/* Row 2 */}
+            <div className="space-y-1.5">
               <Label>Department</Label>
               <Select value={formState.department} onValueChange={(value) => updateField("department", value)}>
-                <SelectTrigger className="sketch-border-light bg-background">
+                <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select department..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -360,10 +363,10 @@ const SidewaysInterviewCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label>Hiring Level</Label>
               <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
-                <SelectTrigger className="sketch-border-light bg-background">
+                <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -377,10 +380,12 @@ const SidewaysInterviewCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+
+            {/* Row 3 */}
+            <div className="space-y-1.5">
               <Label>Education</Label>
               <Select value={formState.education} onValueChange={(value) => updateField("education", value)}>
-                <SelectTrigger className="sketch-border-light bg-background">
+                <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select education..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -390,7 +395,7 @@ const SidewaysInterviewCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="candidate-website">Portfolio / Website</Label>
               <Input
                 id="candidate-website"
@@ -401,7 +406,9 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
-            <div className="space-y-2">
+
+            {/* Row 4 */}
+            <div className="space-y-1.5">
               <Label htmlFor="interviewer-name">Interviewer Name</Label>
               <Input
                 id="interviewer-name"
@@ -412,7 +419,7 @@ const SidewaysInterviewCanvas = () => {
               />
             </div>
             <div className="flex items-end gap-3">
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-1.5">
                 <Label htmlFor="interviewer-email">Interviewer Email</Label>
                 <Input
                   id="interviewer-email"
@@ -423,10 +430,10 @@ const SidewaysInterviewCanvas = () => {
                   className="sketch-border-light bg-background"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5 shrink-0">
                 <Label>Round</Label>
                 <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
-                  <SelectTrigger className="sketch-border-light bg-background h-9 w-20 rounded-full text-center text-sm">
+                  <SelectTrigger className="sketch-border-light bg-background h-11 w-20 rounded-full text-center text-sm">
                     <SelectValue placeholder="R" />
                   </SelectTrigger>
                   <SelectContent>
@@ -439,7 +446,9 @@ const SidewaysInterviewCanvas = () => {
                 </Select>
               </div>
             </div>
-            <div className="sm:col-span-2">
+
+            {/* CV Upload - full width */}
+            <div className="sm:col-span-2 pt-1">
               <CvUpload
                 candidateName={formState.candidateName}
                 onUploadComplete={(path) => setCvFilePath(path)}
