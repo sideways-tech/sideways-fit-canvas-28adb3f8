@@ -15,7 +15,7 @@ const TShapeVisualizer = ({
 
   return (
     <div className="space-y-6">
-      {/* T-Shape Visualization */}
+      {/* T-Shaped Visualization */}
       <div className="flex justify-center py-8">
         <div className="relative w-72 h-56">
           {/* Center point marker */}
@@ -50,10 +50,10 @@ const TShapeVisualizer = ({
         </div>
       </div>
 
-      {/* T-Shape Assessment */}
+      {/* T-Shaped Assessment */}
       <div className="pt-4 border-t border-border/50">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">T-Shape Status:</span>
+          <span className="text-sm text-muted-foreground">T-Shaped Status:</span>
           <HandwrittenLabel 
             className={`text-3xl ${
               depthScore >= 60 && breadthScore >= 60 
