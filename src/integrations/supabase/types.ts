@@ -31,6 +31,7 @@ export type Database = {
           id: string
           interested_in_others: number | null
           interests_passions_notes: string | null
+          interviewer_email: string | null
           interviewer_name: string
           mindset_score: number | null
           motivation_level: string | null
@@ -68,6 +69,7 @@ export type Database = {
           id?: string
           interested_in_others?: number | null
           interests_passions_notes?: string | null
+          interviewer_email?: string | null
           interviewer_name: string
           mindset_score?: number | null
           motivation_level?: string | null
@@ -105,6 +107,7 @@ export type Database = {
           id?: string
           interested_in_others?: number | null
           interests_passions_notes?: string | null
+          interviewer_email?: string | null
           interviewer_name?: string
           mindset_score?: number | null
           motivation_level?: string | null
