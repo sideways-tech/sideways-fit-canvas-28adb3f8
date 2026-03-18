@@ -244,6 +244,7 @@ const SidewaysInterviewCanvas = () => {
         candidate_id: candidateId,
         round_number: parseInt(formState.interviewRound),
         interviewer_name: formState.interviewerName.trim(),
+        interviewer_email: formState.interviewerEmail.trim() || null,
         cv_file_path: cvFilePath || null,
         background_notes: formState.backgroundNotes || null,
         interested_in_others: formState.interestedInOthers,
