@@ -53,7 +53,7 @@ const TShapeVisualizer = ({
       {/* T-Shape Assessment */}
       <div className="pt-4 border-t border-border/50">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">T-Shape Status:</span>
+          <span className="text-sm text-muted-foreground">T-Shaped Status:</span>
           <HandwrittenLabel 
             className={`text-3xl ${
               depthScore >= 60 && breadthScore >= 60 
