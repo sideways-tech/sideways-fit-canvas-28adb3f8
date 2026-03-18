@@ -431,6 +431,13 @@ const SidewaysInterviewCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="sm:col-span-2">
+              <CvUpload
+                candidateName={formState.candidateName}
+                onUploadComplete={(path) => setCvFilePath(path)}
+                currentFilePath={cvFilePath}
+              />
+            </div>
           </div>
         </SketchCard>
 
