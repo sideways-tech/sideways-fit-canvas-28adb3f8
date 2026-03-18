@@ -32,6 +32,7 @@ interface FormState {
   candidateName: string;
   candidateRole: string;
   interviewerName: string;
+  interviewRound: string;
   department: string;
   hiringLevel: string;
   education: string;
