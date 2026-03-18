@@ -34,6 +34,8 @@ interface FormState {
   interviewerName: string;
   department: string;
   hiringLevel: string;
+  education: string;
+  candidateWebsite: string;
   backgroundNotes: string;
   diagnosticLevel: DiagnosticLevel | "";
   interestedInOthers: number;
