@@ -24,6 +24,7 @@ import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";
 import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
+import CvUpload from "./CvUpload";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
