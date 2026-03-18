@@ -86,6 +86,7 @@ const ScoresSummary = ({
   resilienceScore,
   aestheticsInterest,
   motivationLevel,
+  sidewaysMotivationLevel,
   depthOfCraft,
   articulationSkill,
   portfolioQuality,
