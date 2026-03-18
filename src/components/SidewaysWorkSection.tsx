@@ -25,7 +25,7 @@ const SidewaysWorkSection = ({
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-highlighter" />
           <Label className="text-sm font-medium">
-            Have they explored sideways.co.in?
+            Have they explored our website - sideways.co.in?
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
