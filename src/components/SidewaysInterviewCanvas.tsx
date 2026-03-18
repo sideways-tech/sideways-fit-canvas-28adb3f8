@@ -312,9 +312,17 @@ const SidewaysInterviewCanvas = () => {
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
             "We like people who can't be summed up in a résumé bullet."
           </p>
-          <div className="pt-4">
-            <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
-            <p className="text-muted-foreground">The "Can't Be Templated" Fit Test</p>
+          <div className="pt-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
+              <p className="text-muted-foreground">The "Can't Be Templated" Fit Test</p>
+            </div>
+            <Link to="/dashboard">
+              <Button variant="outline" className="sketch-border-light gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Button>
+            </Link>
           </div>
         </motion.header>
 
