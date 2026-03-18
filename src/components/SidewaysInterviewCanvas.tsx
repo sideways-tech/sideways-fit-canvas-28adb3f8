@@ -190,19 +190,113 @@ const SidewaysInterviewCanvas = () => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleSubmitAssessment = async () => {
+    if (!formState.candidateName.trim()) {
+      toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
+      return;
+    }
+    if (!formState.interviewerName.trim()) {
+      toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Upsert candidate
+      const { data: existingCandidates } = await supabase
+        .from("candidates")
+        .select("id")
+        .eq("name", formState.candidateName.trim())
+        .eq("role", formState.candidateRole.trim() || "");
+
+      let candidateId: string;
+
+      if (existingCandidates && existingCandidates.length > 0) {
+        candidateId = existingCandidates[0].id;
+        await supabase.from("candidates").update({
+          department: formState.department || null,
+          hiring_level: formState.hiringLevel || null,
+          education: formState.education || null,
+          website: formState.candidateWebsite || null,
+        }).eq("id", candidateId);
+      } else {
+        const { data: newCandidate, error: cErr } = await supabase
+          .from("candidates")
+          .insert({
+            name: formState.candidateName.trim(),
+            role: formState.candidateRole.trim() || null,
+            department: formState.department || null,
+            hiring_level: formState.hiringLevel || null,
+            education: formState.education || null,
+            website: formState.candidateWebsite || null,
+          })
+          .select("id")
+          .single();
+
+        if (cErr) throw cErr;
+        candidateId = newCandidate.id;
+      }
+
+      // Insert assessment
+      const { error: aErr } = await supabase.from("assessments").insert({
+        candidate_id: candidateId,
+        round_number: parseInt(formState.interviewRound),
+        interviewer_name: formState.interviewerName.trim(),
+        cv_file_path: cvFilePath || null,
+        background_notes: formState.backgroundNotes || null,
+        interested_in_others: formState.interestedInOthers,
+        reads_widely: formState.readsWidely,
+        recent_read_example: formState.recentReadExample || null,
+        interests_passions_notes: formState.interestsPassionsNotes || null,
+        depth_topic: formState.depthTopic || null,
+        depth_score: formState.depthScore,
+        aesthetics_interest: formState.aestheticsInterest,
+        aesthetics_process_note: formState.aestheticsProcessNote || null,
+        depth_of_craft: formState.depthOfCraft,
+        articulation_skill: formState.articulationSkill,
+        portfolio_quality: formState.portfolioQuality,
+        problem_solving_approach: formState.problemSolvingApproach,
+        professional_breadth: formState.professionalBreadth,
+        professional_dive_notes: formState.professionalDiveNotes || null,
+        resilience_score: formState.resilienceScore,
+        diagnostic_level: formState.diagnosticLevel || null,
+        honesty_level: formState.honestyLevel || null,
+        sideways_website_feedback: formState.sidewaysWebsiteFeedback || null,
+        motivation_level: formState.motivationLevel || null,
+        motivation_reason: formState.motivationReason || null,
+        sideways_motivation_level: formState.sidewaysMotivationLevel || null,
+        sideways_motivation_reason: formState.sidewaysMotivationReason || null,
+        person_score: categoryScores.person,
+        professional_score: categoryScores.professional,
+        mindset_score: categoryScores.mindset,
+        overall_score: categoryScores.overall,
+        verdict,
+      });
+
+      if (aErr) throw aErr;
+
+      toast({
+        title: "✅ Assessment Saved",
+        description: `${formState.candidateName}'s Round ${formState.interviewRound} assessment has been saved.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Save failed",
+        description: err.message || "Something went wrong.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleArchive = () => {
-    toast({
-      title: "Assessment Archived",
-      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`,
-    });
+    handleSubmitAssessment();
   };
 
   const handleInvite = () => {
     if (verdict === "strong-no" || verdict === "lean-no") return;
-    toast({
-      title: "🎪 Invitation Sent!",
-      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`,
-    });
+    handleSubmitAssessment();
   };
 
   return (
