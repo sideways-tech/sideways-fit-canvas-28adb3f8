@@ -180,6 +180,9 @@ const SidewaysInterviewCanvas = () => {
     sidewaysMotivationReason: "",
   });
 
+  const [cvFilePath, setCvFilePath] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
+
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
 
