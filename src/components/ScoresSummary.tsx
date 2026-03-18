@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import HandwrittenLabel from "./HandwrittenLabel";
+import TShapeVisualizer from "./TShapeVisualizer";
 import {
   Lightbulb,
   Users,
