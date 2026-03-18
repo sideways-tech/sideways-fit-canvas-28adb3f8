@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { 
-  CheckCircle2, 
-  AlertCircle, 
-  XCircle, 
-  HelpCircle,
+import {
   Lightbulb,
   Users,
   BookOpen,
@@ -46,28 +42,18 @@ type Status = "excellent" | "good" | "needs-work" | "not-assessed";
 
 interface ScoreItem {
   label: string;
-  section: string;
   status: Status;
-  value: string;
+  displayValue: string;
+  sliderValue?: number; // if present, show a progress bar
   icon: React.ElementType;
 }
 
-const getStatusColor = (status: Status) => {
-  switch (status) {
-    case "excellent": return "text-hire bg-hire/10 border-hire/30";
-    case "good": return "text-highlighter bg-highlighter/10 border-highlighter/30";
-    case "needs-work": return "text-reject bg-reject/10 border-reject/30";
-    case "not-assessed": return "text-muted-foreground bg-muted/50 border-border";
-  }
-};
-
-const getStatusIcon = (status: Status) => {
-  switch (status) {
-    case "excellent": return CheckCircle2;
-    case "good": return AlertCircle;
-    case "needs-work": return XCircle;
-    case "not-assessed": return HelpCircle;
-  }
+const getSliderLabel = (value: number): string => {
+  if (value <= 20) return "Low";
+  if (value <= 40) return "Fair";
+  if (value <= 60) return "Good";
+  if (value <= 80) return "Strong";
+  return "Excellent";
 };
 
 const getScoreStatus = (score: number): Status => {
@@ -75,6 +61,29 @@ const getScoreStatus = (score: number): Status => {
   if (score >= 40) return "good";
   return "needs-work";
 };
+
+const dotColor = (status: Status) => {
+  switch (status) {
+    case "excellent": return "bg-hire";
+    case "good": return "bg-highlighter";
+    case "needs-work": return "bg-reject";
+    case "not-assessed": return "border-2 border-muted-foreground/40 bg-transparent";
+  }
+};
+
+const barColor = (status: Status) => {
+  switch (status) {
+    case "excellent": return "bg-hire";
+    case "good": return "bg-highlighter";
+    case "needs-work": return "bg-reject";
+    case "not-assessed": return "bg-muted";
+  }
+};
+
+interface SectionGroup {
+  title: string;
+  items: ScoreItem[];
+}
 
 const ScoresSummary = ({
   diagnosticLevel,
@@ -93,9 +102,6 @@ const ScoresSummary = ({
   problemSolvingApproach,
   professionalBreadth,
 }: ScoresSummaryProps) => {
-  const professionalAvg = Math.round(
-    (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
-  );
 
   const getDiagnosticStatus = (): Status => {
     if (!diagnosticLevel) return "not-assessed";
@@ -103,10 +109,9 @@ const ScoresSummary = ({
     if (diagnosticLevel === "clarifier") return "good";
     return "needs-work";
   };
-
   const getDiagnosticValue = (): string => {
     if (!diagnosticLevel) return "Not assessed";
-    if (diagnosticLevel === "diagnostician") return "Diagnostician ✓";
+    if (diagnosticLevel === "diagnostician") return "Diagnostician";
     if (diagnosticLevel === "clarifier") return "Clarifier";
     return "Order Taker";
   };
@@ -117,10 +122,9 @@ const ScoresSummary = ({
     if (honestyLevel === "diplomatic") return "good";
     return "needs-work";
   };
-
   const getHonestyValue = (): string => {
     if (!honestyLevel) return "Not assessed";
-    if (honestyLevel === "honest") return "Constructive Critique ✓";
+    if (honestyLevel === "honest") return "Constructive Critique";
     if (honestyLevel === "diplomatic") return "Diplomatic";
     return "Flattery";
   };
@@ -138,10 +142,9 @@ const ScoresSummary = ({
     if (motivationLevel === "practical") return "good";
     return "needs-work";
   };
-
   const getMotivationValue = (): string => {
     if (!motivationLevel) return "Not assessed";
-    if (motivationLevel === "passionate") return "Deep Connection ✓";
+    if (motivationLevel === "passionate") return "Deep Connection";
     if (motivationLevel === "practical") return "Practical Reasons";
     return "Unclear";
   };
@@ -152,38 +155,56 @@ const ScoresSummary = ({
     if (sidewaysMotivationLevel === "culture-fit") return "good";
     return "needs-work";
   };
-
   const getSidewaysMotivationValue = (): string => {
     if (!sidewaysMotivationLevel) return "Not assessed";
-    if (sidewaysMotivationLevel === "sideways-specific") return "Sideways-Specific ✓";
+    if (sidewaysMotivationLevel === "sideways-specific") return "Sideways-Specific";
     if (sidewaysMotivationLevel === "culture-fit") return "Culture Fit";
     return "Generic";
   };
 
-  const scores: ScoreItem[] = [
-    // B. Interests, Passions & Aesthetics
-    { label: "Depth (Non-Work)", section: "B", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
-    { label: "Reads Widely", section: "B", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
-    { label: "Interested in Others", section: "B", status: getScoreStatus(interestedInOthers), value: `${interestedInOthers}%`, icon: Users },
-    { label: "Art & Aesthetics", section: "B", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
-    // C. Experience Deep Dive
-    { label: "Depth of Craft", section: "C", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
-    { label: "Professional Breadth", section: "C", status: getScoreStatus(professionalBreadth), value: `${professionalBreadth}%`, icon: Compass },
-    { label: "Articulation & Presentation", section: "C", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
-    { label: "Portfolio Quality", section: "C", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
-    { label: "Problem-Solving", section: "C", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
-    { label: "Willingness to Iterate", section: "C", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
-    // D. Why Industry & Why Sideways
-    { label: "Industry Motivation", section: "D", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
-    { label: "Sideways Motivation", section: "D", status: getSidewaysMotivationStatus(), value: getSidewaysMotivationValue(), icon: Heart },
-    { label: "Honest POV", section: "D", status: getHonestyStatus(), value: getHonestyValue(), icon: Shield },
-    // E. Diagnostic Mindset
-    { label: "Diagnostic Mindset", section: "E", status: getDiagnosticStatus(), value: getDiagnosticValue(), icon: Lightbulb },
+  const sections: SectionGroup[] = [
+    {
+      title: "B. Interests & Aesthetics",
+      items: [
+        { label: "Depth (Non-Work)", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", displayValue: depthTopic ? getSliderLabel(depthScore) : "No topic", sliderValue: depthTopic ? depthScore : undefined, icon: Lightbulb },
+        { label: "Reads Widely", status: getScoreStatus(readsWidely), displayValue: getSliderLabel(readsWidely), sliderValue: readsWidely, icon: BookOpen },
+        { label: "Interested in Others", status: getScoreStatus(interestedInOthers), displayValue: getSliderLabel(interestedInOthers), sliderValue: interestedInOthers, icon: Users },
+        { label: "Art & Aesthetics", status: getScoreStatus(aestheticsInterest), displayValue: getSliderLabel(aestheticsInterest), sliderValue: aestheticsInterest, icon: Palette },
+      ],
+    },
+    {
+      title: "C. Experience Deep Dive",
+      items: [
+        { label: "Depth of Craft", status: getScoreStatus(depthOfCraft), displayValue: getSliderLabel(depthOfCraft), sliderValue: depthOfCraft, icon: Wrench },
+        { label: "Professional Breadth", status: getScoreStatus(professionalBreadth), displayValue: getSliderLabel(professionalBreadth), sliderValue: professionalBreadth, icon: Compass },
+        { label: "Articulation", status: getScoreStatus(articulationSkill), displayValue: getSliderLabel(articulationSkill), sliderValue: articulationSkill, icon: Mic },
+        { label: "Portfolio Quality", status: getScoreStatus(portfolioQuality), displayValue: getSliderLabel(portfolioQuality), sliderValue: portfolioQuality, icon: Briefcase },
+        { label: "Problem-Solving", status: getScoreStatus(problemSolvingApproach), displayValue: getSliderLabel(problemSolvingApproach), sliderValue: problemSolvingApproach, icon: Puzzle },
+        { label: "Willingness to Iterate", status: getResilienceStatus(), displayValue: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5`, icon: Star },
+      ],
+    },
+    {
+      title: "D. Motivation & Honesty",
+      items: [
+        { label: "Industry Motivation", status: getMotivationStatus(), displayValue: getMotivationValue(), icon: Heart },
+        { label: "Sideways Motivation", status: getSidewaysMotivationStatus(), displayValue: getSidewaysMotivationValue(), icon: Heart },
+        { label: "Honest POV", status: getHonestyStatus(), displayValue: getHonestyValue(), icon: Shield },
+      ],
+    },
+    {
+      title: "E. Diagnostic Mindset",
+      items: [
+        { label: "Diagnostic Mindset", status: getDiagnosticStatus(), displayValue: getDiagnosticValue(), icon: Lightbulb },
+      ],
+    },
   ];
 
-  const excellentCount = scores.filter((s) => s.status === "excellent").length;
-  const needsWorkCount = scores.filter((s) => s.status === "needs-work").length;
-  const notAssessedCount = scores.filter((s) => s.status === "not-assessed").length;
+  const allItems = sections.flatMap((s) => s.items);
+  const excellentCount = allItems.filter((s) => s.status === "excellent").length;
+  const needsWorkCount = allItems.filter((s) => s.status === "needs-work").length;
+  const notAssessedCount = allItems.filter((s) => s.status === "not-assessed").length;
+
+  let itemIndex = 0;
 
   return (
     <div className="space-y-6">
@@ -208,12 +229,12 @@ const ScoresSummary = ({
         <div className="flex items-center justify-between mb-3">
           <HandwrittenLabel className="text-2xl">T-Shape Profile</HandwrittenLabel>
           <span className={`text-sm font-medium ${
-            depthOfCraft >= 60 && professionalBreadth >= 60 ? "text-hire" 
-            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "text-highlighter" 
+            depthOfCraft >= 60 && professionalBreadth >= 60 ? "text-hire"
+            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "text-highlighter"
             : "text-muted-foreground"
           }`}>
-            {depthOfCraft >= 60 && professionalBreadth >= 60 ? "Strong T" 
-            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "Emerging" 
+            {depthOfCraft >= 60 && professionalBreadth >= 60 ? "Strong T"
+            : depthOfCraft >= 40 && professionalBreadth >= 40 ? "Emerging"
             : "Developing"}
           </span>
         </div>
@@ -221,7 +242,7 @@ const ScoresSummary = ({
           <div className="flex-1">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-muted-foreground">Depth of Craft</span>
-              <span>{depthOfCraft}%</span>
+              <span>{getSliderLabel(depthOfCraft)}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${depthOfCraft}%` }} transition={{ duration: 0.5 }} />
@@ -230,7 +251,7 @@ const ScoresSummary = ({
           <div className="flex-1">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-muted-foreground">Prof. Breadth</span>
-              <span>{professionalBreadth}%</span>
+              <span>{getSliderLabel(professionalBreadth)}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <motion.div className="h-full bg-highlighter" initial={{ width: 0 }} animate={{ width: `${professionalBreadth}%` }} transition={{ duration: 0.5 }} />
@@ -239,51 +260,62 @@ const ScoresSummary = ({
         </div>
       </div>
 
-      {/* Professional Deep Dive Summary */}
-      <div className="p-4 bg-muted/20 rounded-lg sketch-border-light">
-        <div className="flex items-center justify-between mb-3">
-          <HandwrittenLabel className="text-2xl">Professional Deep Dive</HandwrittenLabel>
-          <span className={`text-sm font-medium ${
-            professionalAvg >= 70 ? "text-hire" : professionalAvg >= 40 ? "text-highlighter" : "text-muted-foreground"
-          }`}>
-            {professionalAvg}%
-          </span>
-        </div>
-      </div>
+      {/* Grouped Scores by Section */}
+      {sections.map((section) => (
+        <div key={section.title} className="space-y-2">
+          <HandwrittenLabel className="text-xl text-muted-foreground">{section.title}</HandwrittenLabel>
+          <div className="space-y-1">
+            {section.items.map((score) => {
+              const Icon = score.icon;
+              const idx = itemIndex++;
+              return (
+                <motion.div
+                  key={score.label}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.03 }}
+                  className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/20 transition-colors"
+                >
+                  {/* Status dot */}
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dotColor(score.status)}`} />
 
-      {/* Detailed Scores Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {scores.map((score, index) => {
-          const StatusIcon = getStatusIcon(score.status);
-          const Icon = score.icon;
-          return (
-            <motion.div
-              key={`${score.section}-${score.label}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`flex items-center gap-3 p-3 rounded-lg border ${getStatusColor(score.status)}`}
-            >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-medium opacity-60">{score.section}.</span>
-                  <span className="text-sm font-medium truncate">{score.label}</span>
-                </div>
-                <div className="text-xs truncate opacity-80">{score.value}</div>
-              </div>
-              <StatusIcon className="w-4 h-4 flex-shrink-0" />
-            </motion.div>
-          );
-        })}
-      </div>
+                  {/* Icon + Label */}
+                  <Icon className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+                  <span className="text-sm flex-shrink-0">{score.label}</span>
+
+                  {/* Progress bar or spacer */}
+                  <div className="flex-1 mx-2">
+                    {score.sliderValue !== undefined ? (
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded-full ${barColor(score.status)}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${score.sliderValue}%` }}
+                          transition={{ duration: 0.4, delay: idx * 0.03 }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-px bg-muted/40" />
+                    )}
+                  </div>
+
+                  {/* Descriptive value */}
+                  <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[5rem] text-right">
+                    {score.displayValue}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground pt-2">
-        <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-hire" /><span>Excellent</span></div>
-        <div className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-highlighter" /><span>Good</span></div>
-        <div className="flex items-center gap-1"><XCircle className="w-3 h-3 text-reject" /><span>Needs Work</span></div>
-        <div className="flex items-center gap-1"><HelpCircle className="w-3 h-3 text-muted-foreground" /><span>Not Assessed</span></div>
+        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-hire" /><span>Excellent</span></div>
+        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-highlighter" /><span>Good</span></div>
+        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-reject" /><span>Needs Work</span></div>
+        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full border border-muted-foreground/40" /><span>Not Assessed</span></div>
       </div>
     </div>
   );
