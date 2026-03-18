@@ -34,6 +34,7 @@ interface ScoresSummaryProps {
   resilienceScore: number;
   aestheticsInterest: number;
   motivationLevel: MotivationLevel;
+  sidewaysMotivationLevel: SidewaysMotivationLevel;
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
