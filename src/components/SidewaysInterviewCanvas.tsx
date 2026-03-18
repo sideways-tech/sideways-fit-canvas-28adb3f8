@@ -4,7 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+import { LayoutDashboard } from "lucide-react";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import BackgroundSection from "./BackgroundSection";
@@ -20,6 +24,7 @@ import AestheticsSection from "./AestheticsSection";
 import IndustryMotivationSection from "./IndustryMotivationSection";
 import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
+import CvUpload from "./CvUpload";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -175,6 +180,9 @@ const SidewaysInterviewCanvas = () => {
     sidewaysMotivationReason: "",
   });
 
+  const [cvFilePath, setCvFilePath] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
+
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
 
@@ -182,19 +190,113 @@ const SidewaysInterviewCanvas = () => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleSubmitAssessment = async () => {
+    if (!formState.candidateName.trim()) {
+      toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
+      return;
+    }
+    if (!formState.interviewerName.trim()) {
+      toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Upsert candidate
+      const { data: existingCandidates } = await supabase
+        .from("candidates")
+        .select("id")
+        .eq("name", formState.candidateName.trim())
+        .eq("role", formState.candidateRole.trim() || "");
+
+      let candidateId: string;
+
+      if (existingCandidates && existingCandidates.length > 0) {
+        candidateId = existingCandidates[0].id;
+        await supabase.from("candidates").update({
+          department: formState.department || null,
+          hiring_level: formState.hiringLevel || null,
+          education: formState.education || null,
+          website: formState.candidateWebsite || null,
+        }).eq("id", candidateId);
+      } else {
+        const { data: newCandidate, error: cErr } = await supabase
+          .from("candidates")
+          .insert({
+            name: formState.candidateName.trim(),
+            role: formState.candidateRole.trim() || null,
+            department: formState.department || null,
+            hiring_level: formState.hiringLevel || null,
+            education: formState.education || null,
+            website: formState.candidateWebsite || null,
+          })
+          .select("id")
+          .single();
+
+        if (cErr) throw cErr;
+        candidateId = newCandidate.id;
+      }
+
+      // Insert assessment
+      const { error: aErr } = await supabase.from("assessments").insert({
+        candidate_id: candidateId,
+        round_number: parseInt(formState.interviewRound),
+        interviewer_name: formState.interviewerName.trim(),
+        cv_file_path: cvFilePath || null,
+        background_notes: formState.backgroundNotes || null,
+        interested_in_others: formState.interestedInOthers,
+        reads_widely: formState.readsWidely,
+        recent_read_example: formState.recentReadExample || null,
+        interests_passions_notes: formState.interestsPassionsNotes || null,
+        depth_topic: formState.depthTopic || null,
+        depth_score: formState.depthScore,
+        aesthetics_interest: formState.aestheticsInterest,
+        aesthetics_process_note: formState.aestheticsProcessNote || null,
+        depth_of_craft: formState.depthOfCraft,
+        articulation_skill: formState.articulationSkill,
+        portfolio_quality: formState.portfolioQuality,
+        problem_solving_approach: formState.problemSolvingApproach,
+        professional_breadth: formState.professionalBreadth,
+        professional_dive_notes: formState.professionalDiveNotes || null,
+        resilience_score: formState.resilienceScore,
+        diagnostic_level: formState.diagnosticLevel || null,
+        honesty_level: formState.honestyLevel || null,
+        sideways_website_feedback: formState.sidewaysWebsiteFeedback || null,
+        motivation_level: formState.motivationLevel || null,
+        motivation_reason: formState.motivationReason || null,
+        sideways_motivation_level: formState.sidewaysMotivationLevel || null,
+        sideways_motivation_reason: formState.sidewaysMotivationReason || null,
+        person_score: categoryScores.person,
+        professional_score: categoryScores.professional,
+        mindset_score: categoryScores.mindset,
+        overall_score: categoryScores.overall,
+        verdict,
+      });
+
+      if (aErr) throw aErr;
+
+      toast({
+        title: "✅ Assessment Saved",
+        description: `${formState.candidateName}'s Round ${formState.interviewRound} assessment has been saved.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Save failed",
+        description: err.message || "Something went wrong.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleArchive = () => {
-    toast({
-      title: "Assessment Archived",
-      description: `${formState.candidateName || "Candidate"}'s assessment has been saved to archives.`,
-    });
+    handleSubmitAssessment();
   };
 
   const handleInvite = () => {
     if (verdict === "strong-no" || verdict === "lean-no") return;
-    toast({
-      title: "🎪 Invitation Sent!",
-      description: `${formState.candidateName || "Candidate"} has been invited to join the Circus!`,
-    });
+    handleSubmitAssessment();
   };
 
   return (
@@ -210,9 +312,17 @@ const SidewaysInterviewCanvas = () => {
           <p className="text-sm text-muted-foreground max-w-md mx-auto italic">
             "We like people who can't be summed up in a résumé bullet."
           </p>
-          <div className="pt-4">
-            <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
-            <p className="text-muted-foreground">The "Can't Be Templated" Fit Test</p>
+          <div className="pt-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
+              <p className="text-muted-foreground">The "Can't Be Templated" Fit Test</p>
+            </div>
+            <Link to="/dashboard">
+              <Button variant="outline" className="sketch-border-light gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Button>
+            </Link>
           </div>
         </motion.header>
 
@@ -320,6 +430,13 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="5">Round 5</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <CvUpload
+                candidateName={formState.candidateName}
+                onUploadComplete={(path) => setCvFilePath(path)}
+                currentFilePath={cvFilePath}
+              />
             </div>
           </div>
         </SketchCard>
