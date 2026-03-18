@@ -169,7 +169,7 @@ const SidewaysInterviewCanvas = () => {
     sidewaysMotivationReason: "",
   });
 
-  const archetype = useMemo(() => calculateArchetype(formState), [formState]);
+  const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
