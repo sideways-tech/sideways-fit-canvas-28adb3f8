@@ -37,14 +37,14 @@ const SidewaysWorkSection = ({
           onChange={(e) => onFeedbackChange(e.target.value)}
           className="sketch-border-light bg-background text-sm min-h-[100px]"
         />
-      </div>
 
-      {/* Honesty Meter (existing component) */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">
-          Their take on Sideways work — how honest were they?
-        </Label>
-        <HonestyMeter value={honestyLevel} onChange={onHonestyChange} />
+        {/* Honesty Meter */}
+        <div className="space-y-3 pt-2">
+          <Label className="text-sm font-medium">
+            Their take on Sideways work — how honest were they?
+          </Label>
+          <HonestyMeter value={honestyLevel} onChange={onHonestyChange} />
+        </div>
       </div>
     </div>
   );
