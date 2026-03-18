@@ -28,6 +28,37 @@ type MotivationLevel = "unclear" | "practical" | "passionate";
 type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
 type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
+interface FormState {
+  candidateName: string;
+  candidateRole: string;
+  interviewerName: string;
+  department: string;
+  hiringLevel: string;
+  backgroundNotes: string;
+  diagnosticLevel: DiagnosticLevel | "";
+  interestedInOthers: number;
+  readsWidely: number;
+  recentReadExample: string;
+  interestsPassionsNotes: string;
+  sidewaysWebsiteFeedback: string;
+  honestyLevel: HonestyLevel | "";
+  depthOfCraft: number;
+  articulationSkill: number;
+  portfolioQuality: number;
+  problemSolvingApproach: number;
+  professionalBreadth: number;
+  professionalDiveNotes: string;
+  depthTopic: string;
+  depthScore: number;
+  resilienceScore: number;
+  aestheticsInterest: number;
+  aestheticsProcessNote: string;
+  motivationLevel: MotivationLevel | "";
+  motivationReason: string;
+  sidewaysMotivationLevel: SidewaysMotivationLevel | "";
+  sidewaysMotivationReason: string;
+}
+
 interface CategoryScores {
   person: number;
   professional: number;
