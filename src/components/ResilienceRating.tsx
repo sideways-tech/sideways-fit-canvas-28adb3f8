@@ -18,10 +18,10 @@ const ResilienceRating = ({ value, onChange }: ResilienceRatingProps) => {
             <p className="text-sm font-medium">
               "The Scrap It" Test
             </p>
-            <p className="text-sm text-muted-foreground">
-              Ask them about a time they had to scrap an idea they loved. 
-              How did they handle it? Did they fight too hard? Let go too easily? 
-              Or iterate gracefully?
+            <p className="text-sm text-muted-foreground">Ask them about a time they had to scrap an idea they loved. How did they handle it? Did they fight too hard? Let go too easily? Or did they iterate gracefully? Talk about it.
+
+
+
             </p>
           </div>
         </div>
@@ -39,24 +39,24 @@ const ResilienceRating = ({ value, onChange }: ResilienceRatingProps) => {
         </div>
 
         <div className="flex gap-2 justify-center py-4">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <motion.button
-              key={star}
-              type="button"
-              onClick={() => onChange(star === value ? 0 : star)}
-              whileHover={{ scale: 1.15, rotate: star % 2 === 0 ? 5 : -5 }}
-              whileTap={{ scale: 0.9 }}
-              className="focus:outline-none focus:ring-2 focus:ring-highlighter rounded"
-            >
+          {[1, 2, 3, 4, 5].map((star) =>
+          <motion.button
+            key={star}
+            type="button"
+            onClick={() => onChange(star === value ? 0 : star)}
+            whileHover={{ scale: 1.15, rotate: star % 2 === 0 ? 5 : -5 }}
+            whileTap={{ scale: 0.9 }}
+            className="focus:outline-none focus:ring-2 focus:ring-highlighter rounded">
+            
               <Star
-                className={`w-10 h-10 transition-colors duration-200 ${
-                  star <= value
-                    ? "fill-highlighter text-highlighter"
-                    : "text-muted-foreground/30 hover:text-muted-foreground/50"
-                }`}
-              />
+              className={`w-10 h-10 transition-colors duration-200 ${
+              star <= value ?
+              "fill-highlighter text-highlighter" :
+              "text-muted-foreground/30 hover:text-muted-foreground/50"}`
+              } />
+            
             </motion.button>
-          ))}
+          )}
         </div>
 
         {/* Rating Description */}
@@ -71,19 +71,19 @@ const ResilienceRating = ({ value, onChange }: ResilienceRatingProps) => {
       </div>
 
       {/* Circus Fit Indicator */}
-      {value >= 4 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="p-3 bg-hire/10 rounded-lg text-center sketch-border-light"
-        >
+      {value >= 4 &&
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-3 bg-hire/10 rounded-lg text-center sketch-border-light">
+        
           <HandwrittenLabel className="text-3xl text-hire">
             Ready for the Circus! 🎪
           </HandwrittenLabel>
         </motion.div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default ResilienceRating;
