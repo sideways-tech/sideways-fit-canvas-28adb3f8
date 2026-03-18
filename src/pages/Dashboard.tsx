@@ -270,7 +270,7 @@ const Dashboard = () => {
                               </Badge>
                             )}
                             {a.cv_file_path && (
-                              <FileText className="w-4 h-4 text-muted-foreground" title="CV attached" />
+                              <FileText className="w-4 h-4 text-muted-foreground" />
                             )}
                             <span className="text-muted-foreground text-xs">
                               {new Date(a.created_at).toLocaleDateString()}
