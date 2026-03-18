@@ -317,25 +317,11 @@ const SidewaysInterviewCanvas = () => {
 
         {/* ACT 2: THE PROFESSIONAL */}
 
-        {/* C. Diagnostic Mindset */}
+        {/* C. Experience Deep Dive + Resilience */}
         <SketchCard className="mb-8" delay={0.3}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">C. Diagnostic Mindset</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Did they ask 'Why' before 'How'? Doctor vs Waiter mindset.</p>
-            </div>
-            <DiagnosticSection
-              value={formState.diagnosticLevel}
-              onChange={(value) => updateField("diagnosticLevel", value)}
-            />
-          </div>
-        </SketchCard>
-
-        {/* D. Experience Deep Dive + Resilience — merge E + G */}
-        <SketchCard className="mb-8" delay={0.4}>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">D. Experience Deep Dive</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">C. Experience Deep Dive</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Ask them to walk you through their best professional work. This is where they present — portfolio pieces, case studies, demos, or slides. Let them lead. Watch for how they frame problems, explain decisions, and own outcomes.</p>
             </div>
             <ProfessionalDeepDiveSection
@@ -365,11 +351,11 @@ const SidewaysInterviewCanvas = () => {
 
         {/* ACT 3: THE FIT */}
 
-        {/* E. Why This Industry & Why Sideways — merge D + I */}
-        <SketchCard className="mb-8" delay={0.5}>
+        {/* D. Why This Industry & Why Sideways */}
+        <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">E. Why This Industry & Why Sideways</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">D. Why This Industry & Why Sideways</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Why this industry, why Sideways — and can they be honest about it?</p>
             </div>
             <IndustryMotivationSection
@@ -387,6 +373,20 @@ const SidewaysInterviewCanvas = () => {
               honestyLevel={formState.honestyLevel}
               onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* E. Diagnostic Mindset — Post-interview grading */}
+        <SketchCard className="mb-8" delay={0.5}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">E. Diagnostic Mindset</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Looking back at the full conversation — did they ask 'Why' before 'How'?</p>
+            </div>
+            <DiagnosticSection
+              value={formState.diagnosticLevel}
+              onChange={(value) => updateField("diagnosticLevel", value)}
             />
           </div>
         </SketchCard>
