@@ -26,94 +26,84 @@ type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
 type HonestyLevel = "flattery" | "diplomatic" | "honest";
 type MotivationLevel = "unclear" | "practical" | "passionate";
 type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
-type Archetype = "vendor" | "birbal" | "work-in-progress";
+type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
-interface FormState {
-  candidateName: string;
-  candidateRole: string;
-  interviewerName: string;
-  department: string;
-  hiringLevel: string;
-  // A. Background
-  backgroundNotes: string;
-  // B. Diagnostic
-  diagnosticLevel: DiagnosticLevel | "";
-  // C. Interested in Others
-  interestedInOthers: number;
-  // D. Interests & Passions
-  readsWidely: number;
-  recentReadExample: string;
-  interestsPassionsNotes: string;
-  // E. Sideways & Our Work
-  sidewaysWebsiteFeedback: string;
-  honestyLevel: HonestyLevel | "";
-  // F. Professional Deep Dive
-  depthOfCraft: number;
-  articulationSkill: number;
-  portfolioQuality: number;
-  problemSolvingApproach: number;
-  professionalBreadth: number;
-  professionalDiveNotes: string;
-  // G. Depth in Non-Work Topic
-  depthTopic: string;
-  depthScore: number;
-  // H. Willingness to Iterate
-  resilienceScore: number;
-  // I. Art & Aesthetics
-  aestheticsInterest: number;
-  aestheticsProcessNote: string;
-  // J. Industry Motivation
-  motivationLevel: MotivationLevel | "";
-  motivationReason: string;
-  sidewaysMotivationLevel: SidewaysMotivationLevel | "";
-  sidewaysMotivationReason: string;
+interface CategoryScores {
+  person: number;
+  professional: number;
+  mindset: number;
+  overall: number;
 }
 
-const calculateArchetype = (state: FormState): Archetype => {
-  const {
-    diagnosticLevel,
-    interestedInOthers,
-    honestyLevel,
-    readsWidely,
-    depthScore,
-    resilienceScore,
-    aestheticsInterest,
-    motivationLevel,
-    depthOfCraft,
-    articulationSkill,
-    portfolioQuality,
-    problemSolvingApproach,
-  } = state;
+const normalizeCategorical = (value: string, map: Record<string, number>): number => {
+  return map[value] ?? 0;
+};
 
-  const breadthScore = state.professionalBreadth;
-  const professionalAvg = Math.round(
-    (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
+const calculateCategoryScores = (state: FormState): CategoryScores => {
+  // ACT 1: The Person (4 dimensions, equal weight)
+  const person = Math.round(
+    (state.interestedInOthers +
+      state.readsWidely +
+      state.aestheticsInterest +
+      state.depthScore) / 4
   );
 
-  // Vendor: Low diagnostic OR flattery OR unclear motivation
-  if (
-    diagnosticLevel === "order-taker" ||
-    honestyLevel === "flattery" ||
-    motivationLevel === "unclear"
-  ) {
-    return "vendor";
+  // ACT 2: The Professional (6 dimensions, weighted)
+  const resilienceNormalized = ((state.resilienceScore - 1) / 4) * 100; // 1-5 → 0-100
+  const professional = Math.round(
+    state.depthOfCraft * 0.22 +
+    state.articulationSkill * 0.18 +
+    state.portfolioQuality * 0.18 +
+    state.problemSolvingApproach * 0.17 +
+    state.professionalBreadth * 0.15 +
+    resilienceNormalized * 0.10
+  );
+
+  // ACT 3: Mindset & Alignment (4 categorical dimensions)
+  const diagnosticScore = normalizeCategorical(state.diagnosticLevel, {
+    "order-taker": 15, "clarifier": 50, "diagnostician": 100,
+  });
+  const honestyScore = normalizeCategorical(state.honestyLevel, {
+    "flattery": 10, "diplomatic": 50, "honest": 100,
+  });
+  const motivationScore = normalizeCategorical(state.motivationLevel, {
+    "unclear": 10, "practical": 50, "passionate": 100,
+  });
+  const sidewaysMotivationScore = normalizeCategorical(state.sidewaysMotivationLevel, {
+    "generic": 15, "culture-fit": 50, "sideways-specific": 100,
+  });
+  const mindset = Math.round(
+    (diagnosticScore + honestyScore + motivationScore + sidewaysMotivationScore) / 4
+  );
+
+  // Overall: weighted combination (Professional matters most)
+  const overall = Math.round(person * 0.25 + professional * 0.40 + mindset * 0.35);
+
+  return { person, professional, mindset, overall };
+};
+
+const calculateVerdict = (state: FormState): { verdict: Verdict; scores: CategoryScores } => {
+  const scores = calculateCategoryScores(state);
+  const { person, professional, mindset, overall } = scores;
+  const minCategory = Math.min(person, professional, mindset);
+
+  // Strong No: any category critically low OR very low overall
+  if (minCategory < 25 || overall < 30) {
+    return { verdict: "strong-no", scores };
   }
 
-  // Birbal: High across all key dimensions
-  if (
-    diagnosticLevel === "diagnostician" &&
-    depthOfCraft >= 60 &&
-    state.professionalBreadth >= 60 &&
-    honestyLevel === "honest" &&
-    resilienceScore >= 4 &&
-    aestheticsInterest >= 50 &&
-    motivationLevel === "passionate" &&
-    professionalAvg >= 60
-  ) {
-    return "birbal";
+  // Lean No: any category below threshold OR mediocre overall
+  if (minCategory < 40 || overall < 45) {
+    return { verdict: "lean-no", scores };
   }
 
-  return "work-in-progress";
+  // Strong Yes: all categories strong AND high overall
+  if (minCategory >= 60 && overall >= 65) {
+    return { verdict: "strong-yes", scores };
+  }
+
+  // Lean Yes: passed minimum bars
+  return { verdict: "lean-yes", scores };
 };
 
 const SidewaysInterviewCanvas = () => {
