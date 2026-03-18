@@ -79,59 +79,17 @@ const IndustryMotivationSection = ({
 }: IndustryMotivationSectionProps) => {
   return (
     <div className="space-y-6">
-      {/* Industry Motivation Level */}
-      <RadioGroup
-        value={level}
-        onValueChange={(val) => onLevelChange(val as MotivationLevel)}
-        className="space-y-3"
-      >
-        {industryOptions.map((option) => {
-          const Icon = option.icon;
-          const isSelected = level === option.value;
-
-          return (
-            <motion.div
-              key={option.value}
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Label
-                htmlFor={`motivation-${option.value}`}
-                className={`flex items-start gap-4 p-4 cursor-pointer sketch-border-light transition-all duration-200 ${
-                  isSelected
-                    ? "bg-muted shadow-[2px_2px_0px_0px_hsl(var(--ink))]"
-                    : "bg-background hover:bg-muted/50"
-                }`}
-              >
-                <RadioGroupItem
-                  value={option.value}
-                  id={`motivation-${option.value}`}
-                  className="mt-1"
-                />
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Icon className={`w-5 h-5 ${option.color}`} />
-                    <span className="font-medium">{option.label}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {option.description}
-                  </p>
-                </div>
-              </Label>
-            </motion.div>
-          );
-        })}
-      </RadioGroup>
-
-      {/* Their Story */}
-      <div className="space-y-3">
-        <Label htmlFor="motivation-reason" className="text-sm font-medium flex items-center gap-2">
-          <Target className="w-4 h-4 text-muted-foreground" />
-          Their Industry Story
-        </Label>
+      {/* Why This Industry sub-block */}
+      <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
+        <div className="flex items-center gap-2">
+          <Target className="w-5 h-5 text-highlighter" />
+          <Label className="text-sm font-medium">Why This Industry?</Label>
+        </div>
         <p className="text-xs text-muted-foreground">
           Capture their specific reason for choosing this industry/role
         </p>
+
+        {/* Textarea first — capture their answer */}
         <Textarea
           id="motivation-reason"
           placeholder="What did they say about why they want to work in creative problem-solving?"
@@ -139,6 +97,66 @@ const IndustryMotivationSection = ({
           onChange={(e) => onReasonChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[80px] resize-none"
         />
+
+        {/* Then grade with MCQ */}
+        <Label className="text-xs text-muted-foreground">
+          Based on their answer, how would you rate their industry motivation?
+        </Label>
+        <RadioGroup
+          value={level}
+          onValueChange={(val) => onLevelChange(val as MotivationLevel)}
+          className="space-y-3"
+        >
+          {industryOptions.map((option) => {
+            const Icon = option.icon;
+            const isSelected = level === option.value;
+
+            return (
+              <motion.div
+                key={option.value}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Label
+                  htmlFor={`motivation-${option.value}`}
+                  className={`flex items-start gap-4 p-4 cursor-pointer sketch-border-light transition-all duration-200 ${
+                    isSelected
+                      ? "bg-muted shadow-[2px_2px_0px_0px_hsl(var(--ink))]"
+                      : "bg-background hover:bg-muted/50"
+                  }`}
+                >
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`motivation-${option.value}`}
+                    className="mt-1"
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-5 h-5 ${option.color}`} />
+                      <span className="font-medium">{option.label}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {option.description}
+                    </p>
+                  </div>
+                </Label>
+              </motion.div>
+            );
+          })}
+        </RadioGroup>
+
+        {level === "passionate" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-2 p-3 bg-hire/10 rounded-lg sketch-border-light"
+          >
+            <Heart className="w-5 h-5 text-hire fill-hire" />
+            <HandwrittenLabel className="text-3xl text-hire">
+              Genuine Intent!
+            </HandwrittenLabel>
+          </motion.div>
+        )}
       </div>
 
       {/* Why Sideways? sub-block */}
@@ -151,6 +169,24 @@ const IndustryMotivationSection = ({
           Do they know who we are and why they want to be here specifically?
         </p>
 
+        {/* Textarea first — capture their answer */}
+        <div className="space-y-2">
+          <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
+            What specifically about Sideways appeals to them? Any Indian / international examples they found inspirational?
+          </Label>
+          <Textarea
+            id="sideways-reason"
+            placeholder="E.g., 'Loved the XYZ campaign', 'Resonated with the problem-solving approach', 'Knows someone here'..."
+            value={sidewaysReason}
+            onChange={(e) => onSidewaysReasonChange(e.target.value)}
+            className="sketch-border-light bg-background min-h-[80px] resize-none"
+          />
+        </div>
+
+        {/* Then grade with MCQ */}
+        <Label className="text-xs text-muted-foreground">
+          Based on their answer, how Sideways-specific was their motivation?
+        </Label>
         <RadioGroup
           value={sidewaysLevel}
           onValueChange={(val) => onSidewaysLevelChange(val as SidewaysMotivationLevel)}
@@ -194,19 +230,6 @@ const IndustryMotivationSection = ({
           })}
         </RadioGroup>
 
-        <div className="space-y-2 pt-2">
-          <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-            What specifically about Sideways appeals to them? Any Indian / international examples they found inspirational?
-          </Label>
-          <Textarea
-            id="sideways-reason"
-            placeholder="E.g., 'Loved the XYZ campaign', 'Resonated with the problem-solving approach', 'Knows someone here'..."
-            value={sidewaysReason}
-            onChange={(e) => onSidewaysReasonChange(e.target.value)}
-            className="sketch-border-light bg-background min-h-[80px] resize-none"
-          />
-        </div>
-
         {sidewaysLevel === "sideways-specific" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -220,20 +243,6 @@ const IndustryMotivationSection = ({
           </motion.div>
         )}
       </div>
-
-      {/* Passionate indicator */}
-      {level === "passionate" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2 p-3 bg-hire/10 rounded-lg sketch-border-light"
-        >
-          <Heart className="w-5 h-5 text-hire fill-hire" />
-          <HandwrittenLabel className="text-3xl text-hire">
-            Genuine Intent!
-          </HandwrittenLabel>
-        </motion.div>
-      )}
     </div>
   );
 };
