@@ -21,22 +21,6 @@ interface ProfessionalDeepDiveSectionProps {
 
 const sliders = [
   {
-    key: "depthOfCraft" as const,
-    label: "Depth of Craft",
-    description: "How deep is their mastery in their core domain?",
-    icon: Wrench,
-    low: "Surface-level",
-    high: "Deep expertise",
-  },
-  {
-    key: "professionalBreadth" as const,
-    label: "Breadth of Professional Interests",
-    description: "Beyond their core role, how curious are they about adjacent disciplines? A client servicing person interested in copy, art direction, typography. A designer who understands strategy, production, media.",
-    icon: Compass,
-    low: "Stays in their lane",
-    high: "Cross-disciplinary curiosity",
-  },
-  {
     key: "articulationSkill" as const,
     label: "Articulation & Presentation",
     description: "Can they walk through their work with clarity, narrative, and presence?",
@@ -60,8 +44,23 @@ const sliders = [
     low: "Shows only outputs",
     high: "Reveals the thinking",
   },
+  {
+    key: "depthOfCraft" as const,
+    label: "Depth of Craft",
+    description: "How deep is their mastery in their core domain?",
+    icon: Wrench,
+    low: "Surface-level",
+    high: "Deep expertise",
+  },
+  {
+    key: "professionalBreadth" as const,
+    label: "Breadth of Professional Interests",
+    description: "Beyond their core role, how curious are they about adjacent disciplines? A client servicing person interested in copy, art direction, typography. A designer who understands strategy, production, media.",
+    icon: Compass,
+    low: "Stays in their lane",
+    high: "Cross-disciplinary curiosity",
+  },
 ];
-
 const ProfessionalDeepDiveSection = ({
   depthOfCraft,
   articulationSkill,
