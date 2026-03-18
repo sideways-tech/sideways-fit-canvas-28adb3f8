@@ -22,6 +22,7 @@ import {
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician" | "";
 type HonestyLevel = "flattery" | "diplomatic" | "honest" | "";
 type MotivationLevel = "unclear" | "practical" | "passionate" | "";
+type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific" | "";
 
 interface ScoresSummaryProps {
   diagnosticLevel: DiagnosticLevel;
@@ -33,6 +34,7 @@ interface ScoresSummaryProps {
   resilienceScore: number;
   aestheticsInterest: number;
   motivationLevel: MotivationLevel;
+  sidewaysMotivationLevel: SidewaysMotivationLevel;
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
@@ -84,6 +86,7 @@ const ScoresSummary = ({
   resilienceScore,
   aestheticsInterest,
   motivationLevel,
+  sidewaysMotivationLevel,
   depthOfCraft,
   articulationSkill,
   portfolioQuality,
@@ -143,20 +146,39 @@ const ScoresSummary = ({
     return "Unclear";
   };
 
+  const getSidewaysMotivationStatus = (): Status => {
+    if (!sidewaysMotivationLevel) return "not-assessed";
+    if (sidewaysMotivationLevel === "sideways-specific") return "excellent";
+    if (sidewaysMotivationLevel === "culture-fit") return "good";
+    return "needs-work";
+  };
+
+  const getSidewaysMotivationValue = (): string => {
+    if (!sidewaysMotivationLevel) return "Not assessed";
+    if (sidewaysMotivationLevel === "sideways-specific") return "Sideways-Specific ✓";
+    if (sidewaysMotivationLevel === "culture-fit") return "Culture Fit";
+    return "Generic";
+  };
+
   const scores: ScoreItem[] = [
-    { label: "Diagnostic Mindset", section: "B", status: getDiagnosticStatus(), value: getDiagnosticValue(), icon: Lightbulb },
-    { label: "Interested in Others", section: "C", status: getScoreStatus(interestedInOthers), value: `${interestedInOthers}%`, icon: Users },
-    { label: "Reads Widely", section: "C", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
+    // B. Interests, Passions & Aesthetics
+    { label: "Depth (Non-Work)", section: "B", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
+    { label: "Reads Widely", section: "B", status: getScoreStatus(readsWidely), value: `${readsWidely}%`, icon: BookOpen },
+    { label: "Interested in Others", section: "B", status: getScoreStatus(interestedInOthers), value: `${interestedInOthers}%`, icon: Users },
+    { label: "Art & Aesthetics", section: "B", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
+    // C. Experience Deep Dive
+    { label: "Depth of Craft", section: "C", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
+    { label: "Professional Breadth", section: "C", status: getScoreStatus(professionalBreadth), value: `${professionalBreadth}%`, icon: Compass },
+    { label: "Articulation & Presentation", section: "C", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
+    { label: "Portfolio Quality", section: "C", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
+    { label: "Problem-Solving", section: "C", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
+    { label: "Willingness to Iterate", section: "C", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
+    // D. Why Industry & Why Sideways
+    { label: "Industry Motivation", section: "D", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
+    { label: "Sideways Motivation", section: "D", status: getSidewaysMotivationStatus(), value: getSidewaysMotivationValue(), icon: Heart },
     { label: "Honest POV", section: "D", status: getHonestyStatus(), value: getHonestyValue(), icon: Shield },
-    { label: "Depth of Craft", section: "E", status: getScoreStatus(depthOfCraft), value: `${depthOfCraft}%`, icon: Wrench },
-    { label: "Professional Breadth", section: "E", status: getScoreStatus(professionalBreadth), value: `${professionalBreadth}%`, icon: Compass },
-    { label: "Articulation & Presentation", section: "E", status: getScoreStatus(articulationSkill), value: `${articulationSkill}%`, icon: Mic },
-    { label: "Portfolio Quality", section: "E", status: getScoreStatus(portfolioQuality), value: `${portfolioQuality}%`, icon: Briefcase },
-    { label: "Problem-Solving", section: "E", status: getScoreStatus(problemSolvingApproach), value: `${problemSolvingApproach}%`, icon: Puzzle },
-    { label: "Depth (Non-Work)", section: "F", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", value: depthTopic ? `${depthScore}%` : "No topic", icon: Lightbulb },
-    { label: "Willingness to Iterate", section: "G", status: getResilienceStatus(), value: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5 ★`, icon: Star },
-    { label: "Art & Aesthetics", section: "H", status: getScoreStatus(aestheticsInterest), value: `${aestheticsInterest}%`, icon: Palette },
-    { label: "Industry Motivation", section: "I", status: getMotivationStatus(), value: getMotivationValue(), icon: Heart },
+    // E. Diagnostic Mindset
+    { label: "Diagnostic Mindset", section: "E", status: getDiagnosticStatus(), value: getDiagnosticValue(), icon: Lightbulb },
   ];
 
   const excellentCount = scores.filter((s) => s.status === "excellent").length;

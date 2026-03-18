@@ -408,6 +408,7 @@ const SidewaysInterviewCanvas = () => {
               resilienceScore={formState.resilienceScore}
               aestheticsInterest={formState.aestheticsInterest}
               motivationLevel={formState.motivationLevel}
+              sidewaysMotivationLevel={formState.sidewaysMotivationLevel}
               depthOfCraft={formState.depthOfCraft}
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
