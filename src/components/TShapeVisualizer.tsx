@@ -40,12 +40,12 @@ const TShapeVisualizer = ({
             transition={{ type: "spring", stiffness: 100, damping: 15 }}
           />
 
-          {/* Labels */}
+          {/* Labels with scores */}
           <div className="absolute -left-4 top-2 text-muted-foreground font-handwritten text-3xl -rotate-12">
-            Breadth →
+            Breadth → <span className="text-ink font-bold">{breadthScore}</span>
           </div>
           <div className="absolute left-1/2 bottom-0 text-muted-foreground font-handwritten text-3xl rotate-6 translate-x-4">
-            ↓ Depth
+            ↓ Depth <span className="text-ink font-bold">{depthScore}</span>
           </div>
         </div>
       </div>
