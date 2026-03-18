@@ -1,46 +1,86 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { Archive, Sparkles, AlertTriangle, Award, UserX } from "lucide-react";
+import { Archive, Sparkles, XCircle, ThumbsDown, ThumbsUp, Award } from "lucide-react";
 
-type Archetype = "vendor" | "birbal" | "work-in-progress";
+type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
+
+interface CategoryScores {
+  person: number;
+  professional: number;
+  mindset: number;
+  overall: number;
+}
 
 interface VerdictFooterProps {
-  archetype: Archetype;
+  verdict: Verdict;
+  scores: CategoryScores;
   onArchive: () => void;
   onInvite: () => void;
 }
 
-const archetypeConfig = {
-  vendor: {
-    label: "The Vendor",
-    sublabel: "Not a culture fit",
-    icon: UserX,
+const verdictConfig = {
+  "strong-no": {
+    label: "Strong No",
+    sublabel: "Not a fit for Sideways",
+    icon: XCircle,
     bgColor: "bg-reject/10",
     textColor: "text-reject",
-    description: "Order-taker mentality or lacks honest feedback capacity. May be a great vendor, but not a Sideways team member.",
+    description:
+      "Significant gaps across key dimensions. The candidate is unlikely to thrive in a diagnostic, T-shaped culture.",
   },
-  "work-in-progress": {
-    label: "Work in Progress",
-    sublabel: "Potential, but needs more signal",
-    icon: AlertTriangle,
-    bgColor: "bg-highlighter/10",
-    textColor: "text-foreground",
-    description: "Shows some T-shaped qualities but missing key elements. Consider a follow-up conversation.",
+  "lean-no": {
+    label: "Lean No",
+    sublabel: "Below the bar — revisit if they grow",
+    icon: ThumbsDown,
+    bgColor: "bg-reject/5",
+    textColor: "text-reject",
+    description:
+      "Some promising signals but one or more categories fall short. Consider reconnecting in 6–12 months.",
   },
-  birbal: {
-    label: "The Birbal",
+  "lean-yes": {
+    label: "Lean Yes",
+    sublabel: "Above the bar — worth a second look",
+    icon: ThumbsUp,
+    bgColor: "bg-hire/5",
+    textColor: "text-hire",
+    description:
+      "Clears the minimum thresholds across all categories. A follow-up conversation or work trial is recommended.",
+  },
+  "strong-yes": {
+    label: "Strong Yes",
     sublabel: "Trusted Advisor Material",
     icon: Award,
     bgColor: "bg-hire/10",
     textColor: "text-hire",
-    description: "Diagnostic mindset, T-shaped curiosity, and speaks truth to power. Ready for the Circus!",
+    description:
+      "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!",
   },
 };
 
-const VerdictFooter = ({ archetype, onArchive, onInvite }: VerdictFooterProps) => {
-  const config = archetypeConfig[archetype];
+const categoryLabels: { key: keyof CategoryScores; label: string }[] = [
+  { key: "person", label: "The Person" },
+  { key: "professional", label: "The Professional" },
+  { key: "mindset", label: "Mindset & Alignment" },
+  { key: "overall", label: "Overall" },
+];
+
+const getScoreColor = (score: number) => {
+  if (score >= 60) return "text-hire";
+  if (score >= 40) return "text-highlighter";
+  return "text-reject";
+};
+
+const getBarColor = (score: number) => {
+  if (score >= 60) return "bg-hire";
+  if (score >= 40) return "bg-highlighter";
+  return "bg-reject";
+};
+
+const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterProps) => {
+  const config = verdictConfig[verdict];
   const Icon = config.icon;
+  const isHireable = verdict === "lean-yes" || verdict === "strong-yes";
 
   return (
     <motion.div
@@ -49,7 +89,27 @@ const VerdictFooter = ({ archetype, onArchive, onInvite }: VerdictFooterProps) =
       transition={{ delay: 0.3 }}
       className="space-y-6"
     >
-      {/* Archetype Card */}
+      {/* Category Scores Breakdown */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {categoryLabels.map(({ key, label }) => (
+          <div key={key} className="p-3 rounded-lg sketch-border-light bg-muted/20 space-y-2">
+            <p className="text-xs text-muted-foreground font-medium">{label}</p>
+            <p className={`text-2xl font-bold tabular-nums ${getScoreColor(scores[key])}`}>
+              {scores[key]}
+            </p>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                className={`h-full rounded-full ${getBarColor(scores[key])}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${scores[key]}%` }}
+                transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Verdict Card */}
       <div className={`p-6 rounded-lg sketch-border ${config.bgColor}`}>
         <div className="flex items-start gap-4">
           <motion.div
@@ -83,15 +143,17 @@ const VerdictFooter = ({ archetype, onArchive, onInvite }: VerdictFooterProps) =
         </Button>
         <Button
           onClick={onInvite}
-          disabled={archetype === "vendor"}
+          disabled={!isHireable}
           className={`flex-1 h-12 gap-2 sketch-border ${
-            archetype === "birbal"
+            verdict === "strong-yes"
               ? "bg-ink text-highlighter hover:bg-ink/90"
+              : isHireable
+              ? "bg-muted/80 text-foreground hover:bg-muted"
               : "bg-muted text-muted-foreground"
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          Invite to the Circus
+          {verdict === "strong-yes" ? "Invite to the Circus" : isHireable ? "Consider for Next Round" : "Not Recommended"}
         </Button>
       </div>
     </motion.div>
