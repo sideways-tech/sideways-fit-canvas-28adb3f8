@@ -15,7 +15,7 @@ const TShapeVisualizer = ({
 
   return (
     <div className="space-y-6">
-      {/* T-Shape Visualization */}
+      {/* T-Shaped Visualization */}
       <div className="flex justify-center py-8">
         <div className="relative w-72 h-56">
           {/* Center point marker */}
