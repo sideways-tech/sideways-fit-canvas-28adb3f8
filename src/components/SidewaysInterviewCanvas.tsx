@@ -411,19 +411,19 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="interviewer-email">Interviewer Email</Label>
-              <Input
-                id="interviewer-email"
-                type="email"
-                placeholder="interviewer@sideways.com"
-                value={formState.interviewerEmail}
-                onChange={(e) => updateField("interviewerEmail", e.target.value)}
-                className="sketch-border-light bg-background"
-              />
-            </div>
-            <div className="space-y-2 flex items-end gap-3">
-              <div className="flex-1">
+            <div className="flex items-end gap-3">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="interviewer-email">Interviewer Email</Label>
+                <Input
+                  id="interviewer-email"
+                  type="email"
+                  placeholder="interviewer@sideways.com"
+                  value={formState.interviewerEmail}
+                  onChange={(e) => updateField("interviewerEmail", e.target.value)}
+                  className="sketch-border-light bg-background"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Round</Label>
                 <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
                   <SelectTrigger className="sketch-border-light bg-background h-9 w-20 rounded-full text-center text-sm">
