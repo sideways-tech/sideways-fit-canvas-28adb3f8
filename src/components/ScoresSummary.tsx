@@ -227,7 +227,7 @@ const ScoresSummary = ({
 
       {/* T-Shape Summary */}
       <div className="p-4 bg-muted/20 rounded-lg sketch-border-light">
-        <HandwrittenLabel className="text-2xl">T-Shape Profile</HandwrittenLabel>
+        <HandwrittenLabel className="text-2xl">T-Shaped Profile</HandwrittenLabel>
         <TShapeVisualizer depthScore={depthOfCraft} breadthScore={professionalBreadth} />
       </div>
 
