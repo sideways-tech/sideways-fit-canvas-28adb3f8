@@ -303,15 +303,6 @@ const SidewaysInterviewCanvas = () => {
               onInterestChange={(value) => updateField("aestheticsInterest", value)}
               onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
             />
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">General notes on their passions & interests</Label>
-              <Textarea
-                placeholder="What do they get excited about? Hobbies, obsessions, side projects..."
-                value={formState.interestsPassionsNotes}
-                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
-                className="sketch-border-light bg-background text-sm min-h-[100px]"
-              />
-            </div>
           </div>
         </SketchCard>
 
