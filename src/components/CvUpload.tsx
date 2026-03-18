@@ -47,7 +47,7 @@ const CvUpload = ({ candidateName, onUploadComplete, currentFilePath }: CvUpload
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 text-right">
       <Label>Upload CV</Label>
       <div className="flex items-center gap-3">
         <Button
