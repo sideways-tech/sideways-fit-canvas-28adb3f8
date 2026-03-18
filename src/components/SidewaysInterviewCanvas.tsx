@@ -306,6 +306,21 @@ const SidewaysInterviewCanvas = () => {
                 className="sketch-border-light bg-background"
               />
             </div>
+            <div className="space-y-2">
+              <Label>Interview Round</Label>
+              <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
+                <SelectTrigger className="sketch-border-light bg-background">
+                  <SelectValue placeholder="Select round..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Round 1</SelectItem>
+                  <SelectItem value="2">Round 2</SelectItem>
+                  <SelectItem value="3">Round 3</SelectItem>
+                  <SelectItem value="4">Round 4</SelectItem>
+                  <SelectItem value="5">Round 5</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </SketchCard>
 
