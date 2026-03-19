@@ -32,7 +32,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
   const { data: kraData, isLoading } = useQuery({
     queryKey: ["kra-definitions", department, hiringLevel],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("kra_definitions")
         .select("*")
         .eq("discipline", department)
@@ -41,7 +41,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
         .order("sub_kra_order", { ascending: true });
 
       if (error) throw error;
-      return data as KraDefinition[];
+      return (data || []) as KraDefinition[];
     },
     enabled: !!department && !!hiringLevel,
   });
