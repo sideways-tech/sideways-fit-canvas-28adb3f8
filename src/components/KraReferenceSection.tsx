@@ -31,7 +31,7 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
   const discipline = DISCIPLINE_MAP[department] || department;
   const [expandedKras, setExpandedKras] = useState<Set<number>>(new Set());
 
-  const { data: kraData, isLoading } = useQuery({
+  const { data: kraData, isLoading, isError } = useQuery({
     queryKey: ["kra-definitions", discipline, hiringLevel],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,6 +45,8 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
       return data;
     },
     enabled: !!department && !!hiringLevel,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 
   if (!department || !hiringLevel) {
@@ -102,6 +104,17 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
           <div className="h-8 bg-muted rounded w-1/3" />
           <div className="h-4 bg-muted rounded w-full" />
           <div className="h-4 bg-muted rounded w-2/3" />
+        </div>
+      </SketchCard>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SketchCard className="mb-8" delay={0.12}>
+        <div className="flex items-center gap-3 text-destructive py-6 justify-center">
+          <BookOpen className="w-5 h-5" />
+          <p className="text-sm italic">Failed to load KRA data. Please try again.</p>
         </div>
       </SketchCard>
     );
