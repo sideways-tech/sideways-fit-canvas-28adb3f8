@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { Archive, Sparkles, XCircle, ThumbsDown, ThumbsUp, Award } from "lucide-react";
+import { Archive, Sparkles, XCircle, ThumbsDown, ThumbsUp, Award, Loader2 } from "lucide-react";
 
 type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
@@ -17,6 +17,7 @@ interface VerdictFooterProps {
   scores: CategoryScores;
   onArchive: () => void;
   onInvite: () => void;
+  isSaving?: boolean;
 }
 
 const verdictConfig = {
@@ -77,7 +78,7 @@ const getBarColor = (score: number) => {
   return "bg-reject";
 };
 
-const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterProps) => {
+const VerdictFooter = ({ verdict, scores, onArchive, onInvite, isSaving = false }: VerdictFooterProps) => {
   const config = verdictConfig[verdict];
   const Icon = config.icon;
   const isHireable = verdict === "lean-yes" || verdict === "strong-yes";
@@ -136,10 +137,20 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterPr
         <Button
           variant="outline"
           onClick={onArchive}
+          disabled={isSaving}
           className="w-full sm:w-[40%] sketch-border-light gap-2 h-12"
         >
-          <Archive className="w-4 h-4" />
-          Save Report Card
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Uploading…
+            </>
+          ) : (
+            <>
+              <Archive className="w-4 h-4" />
+              Save Report Card
+            </>
+          )}
         </Button>
       </div>
     </motion.div>
