@@ -64,8 +64,12 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
   if (!department || !hiringLevel) return null;
   if (isPending) {
     return (
-      <div className="mb-8 rounded-sm border border-border bg-card px-6 py-5">
-        <p className="text-sm text-muted-foreground">Loading KRAs…</p>
+      <div className="mb-8 flex items-center gap-3 rounded-sm border border-border bg-card px-6 py-5">
+        <svg className="h-5 w-5 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <p className="text-sm text-muted-foreground">Fetching KRA reference…</p>
       </div>
     );
   }
@@ -74,7 +78,17 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
   const sidewaysRows = (allRows || []).filter((row) => normalizeText(row.discipline) === normalizeText("_sideways_person"));
   const combinedRows = [...matchingDisciplineRows, ...sidewaysRows];
 
-  if (combinedRows.length === 0) return null;
+  const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  if (combinedRows.length === 0) {
+    return (
+      <div className="mb-8 rounded-sm border border-dashed border-border bg-card px-6 py-5">
+        <p className="text-sm italic text-muted-foreground">
+          No KRA definitions found for <span className="font-medium">{departmentLabel}</span> at level <span className="font-medium">{hiringLevel}</span>. You can upload them via the <a href="/kra-admin" className="underline hover:text-foreground">KRA Admin</a> page.
+        </p>
+      </div>
+    );
+  }
 
   const grouped: GroupedKra[] = [];
   const seen = new Map<string, number>();
@@ -97,7 +111,6 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
     });
   }
 
-  const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <AnimatePresence>
