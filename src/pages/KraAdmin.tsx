@@ -125,7 +125,7 @@ const KraAdmin = () => {
     if (!confirm(`Delete all KRA data for "${disc}"?`)) return;
 
     try {
-      const { error } = await supabase.from("kra_definitions").delete().eq("discipline", disc);
+      const { error } = await (supabase as any).from("kra_definitions").delete().eq("discipline", disc);
       if (error) throw error;
 
       toast({ title: "Deleted", description: `KRA data for "${disc}" removed.` });
