@@ -83,7 +83,7 @@ const HonestyMeter = ({ value, onChange }: HonestyMeterProps) => {
             >
               <Label
                 htmlFor={`honesty-${option.value}`}
-                className={`flex flex-col items-center gap-2 p-4 cursor-pointer rounded-lg border-2 transition-all duration-200 text-center ${
+                className={`flex flex-col items-center gap-2 p-4 cursor-pointer rounded-lg border-2 transition-all duration-200 text-center h-full ${
                   isSelected
                     ? `${option.bgColor} ${option.borderColor} shadow-[2px_2px_0px_0px_hsl(var(--ink))]`
                     : "bg-background border-border/30 hover:border-border"
