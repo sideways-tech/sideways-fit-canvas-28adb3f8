@@ -10,19 +10,32 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       toast({ title: "Missing fields", description: "Please enter both email and password.", variant: "destructive" });
       return;
     }
+    if (password.length < 6) {
+      toast({ title: "Weak password", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-
-    if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email: email.trim(), password });
+      if (error) {
+        toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Account created", description: "You're now signed in." });
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      }
     }
     setLoading(false);
   };
@@ -33,10 +46,12 @@ const Login = () => {
         <div className="text-center space-y-4">
           <img src={sidewaysLogo} alt="Sideways" className="h-20 mx-auto" />
           <h1 className="text-xl font-semibold">Internal Access</h1>
-          <p className="text-sm text-muted-foreground">Sign in to access the assessment tool</p>
+          <p className="text-sm text-muted-foreground">
+            {isSignUp ? "Create your team account" : "Sign in to access the assessment tool"}
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="login-email">Email</Label>
             <Input
@@ -60,9 +75,20 @@ const Login = () => {
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Signing in…" : "Sign In"}
+            {loading ? (isSignUp ? "Creating account…" : "Signing in…") : (isSignUp ? "Create Account" : "Sign In")}
           </Button>
         </form>
+
+        <p className="text-sm text-muted-foreground text-center">
+          {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+          <button
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-foreground underline underline-offset-2 hover:opacity-70"
+          >
+            {isSignUp ? "Sign in" : "Sign up"}
+          </button>
+        </p>
 
         <p className="text-xs text-muted-foreground text-center">
           This tool is for authorised Sideways team members only.
