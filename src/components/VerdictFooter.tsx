@@ -141,20 +141,6 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterPr
           <Archive className="w-4 h-4" />
           Send to Archive
         </Button>
-        <Button
-          onClick={onInvite}
-          disabled={!isHireable}
-          className={`flex-1 h-12 gap-2 sketch-border ${
-            verdict === "strong-yes"
-              ? "bg-ink text-highlighter hover:bg-ink/90"
-              : isHireable
-              ? "bg-muted/80 text-foreground hover:bg-muted"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          <Sparkles className="w-4 h-4" />
-          {verdict === "strong-yes" ? "Invite to the Circus" : isHireable ? "Consider for Next Round" : "Not Recommended"}
-        </Button>
       </div>
     </motion.div>
   );
