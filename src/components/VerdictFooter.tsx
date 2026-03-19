@@ -78,7 +78,7 @@ const getBarColor = (score: number) => {
   return "bg-reject";
 };
 
-const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterProps) => {
+const VerdictFooter = ({ verdict, scores, onArchive, onInvite, isSaving = false }: VerdictFooterProps) => {
   const config = verdictConfig[verdict];
   const Icon = config.icon;
   const isHireable = verdict === "lean-yes" || verdict === "strong-yes";
