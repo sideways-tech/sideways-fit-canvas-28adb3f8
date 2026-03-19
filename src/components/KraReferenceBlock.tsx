@@ -29,7 +29,7 @@ interface GroupedKra {
 }
 
 const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) => {
-  const { data: kraData, isLoading } = useQuery({
+  const { data: kraData, isLoading, isError } = useQuery({
     queryKey: ["kra-definitions", department, hiringLevel],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -44,10 +44,12 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
       return (data || []) as KraDefinition[];
     },
     enabled: !!department && !!hiringLevel,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Also fetch Sideways Person traits (universal)
-  const { data: sidewaysData } = useQuery({
+  const { data: sidewaysData, isError: isSidewaysError } = useQuery({
     queryKey: ["kra-definitions", "_sideways_person", hiringLevel],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -62,6 +64,8 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
       return (data || []) as KraDefinition[];
     },
     enabled: !!hiringLevel,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
   });
 
   if (!department || !hiringLevel) return null;
@@ -115,6 +119,8 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
 
             {isLoading ? (
               <p className="text-sm text-muted-foreground py-4">Loading KRAs…</p>
+            ) : (isError || isSidewaysError) ? (
+              <p className="text-sm text-destructive py-4">Could not load KRAs. The database may be temporarily unavailable — try refreshing.</p>
             ) : (
               <Accordion type="multiple" className="w-full">
                 {grouped.map((kra, i) => (
