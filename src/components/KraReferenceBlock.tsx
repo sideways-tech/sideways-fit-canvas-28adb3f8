@@ -111,7 +111,6 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
     });
   }
 
-  const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <AnimatePresence>
