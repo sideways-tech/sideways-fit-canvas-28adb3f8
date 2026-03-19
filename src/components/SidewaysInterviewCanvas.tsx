@@ -489,14 +489,16 @@ const SidewaysInterviewCanvas = () => {
                   onBlur={() => markTouched("interviewerEmail")}
                   className={`sketch-border-light bg-background ${touched.interviewerEmail && (isFieldEmpty("interviewerEmail") || !isValidEmail(formState.interviewerEmail.trim())) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
-                {touched.interviewerEmail && isFieldEmpty("interviewerEmail") && (
-                  <p className="text-xs text-destructive mt-1">Required</p>
-                )}
-                {touched.interviewerEmail && !isFieldEmpty("interviewerEmail") && !isValidEmail(formState.interviewerEmail.trim()) && (
-                  <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
-                )}
+                <div className="h-5">
+                  {touched.interviewerEmail && isFieldEmpty("interviewerEmail") && (
+                    <p className="text-xs text-destructive">Required</p>
+                  )}
+                  {touched.interviewerEmail && !isFieldEmpty("interviewerEmail") && !isValidEmail(formState.interviewerEmail.trim()) && (
+                    <p className="text-xs text-destructive">Enter a valid email address</p>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1.5 shrink-0 self-start">
+              <div className="space-y-1.5 shrink-0">
                 <Label>Round <span className="text-destructive">*</span></Label>
                 <Select value={formState.interviewRound} onValueChange={(value) => { updateField("interviewRound", value); markTouched("interviewRound"); }}>
                   <SelectTrigger className={`sketch-border-light bg-highlighter/30 h-11 w-20 rounded-full text-center text-sm font-medium ${touched.interviewRound && isFieldEmpty("interviewRound") ? "border-destructive" : ""}`} onBlur={() => markTouched("interviewRound")}>
