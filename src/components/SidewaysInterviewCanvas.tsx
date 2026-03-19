@@ -26,6 +26,7 @@ import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
 import KraReferenceBlock from "./KraReferenceBlock";
+import ThankYouPage from "./ThankYouPage";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -195,6 +196,8 @@ const SidewaysInterviewCanvas = () => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const [submitted, setSubmitted] = useState(false);
+
   const isValidEmail = (v: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(v);
   const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
 
@@ -311,10 +314,50 @@ const SidewaysInterviewCanvas = () => {
 
       if (aErr) throw aErr;
 
-      toast({
-        title: "✅ Assessment Saved",
-        description: `${formState.candidateName}'s Round ${formState.interviewRound} assessment has been saved.`,
-      });
+      // Send email report if interviewer email provided
+      if (formState.interviewerEmail.trim()) {
+        try {
+          await supabase.functions.invoke("send-assessment-report", {
+            body: {
+              interviewerEmail: formState.interviewerEmail.trim(),
+              candidateData: {
+                name: formState.candidateName.trim(),
+                role: formState.candidateRole.trim() || null,
+                department: formState.department || null,
+                hiring_level: formState.hiringLevel || null,
+              },
+              assessmentData: {
+                interviewer_name: formState.interviewerName.trim(),
+                round_number: parseInt(formState.interviewRound),
+                interested_in_others: formState.interestedInOthers,
+                reads_widely: formState.readsWidely,
+                depth_score: formState.depthScore,
+                depth_topic: formState.depthTopic || null,
+                aesthetics_interest: formState.aestheticsInterest,
+                depth_of_craft: formState.depthOfCraft,
+                articulation_skill: formState.articulationSkill,
+                portfolio_quality: formState.portfolioQuality,
+                problem_solving_approach: formState.problemSolvingApproach,
+                professional_breadth: formState.professionalBreadth,
+                resilience_score: formState.resilienceScore,
+                diagnostic_level: formState.diagnosticLevel || null,
+                honesty_level: formState.honestyLevel || null,
+                motivation_level: formState.motivationLevel || null,
+                sideways_motivation_level: formState.sidewaysMotivationLevel || null,
+                background_notes: formState.backgroundNotes || null,
+                professional_dive_notes: formState.professionalDiveNotes || null,
+              },
+              scores: categoryScores,
+              verdict,
+            },
+          });
+        } catch {
+          // Email is best-effort; don't block the save
+        }
+      }
+
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       toast({
         title: "Save failed",
@@ -334,6 +377,19 @@ const SidewaysInterviewCanvas = () => {
     if (verdict === "strong-no" || verdict === "lean-no") return;
     handleSubmitAssessment();
   };
+
+  if (submitted) {
+    return (
+      <ThankYouPage
+        candidateName={formState.candidateName}
+        roundNumber={formState.interviewRound}
+        verdict={verdict}
+        interviewerEmail={formState.interviewerEmail}
+        overallScore={categoryScores.overall}
+        onStartNew={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background paper-texture">
