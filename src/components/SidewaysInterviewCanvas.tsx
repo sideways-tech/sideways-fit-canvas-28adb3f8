@@ -251,8 +251,7 @@ const SidewaysInterviewCanvas = () => {
       const { data: existingCandidates } = await supabase
         .from("candidates")
         .select("id")
-        .eq("name", formState.candidateName.trim())
-        .eq("role", formState.candidateRole.trim() || "");
+        .eq("email", formState.candidateEmail.trim());
 
       let candidateId: string;
 
