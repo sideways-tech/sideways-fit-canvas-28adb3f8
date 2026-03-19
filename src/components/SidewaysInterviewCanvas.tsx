@@ -378,6 +378,19 @@ const SidewaysInterviewCanvas = () => {
     handleSubmitAssessment();
   };
 
+  if (submitted) {
+    return (
+      <ThankYouPage
+        candidateName={formState.candidateName}
+        roundNumber={formState.interviewRound}
+        verdict={verdict}
+        interviewerEmail={formState.interviewerEmail}
+        overallScore={categoryScores.overall}
+        onStartNew={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background paper-texture">
       <div className="container max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
