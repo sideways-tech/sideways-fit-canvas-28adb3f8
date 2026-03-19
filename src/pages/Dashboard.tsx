@@ -54,6 +54,7 @@ const Dashboard = () => {
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [verdictFilter, setVerdictFilter] = useState<string>("all");
   const [expandedCandidates, setExpandedCandidates] = useState<Set<string>>(new Set());
+  const queryClient = useQueryClient();
 
   const { data: candidates, isLoading } = useQuery({
     queryKey: ["candidates-dashboard"],
