@@ -199,9 +199,59 @@ const SidewaysInterviewCanvas = () => {
   };
 
   const [submitted, setSubmitted] = useState(false);
+  const roundAutoSetRef = useRef(false);
 
   const isValidEmail = (v: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(v);
   const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
+
+  // Auto-detect round number when candidate email changes
+  useEffect(() => {
+    const email = formState.candidateEmail.trim();
+    if (!email || !isValidEmail(email)) {
+      roundAutoSetRef.current = false;
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const { data: candidates } = await supabase
+          .from("candidates")
+          .select("id")
+          .eq("email", email)
+          .limit(1);
+
+        if (!candidates || candidates.length === 0) {
+          setFormState((prev) => ({ ...prev, interviewRound: prev.interviewRound || "1" }));
+          roundAutoSetRef.current = false;
+          return;
+        }
+
+        const candidateId = candidates[0].id;
+        const { data: assessments } = await supabase
+          .from("assessments")
+          .select("round_number")
+          .eq("candidate_id", candidateId)
+          .order("round_number", { ascending: false })
+          .limit(1);
+
+        const maxRound = assessments?.[0]?.round_number ?? 0;
+        const nextRound = Math.min(maxRound + 1, 5);
+        setFormState((prev) => ({ ...prev, interviewRound: nextRound.toString() }));
+        roundAutoSetRef.current = true;
+
+        if (maxRound > 0) {
+          toast({
+            title: "Returning candidate",
+            description: `Previous round ${maxRound} found — auto-set to Round ${nextRound}.`,
+          });
+        }
+      } catch {
+        // Silent fail — don't block the form
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formState.candidateEmail]);
 
   const requiredFields: { field: keyof FormState; label: string }[] = [
     { field: "candidateName", label: "Candidate's Name" },
