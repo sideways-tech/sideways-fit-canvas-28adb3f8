@@ -45,7 +45,7 @@ interface FormState {
   department: string;
   hiringLevel: string;
   education: string;
-  candidateWebsite: string;
+  candidateWebsite: string; // kept for DB compatibility
   backgroundNotes: string;
   diagnosticLevel: DiagnosticLevel | "";
   interestedInOthers: number;
