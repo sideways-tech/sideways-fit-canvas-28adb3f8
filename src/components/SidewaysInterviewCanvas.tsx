@@ -25,6 +25,7 @@ import IndustryMotivationSection from "./IndustryMotivationSection";
 import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
+import KraReferenceSection from "./KraReferenceSection";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -457,6 +458,9 @@ const SidewaysInterviewCanvas = () => {
             </div>
           </div>
         </SketchCard>
+
+        {/* KRA Reference Block */}
+        <KraReferenceSection department={formState.department} hiringLevel={formState.hiringLevel} />
 
         {/* A. Background */}
         <SketchCard className="mb-8" delay={0.15}>
