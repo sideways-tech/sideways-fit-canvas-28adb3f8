@@ -346,7 +346,7 @@ const Dashboard = () => {
                               </a>
                             )}
                             <span className="text-muted-foreground text-xs">
-                              {new Date(a.created_at).toLocaleDateString()}
+                              {new Date(a.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
                             </span>
                           </div>
                         );
