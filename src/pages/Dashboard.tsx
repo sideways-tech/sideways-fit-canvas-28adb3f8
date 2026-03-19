@@ -278,6 +278,24 @@ const Dashboard = () => {
                             >
                               <FileText className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
                             </a>
+                            {a.cv_file_path && (
+                              <a
+                                href="#"
+                                onClick={async (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const { data } = await supabase.storage
+                                    .from("cvs")
+                                    .createSignedUrl(a.cv_file_path!, 60);
+                                  if (data?.signedUrl) {
+                                    window.open(data.signedUrl, "_blank");
+                                  }
+                                }}
+                                title="Download CV"
+                              >
+                                <Paperclip className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
+                              </a>
+                            )}
                             <span className="text-muted-foreground text-xs">
                               {new Date(a.created_at).toLocaleDateString()}
                             </span>
