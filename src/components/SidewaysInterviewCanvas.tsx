@@ -152,6 +152,7 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
 const SidewaysInterviewCanvas = () => {
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
+    candidateEmail: "",
     candidateRole: "",
     interviewerName: "",
     interviewerEmail: "",
