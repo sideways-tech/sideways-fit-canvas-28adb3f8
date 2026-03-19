@@ -205,6 +205,7 @@ const SidewaysInterviewCanvas = () => {
 
   const requiredFields: { field: keyof FormState; label: string }[] = [
     { field: "candidateName", label: "Candidate's Name" },
+    { field: "candidateEmail", label: "Candidate's Email" },
     { field: "candidateRole", label: "Role hiring for" },
     { field: "department", label: "Department" },
     { field: "hiringLevel", label: "Hiring Level" },
