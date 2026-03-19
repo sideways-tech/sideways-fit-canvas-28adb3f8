@@ -270,6 +270,7 @@ const SidewaysInterviewCanvas = () => {
           .from("candidates")
           .insert({
             name: formState.candidateName.trim(),
+            email: formState.candidateEmail.trim(),
             role: formState.candidateRole.trim() || null,
             department: formState.department || null,
             hiring_level: formState.hiringLevel || null,
