@@ -265,42 +265,6 @@ export type Database = {
         }
         Relationships: []
       }
-      kra_definitions: {
-        Row: {
-          created_at: string
-          description: string | null
-          discipline: string
-          id: string
-          kra_name: string
-          kra_number: number
-          level: string
-          sub_kra_name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          discipline: string
-          id?: string
-          kra_name: string
-          kra_number: number
-          level: string
-          sub_kra_name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          discipline?: string
-          id?: string
-          kra_name?: string
-          kra_number?: number
-          level?: string
-          sub_kra_name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       suppressed_emails: {
         Row: {
           created_at: string

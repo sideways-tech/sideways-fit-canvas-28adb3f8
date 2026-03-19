@@ -2,6 +2,3 @@ project_id = "zewndcsntudrvhyvnnav"
 
 [functions.process-email-queue]
 verify_jwt = true
-
-[functions.ingest-kra-excel]
-verify_jwt = false
