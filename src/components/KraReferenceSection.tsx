@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, BookOpen } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 
