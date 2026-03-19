@@ -17,6 +17,7 @@ interface VerdictFooterProps {
   scores: CategoryScores;
   onArchive: () => void;
   onInvite: () => void;
+  isSaving?: boolean;
 }
 
 const verdictConfig = {
