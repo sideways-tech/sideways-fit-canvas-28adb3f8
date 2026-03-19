@@ -27,18 +27,45 @@ function ScoreBar({ label, score }: { label: string; score: number | null }) {
   );
 }
 
+function SliderRow({ label, value }: { label: string; value: number | null | undefined }) {
+  if (value === null || value === undefined) return null;
+  const color =
+    value >= 60 ? "bg-success" : value >= 40 ? "bg-accent" : "bg-destructive";
+  return (
+    <div className="mb-2">
+      <div className="flex justify-between mb-1">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-xs font-bold tabular-nums">{value}</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
+
 function DetailRow({ label, value }: { label: string; value: string | number | null | undefined }) {
-  if (value === null || value === undefined || value === "") return null;
+  if (value === null || value === undefined || value === "" || value === "—") return null;
   return (
     <div className="flex justify-between py-2 border-b border-border last:border-0">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-semibold text-foreground">{String(value)}</span>
+      <span className="text-sm font-semibold text-foreground text-right max-w-[60%]">{String(value)}</span>
+    </div>
+  );
+}
+
+function NoteBlock({ title, text }: { title: string; text: string | null | undefined }) {
+  if (!text) return null;
+  return (
+    <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
+      <h3 className="text-base font-bold text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground whitespace-pre-line">{text}</p>
     </div>
   );
 }
 
 function formatCategorical(value: string | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "";
   return value.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -102,8 +129,20 @@ const AssessmentReport = () => {
           <p className="text-sm text-muted-foreground mt-1">
             {c.role || "Role not specified"} · {(c.department || "").replace(/-/g, " / ").replace(/\b\w/g, (ch) => ch.toUpperCase())} · {c.hiring_level || "—"}
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Round {a.round_number} · Interviewer: {a.interviewer_name} · {new Date(a.created_at).toLocaleDateString()}
+          {c.email && (
+            <p className="text-sm text-muted-foreground mt-1">{c.email}</p>
+          )}
+          {c.education && (
+            <p className="text-sm text-muted-foreground mt-1">Education: {c.education}</p>
+          )}
+          {c.website && (
+            <p className="text-sm text-muted-foreground mt-1">Website: {c.website}</p>
+          )}
+          <p className="text-xs text-muted-foreground mt-3">
+            Round {a.round_number} · Interviewer: {a.interviewer_name}
+            {a.interviewer_email ? ` (${a.interviewer_email})` : ""}
+            {" · "}
+            {new Date(a.created_at).toLocaleDateString()}
           </p>
         </div>
 
@@ -114,7 +153,7 @@ const AssessmentReport = () => {
           </div>
         )}
 
-        {/* Scores */}
+        {/* Category Scores */}
         <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
           <h3 className="text-base font-bold text-foreground mb-4">Category Scores</h3>
           <ScoreBar label="The Person" score={a.person_score} />
@@ -125,40 +164,45 @@ const AssessmentReport = () => {
           </div>
         </div>
 
-        {/* Dimensions */}
+        {/* The Person — Slider Dimensions */}
         <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
-          <h3 className="text-base font-bold text-foreground mb-3">Assessment Dimensions</h3>
-          <DetailRow label="Interested in Others" value={a.interested_in_others} />
-          <DetailRow label="Reads Widely" value={a.reads_widely} />
-          <DetailRow label="Depth Score" value={a.depth_score} />
+          <h3 className="text-base font-bold text-foreground mb-4">The Person</h3>
+          <SliderRow label="Interested in Others" value={a.interested_in_others} />
+          <SliderRow label="Reading Breadth" value={a.reads_widely} />
+          <SliderRow label="T-Shape Depth" value={a.depth_score} />
+          <SliderRow label="Aesthetics Interest" value={a.aesthetics_interest} />
+          <DetailRow label="Recent Read / Example" value={a.recent_read_example} />
           <DetailRow label="Depth Topic" value={a.depth_topic} />
-          <DetailRow label="Aesthetics Interest" value={a.aesthetics_interest} />
-          <DetailRow label="Depth of Craft" value={a.depth_of_craft} />
-          <DetailRow label="Articulation Skill" value={a.articulation_skill} />
-          <DetailRow label="Portfolio Quality" value={a.portfolio_quality} />
-          <DetailRow label="Problem Solving" value={a.problem_solving_approach} />
-          <DetailRow label="Professional Breadth" value={a.professional_breadth} />
-          <DetailRow label="Resilience" value={a.resilience_score} />
+          <DetailRow label="Interests & Passions" value={a.interests_passions_notes} />
+        </div>
+
+        {/* The Professional — Slider Dimensions */}
+        <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
+          <h3 className="text-base font-bold text-foreground mb-4">The Professional</h3>
+          <SliderRow label="Depth of Craft" value={a.depth_of_craft} />
+          <SliderRow label="Articulation Skill" value={a.articulation_skill} />
+          <SliderRow label="Portfolio Quality" value={a.portfolio_quality} />
+          <SliderRow label="Problem Solving Approach" value={a.problem_solving_approach} />
+          <SliderRow label="Professional Breadth" value={a.professional_breadth} />
+          <DetailRow label="Aesthetics Process Note" value={a.aesthetics_process_note} />
+        </div>
+
+        {/* Mindset & Alignment */}
+        <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
+          <h3 className="text-base font-bold text-foreground mb-4">Mindset & Alignment</h3>
+          <SliderRow label="Resilience" value={a.resilience_score} />
           <DetailRow label="Diagnostic Level" value={formatCategorical(a.diagnostic_level)} />
           <DetailRow label="Honesty Level" value={formatCategorical(a.honesty_level)} />
-          <DetailRow label="Motivation" value={formatCategorical(a.motivation_level)} />
+          <DetailRow label="Motivation Level" value={formatCategorical(a.motivation_level)} />
+          <DetailRow label="Motivation Reason" value={a.motivation_reason} />
           <DetailRow label="Sideways Motivation" value={formatCategorical(a.sideways_motivation_level)} />
+          <DetailRow label="Sideways Motivation Reason" value={a.sideways_motivation_reason} />
+          <DetailRow label="Sideways Website Feedback" value={a.sideways_website_feedback} />
         </div>
 
         {/* Notes */}
-        {a.background_notes && (
-          <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
-            <h3 className="text-base font-bold text-foreground mb-2">Background Notes</h3>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">{a.background_notes}</p>
-          </div>
-        )}
-
-        {a.professional_dive_notes && (
-          <div className="sketch-border rounded-lg p-5 mb-5 bg-card">
-            <h3 className="text-base font-bold text-foreground mb-2">Professional Deep Dive</h3>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">{a.professional_dive_notes}</p>
-          </div>
-        )}
+        <NoteBlock title="Background Notes" text={a.background_notes} />
+        <NoteBlock title="Professional Deep Dive" text={a.professional_dive_notes} />
 
         {/* Footer */}
         <div className="text-center py-6 text-xs text-muted-foreground/60">

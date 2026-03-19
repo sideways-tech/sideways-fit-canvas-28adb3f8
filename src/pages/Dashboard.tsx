@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
 import sidewaysLogo from "@/assets/sideways-logo.png";
@@ -278,6 +278,24 @@ const Dashboard = () => {
                             >
                               <FileText className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
                             </a>
+                            {a.cv_file_path && (
+                              <a
+                                href="#"
+                                onClick={async (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const { data } = await supabase.storage
+                                    .from("cvs")
+                                    .createSignedUrl(a.cv_file_path!, 60);
+                                  if (data?.signedUrl) {
+                                    window.open(data.signedUrl, "_blank");
+                                  }
+                                }}
+                                title="Download CV"
+                              >
+                                <Paperclip className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
+                              </a>
+                            )}
                             <span className="text-muted-foreground text-xs">
                               {new Date(a.created_at).toLocaleDateString()}
                             </span>
