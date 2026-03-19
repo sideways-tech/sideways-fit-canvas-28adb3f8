@@ -269,9 +269,15 @@ const Dashboard = () => {
                                 {aVerdict.label}
                               </Badge>
                             )}
-                            {a.cv_file_path && (
-                              <FileText className="w-4 h-4 text-muted-foreground" />
-                            )}
+                            <a
+                              href={`/report/${a.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              title="View assessment report"
+                            >
+                              <FileText className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
+                            </a>
                             <span className="text-muted-foreground text-xs">
                               {new Date(a.created_at).toLocaleDateString()}
                             </span>
