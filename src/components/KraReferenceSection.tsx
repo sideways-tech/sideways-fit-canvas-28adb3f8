@@ -27,25 +27,41 @@ interface KraGroup {
   sub_kras: { sub_kra_name: string; description: string | null }[];
 }
 
+const KRA_QUERY_TIMEOUT_MS = 8000;
+
 const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionProps) => {
   const discipline = DISCIPLINE_MAP[department] || department;
   const [expandedKras, setExpandedKras] = useState<Set<number>>(new Set());
 
-  const { data: kraData, isLoading, isError } = useQuery({
+  const { data: kraData, isLoading, isError, error } = useQuery({
     queryKey: ["kra-definitions", discipline, hiringLevel],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("kra_definitions")
-        .select("kra_number, kra_name, sub_kra_name, description")
-        .eq("discipline", discipline)
-        .eq("level", hiringLevel)
-        .order("kra_number");
+      const controller = new AbortController();
+      const timeoutId = globalThis.setTimeout(() => controller.abort(), KRA_QUERY_TIMEOUT_MS);
 
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from("kra_definitions")
+          .select("kra_number, kra_name, sub_kra_name, description")
+          .eq("discipline", discipline)
+          .eq("level", hiringLevel)
+          .order("kra_number")
+          .abortSignal(controller.signal);
+
+        if (error) throw error;
+        return data ?? [];
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          throw new Error("KRA lookup timed out");
+        }
+        throw err;
+      } finally {
+        globalThis.clearTimeout(timeoutId);
+      }
     },
     enabled: !!department && !!hiringLevel,
-    retry: 1,
+    retry: false,
+    refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -110,11 +126,15 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
   }
 
   if (isError) {
+    const message = error instanceof Error && error.message === "KRA lookup timed out"
+      ? `KRA data took too long to load for ${discipline} at ${hiringLevel}. This usually means the backend query is stuck, not that data exists.`
+      : `Could not load KRA data for ${discipline} at ${hiringLevel}.`;
+
     return (
       <SketchCard className="mb-8" delay={0.12}>
         <div className="flex items-center gap-3 text-destructive py-6 justify-center">
           <BookOpen className="w-5 h-5" />
-          <p className="text-sm italic">Failed to load KRA data. Please try again.</p>
+          <p className="text-sm italic">{message}</p>
         </div>
       </SketchCard>
     );
