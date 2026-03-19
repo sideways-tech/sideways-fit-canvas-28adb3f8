@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.parse-kra-excel]
 verify_jwt = false
+
+[functions.send-assessment-report]
+verify_jwt = false
