@@ -137,10 +137,20 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite, isSaving = false 
         <Button
           variant="outline"
           onClick={onArchive}
+          disabled={isSaving}
           className="w-full sm:w-[40%] sketch-border-light gap-2 h-12"
         >
-          <Archive className="w-4 h-4" />
-          Save Report Card
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Uploading…
+            </>
+          ) : (
+            <>
+              <Archive className="w-4 h-4" />
+              Save Report Card
+            </>
+          )}
         </Button>
       </div>
     </motion.div>
