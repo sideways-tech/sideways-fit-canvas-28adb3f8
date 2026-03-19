@@ -153,7 +153,7 @@ const SidewaysInterviewCanvas = () => {
     candidateRole: "",
     interviewerName: "",
     interviewerEmail: "",
-    interviewRound: "1",
+    interviewRound: "",
     department: "",
     hiringLevel: "",
     education: "",
@@ -198,21 +198,32 @@ const SidewaysInterviewCanvas = () => {
   const isValidEmail = (v: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(v);
   const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
 
+  const requiredFields: { field: keyof FormState; label: string }[] = [
+    { field: "candidateName", label: "Candidate's Name" },
+    { field: "candidateRole", label: "Role hiring for" },
+    { field: "department", label: "Department" },
+    { field: "hiringLevel", label: "Hiring Level" },
+    { field: "interviewerName", label: "Interviewer Name" },
+    { field: "interviewerEmail", label: "Interviewer Email" },
+    { field: "interviewRound", label: "Round" },
+  ];
+
+  const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
+
   const handleSubmitAssessment = async () => {
-    if (!formState.candidateName.trim()) {
-      toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
+    // Mark all required fields as touched
+    const allTouched: Record<string, boolean> = { ...touched };
+    requiredFields.forEach(({ field }) => { allTouched[field] = true; });
+    setTouched(allTouched);
+
+    const firstMissing = requiredFields.find(({ field }) => isFieldEmpty(field));
+    if (firstMissing) {
+      toast({ title: "Missing info", description: `Please fill in "${firstMissing.label}".`, variant: "destructive" });
       return;
     }
-    if (!formState.interviewerName.trim()) {
-      toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
+    if (!isValidEmail(formState.interviewerEmail.trim())) {
+      toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
       return;
-    }
-    if (formState.interviewerEmail.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formState.interviewerEmail.trim())) {
-        toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
-        return;
-      }
     }
     if (formState.candidateWebsite.trim()) {
       try {
@@ -346,33 +357,41 @@ const SidewaysInterviewCanvas = () => {
         {/* Candidate Info */}
         <SketchCard className="mb-8" delay={0.1}>
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
-            {/* Row 1 */}
+             {/* Row 1 */}
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-name">Candidate's Name</Label>
+              <Label htmlFor="candidate-name">Candidate's Name <span className="text-destructive">*</span></Label>
               <Input
                 id="candidate-name"
                 placeholder="Enter name..."
                 value={formState.candidateName}
                 onChange={(e) => updateField("candidateName", e.target.value)}
-                className="sketch-border-light bg-background"
+                onBlur={() => markTouched("candidateName")}
+                className={`sketch-border-light bg-background ${touched.candidateName && isFieldEmpty("candidateName") ? "border-destructive" : ""}`}
               />
+              {touched.candidateName && isFieldEmpty("candidateName") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-role">Role hiring for</Label>
+              <Label htmlFor="candidate-role">Role hiring for <span className="text-destructive">*</span></Label>
               <Input
                 id="candidate-role"
                 placeholder="Position applying for..."
                 value={formState.candidateRole}
                 onChange={(e) => updateField("candidateRole", e.target.value)}
-                className="sketch-border-light bg-background"
+                onBlur={() => markTouched("candidateRole")}
+                className={`sketch-border-light bg-background ${touched.candidateRole && isFieldEmpty("candidateRole") ? "border-destructive" : ""}`}
               />
+              {touched.candidateRole && isFieldEmpty("candidateRole") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
 
             {/* Row 2 */}
             <div className="space-y-1.5">
-              <Label>Department</Label>
-              <Select value={formState.department} onValueChange={(value) => updateField("department", value)}>
-                <SelectTrigger className="sketch-border-light bg-background h-11">
+              <Label>Department <span className="text-destructive">*</span></Label>
+              <Select value={formState.department} onValueChange={(value) => { updateField("department", value); markTouched("department"); }}>
+                <SelectTrigger className={`sketch-border-light bg-background h-11 ${touched.department && isFieldEmpty("department") ? "border-destructive" : ""}`} onBlur={() => markTouched("department")}>
                   <SelectValue placeholder="Select department..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -384,11 +403,14 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="servicing">Servicing</SelectItem>
                 </SelectContent>
               </Select>
+              {touched.department && isFieldEmpty("department") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
             <div className="space-y-1.5">
-              <Label>Hiring Level</Label>
-              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); if (value !== "L1") updateField("education", ""); }}>
-                <SelectTrigger className="sketch-border-light bg-background h-11">
+              <Label>Hiring Level <span className="text-destructive">*</span></Label>
+              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); markTouched("hiringLevel"); if (value !== "L1") updateField("education", ""); }}>
+                <SelectTrigger className={`sketch-border-light bg-background h-11 ${touched.hiringLevel && isFieldEmpty("hiringLevel") ? "border-destructive" : ""}`} onBlur={() => markTouched("hiringLevel")}>
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -401,6 +423,9 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="L7">L7</SelectItem>
                 </SelectContent>
               </Select>
+              {touched.hiringLevel && isFieldEmpty("hiringLevel") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
 
             {/* Row 3 */}
@@ -439,18 +464,22 @@ const SidewaysInterviewCanvas = () => {
 
             {/* Row 4 */}
             <div className="space-y-1.5">
-              <Label htmlFor="interviewer-name">Interviewer Name</Label>
+              <Label htmlFor="interviewer-name">Interviewer Name <span className="text-destructive">*</span></Label>
               <Input
                 id="interviewer-name"
                 placeholder="Who is conducting this interview..."
                 value={formState.interviewerName}
                 onChange={(e) => updateField("interviewerName", e.target.value)}
-                className="sketch-border-light bg-background"
+                onBlur={() => markTouched("interviewerName")}
+                className={`sketch-border-light bg-background ${touched.interviewerName && isFieldEmpty("interviewerName") ? "border-destructive" : ""}`}
               />
+              {touched.interviewerName && isFieldEmpty("interviewerName") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
             <div className="flex items-end gap-3">
               <div className="flex-1 space-y-1.5">
-                <Label htmlFor="interviewer-email">Interviewer Email</Label>
+                <Label htmlFor="interviewer-email">Interviewer Email <span className="text-destructive">*</span></Label>
                 <Input
                   id="interviewer-email"
                   type="email"
@@ -458,16 +487,19 @@ const SidewaysInterviewCanvas = () => {
                   value={formState.interviewerEmail}
                   onChange={(e) => updateField("interviewerEmail", e.target.value)}
                   onBlur={() => markTouched("interviewerEmail")}
-                  className={`sketch-border-light bg-background ${touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                  className={`sketch-border-light bg-background ${touched.interviewerEmail && (isFieldEmpty("interviewerEmail") || !isValidEmail(formState.interviewerEmail.trim())) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
-                {touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
+                {touched.interviewerEmail && isFieldEmpty("interviewerEmail") && (
+                  <p className="text-xs text-destructive mt-1">Required</p>
+                )}
+                {touched.interviewerEmail && !isFieldEmpty("interviewerEmail") && !isValidEmail(formState.interviewerEmail.trim()) && (
                   <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
                 )}
               </div>
               <div className="space-y-1.5 shrink-0">
-                <Label>Round</Label>
-                <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
-                  <SelectTrigger className="sketch-border-light bg-highlighter/30 h-11 w-20 rounded-full text-center text-sm font-medium">
+                <Label>Round <span className="text-destructive">*</span></Label>
+                <Select value={formState.interviewRound} onValueChange={(value) => { updateField("interviewRound", value); markTouched("interviewRound"); }}>
+                  <SelectTrigger className={`sketch-border-light bg-highlighter/30 h-11 w-20 rounded-full text-center text-sm font-medium ${touched.interviewRound && isFieldEmpty("interviewRound") ? "border-destructive" : ""}`} onBlur={() => markTouched("interviewRound")}>
                     <SelectValue placeholder="R" />
                   </SelectTrigger>
                   <SelectContent>
@@ -478,6 +510,9 @@ const SidewaysInterviewCanvas = () => {
                     <SelectItem value="5">5</SelectItem>
                   </SelectContent>
                 </Select>
+                {touched.interviewRound && isFieldEmpty("interviewRound") && (
+                  <p className="text-xs text-destructive mt-1">Required</p>
+                )}
               </div>
             </div>
 
