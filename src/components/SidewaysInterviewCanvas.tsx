@@ -477,7 +477,7 @@ const SidewaysInterviewCanvas = () => {
                 <p className="text-xs text-destructive mt-1">Required</p>
               )}
             </div>
-            <div className="flex items-end gap-3">
+            <div className="flex items-start gap-3">
               <div className="flex-1 space-y-1.5">
                 <Label htmlFor="interviewer-email">Interviewer Email <span className="text-destructive">*</span></Label>
                 <Input
