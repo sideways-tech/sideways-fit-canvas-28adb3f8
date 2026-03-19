@@ -119,6 +119,8 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
 
             {isLoading ? (
               <p className="text-sm text-muted-foreground py-4">Loading KRAs…</p>
+            ) : (isError || isSidewaysError) ? (
+              <p className="text-sm text-destructive py-4">Could not load KRAs. The database may be temporarily unavailable — try refreshing.</p>
             ) : (
               <Accordion type="multiple" className="w-full">
                 {grouped.map((kra, i) => (
