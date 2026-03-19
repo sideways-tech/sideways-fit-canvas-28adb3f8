@@ -109,6 +109,17 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
     );
   }
 
+  if (isError) {
+    return (
+      <SketchCard className="mb-8" delay={0.12}>
+        <div className="flex items-center gap-3 text-destructive py-6 justify-center">
+          <BookOpen className="w-5 h-5" />
+          <p className="text-sm italic">Failed to load KRA data. Please try again.</p>
+        </div>
+      </SketchCard>
+    );
+  }
+
   if (kraGroups.length === 0) {
     return (
       <SketchCard className="mb-8" delay={0.12}>
