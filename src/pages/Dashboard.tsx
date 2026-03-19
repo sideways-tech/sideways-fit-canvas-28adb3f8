@@ -113,7 +113,7 @@ const Dashboard = () => {
     }
   };
 
-
+  const getLatestVerdict = (assessments: Assessment[]) => {
     const latest = assessments[assessments.length - 1];
     return latest?.verdict || null;
   };
