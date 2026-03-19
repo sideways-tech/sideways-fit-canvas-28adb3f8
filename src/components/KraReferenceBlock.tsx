@@ -28,14 +28,30 @@ interface GroupedKra {
   subKras: { sub_kra_name: string; sub_kra_order: number; description: string }[];
 }
 
+const disciplineAliases: Record<string, string[]> = {
+  strategy: ["strategy", "brand strategy", "strategic planning"],
+  creative: ["creative"],
+  copy: ["copy", "copywriting"],
+  "tech-ux": ["tech-ux", "tech / ux", "tech/ux", "ux", "technology", "tech"],
+  "product-design": ["product-design", "product design", "design"],
+  servicing: ["servicing", "client servicing", "account management"],
+};
+
+const normalizeText = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+const matchesDiscipline = (rowDiscipline: string, selectedDepartment: string) => {
+  const normalizedRow = normalizeText(rowDiscipline);
+  const aliases = disciplineAliases[selectedDepartment] || [selectedDepartment];
+  return aliases.some((alias) => normalizedRow === normalizeText(alias));
+};
+
 const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) => {
-  const { data: kraData, isLoading, isError } = useQuery({
+  const { data: allRows, isPending, isError } = useQuery({
     queryKey: ["kra-definitions", department, hiringLevel],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("kra_definitions")
         .select("*")
-        .eq("discipline", department)
         .eq("level", hiringLevel)
         .order("kra_order", { ascending: true })
         .order("sub_kra_order", { ascending: true });
@@ -44,41 +60,37 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
       return (data || []) as KraDefinition[];
     },
     enabled: !!department && !!hiringLevel,
-    retry: 2,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  // Also fetch Sideways Person traits (universal)
-  const { data: sidewaysData, isError: isSidewaysError } = useQuery({
-    queryKey: ["kra-definitions", "_sideways_person", hiringLevel],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("kra_definitions")
-        .select("*")
-        .eq("discipline", "_sideways_person")
-        .eq("level", hiringLevel)
-        .order("kra_order", { ascending: true })
-        .order("sub_kra_order", { ascending: true });
-
-      if (error) throw error;
-      return (data || []) as KraDefinition[];
-    },
-    enabled: !!hiringLevel,
-    retry: 2,
+    retry: 1,
     staleTime: 5 * 60 * 1000,
   });
 
   if (!department || !hiringLevel) return null;
+  if (isPending) {
+    return (
+      <div className="mb-8 rounded-sm border border-border bg-card px-6 py-5">
+        <p className="text-sm text-muted-foreground">Loading KRAs…</p>
+      </div>
+    );
+  }
 
-  const allData = [...(kraData || []), ...(sidewaysData || [])];
+  if (isError) {
+    return (
+      <div className="mb-8 rounded-sm border border-destructive/30 bg-card px-6 py-5">
+        <p className="text-sm text-destructive">Could not load KRAs right now.</p>
+      </div>
+    );
+  }
 
-  if (!isLoading && allData.length === 0) return null;
+  const matchingDisciplineRows = (allRows || []).filter((row) => matchesDiscipline(row.discipline, department));
+  const sidewaysRows = (allRows || []).filter((row) => normalizeText(row.discipline) === normalizeText("_sideways_person"));
+  const combinedRows = [...matchingDisciplineRows, ...sidewaysRows];
 
-  // Group by KRA name
+  if (combinedRows.length === 0) return null;
+
   const grouped: GroupedKra[] = [];
   const seen = new Map<string, number>();
 
-  for (const row of allData) {
+  for (const row of combinedRows) {
     if (!seen.has(row.kra_name)) {
       seen.set(row.kra_name, grouped.length);
       grouped.push({
@@ -87,6 +99,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
         subKras: [],
       });
     }
+
     const idx = seen.get(row.kra_name)!;
     grouped[idx].subKras.push({
       sub_kra_name: row.sub_kra_name,
@@ -105,57 +118,51 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
         exit={{ opacity: 0, height: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <SketchCard className="mb-8 bg-highlighter/5 border-highlighter/40" delay={0.12}>
+        <div className="mb-8 rounded-sm border border-border bg-card px-6 py-5 shadow-[4px_4px_0px_0px_hsl(var(--ink))]">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-muted-foreground" />
+              <BookOpen className="h-5 w-5 text-muted-foreground" />
               <HandwrittenLabel as="h3" className="text-3xl">
                 KRA Reference — {departmentLabel} · {hiringLevel}
               </HandwrittenLabel>
             </div>
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs italic text-muted-foreground">
               These are the Key Result Areas expected for this discipline & level. Use as a reference during evaluation.
             </p>
 
-            {isLoading ? (
-              <p className="text-sm text-muted-foreground py-4">Loading KRAs…</p>
-            ) : (isError || isSidewaysError) ? (
-              <p className="text-sm text-destructive py-4">Could not load KRAs. The database may be temporarily unavailable — try refreshing.</p>
-            ) : (
-              <Accordion type="multiple" className="w-full">
-                {grouped.map((kra, i) => (
-                  <AccordionItem key={i} value={`kra-${i}`} className="border-ink/10">
-                    <AccordionTrigger className="text-sm font-semibold hover:no-underline py-3">
-                      <span className="flex items-center gap-2 text-left">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-ink/10 text-xs font-bold shrink-0">
-                          {i + 1}
-                        </span>
-                        {kra.kra_name}
+            <Accordion type="multiple" className="w-full">
+              {grouped.map((kra, i) => (
+                <AccordionItem key={`${kra.kra_name}-${i}`} value={`kra-${i}`} className="border-ink/10">
+                  <AccordionTrigger className="py-3 text-left text-sm font-semibold hover:no-underline">
+                    <span className="flex items-center gap-2 text-left">
+                      <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/10 text-xs font-bold">
+                        {i + 1}
                       </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2 ml-8">
-                        {kra.subKras.map((sub, j) => (
-                          <div key={j} className="flex gap-2 text-sm">
-                            <ChevronRight className="w-3 h-3 mt-1.5 shrink-0 text-muted-foreground" />
-                            <div>
-                              <span className="font-medium">{sub.sub_kra_name}</span>
-                              {sub.description && sub.description !== "NIL" && (
-                                <p className="text-muted-foreground text-xs mt-0.5 whitespace-pre-line">
-                                  {sub.description}
-                                </p>
-                              )}
-                            </div>
+                      {kra.kra_name}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="ml-8 space-y-2">
+                      {kra.subKras.map((sub, j) => (
+                        <div key={`${sub.sub_kra_name}-${j}`} className="flex gap-2 text-sm">
+                          <ChevronRight className="mt-1.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                          <div>
+                            <span className="font-medium">{sub.sub_kra_name}</span>
+                            {sub.description && sub.description !== "NIL" && (
+                              <p className="mt-0.5 whitespace-pre-line text-xs text-muted-foreground">
+                                {sub.description}
+                              </p>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
-        </SketchCard>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
