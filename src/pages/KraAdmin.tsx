@@ -72,28 +72,29 @@ const KraAdmin = () => {
         const { data, error } = (await withTimeout(
           (supabase as any)
             .from("kra_definitions")
-            .select("kra_name, kra_order, level")
-            .eq("discipline", discipline)
-            .order("kra_order", { ascending: true }),
+            .select("kra_name, level")
+            .eq("discipline", discipline),
           4000,
           "Backend unavailable"
-        )) as { data: { kra_name: string; kra_order: number; level: string }[] | null; error: any };
+        )) as { data: { kra_name: string; level: string }[] | null; error: any };
 
         if (error) throw error;
 
-        const kraMap = new Map<string, { order: number; levels: Set<string> }>();
+        const kraMap = new Map<string, Set<string>>();
         for (const row of data || []) {
           if (!kraMap.has(row.kra_name)) {
-            kraMap.set(row.kra_name, { order: row.kra_order, levels: new Set() });
+            kraMap.set(row.kra_name, new Set());
           }
-          kraMap.get(row.kra_name)!.levels.add(row.level);
+          kraMap.get(row.kra_name)!.add(row.level);
         }
 
-        return Array.from(kraMap.entries()).map(([name, info]) => ({
-          name,
-          order: info.order,
-          levels: Array.from(info.levels).sort(),
-        }));
+        return Array.from(kraMap.entries())
+          .map(([name, levels]) => ({
+            name,
+            order: 0,
+            levels: Array.from(levels).sort(),
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
       } catch {
         return getStoredKraSummary(discipline);
       }
