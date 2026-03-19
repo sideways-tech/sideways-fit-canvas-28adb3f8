@@ -424,8 +424,11 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="https://..."
                 value={formState.candidateWebsite}
                 onChange={(e) => updateField("candidateWebsite", e.target.value)}
-                className="sketch-border-light bg-background"
+                className={`sketch-border-light bg-background ${formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
               />
+              {formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) && (
+                <p className="text-xs text-destructive mt-1">Enter a valid URL starting with https://</p>
+              )}
             </div>
 
             {/* Row 4 */}
