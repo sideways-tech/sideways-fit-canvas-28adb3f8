@@ -534,19 +534,24 @@ const SidewaysInterviewCanvas = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-website">Portfolio / Website</Label>
+              <Label htmlFor="candidate-email">Candidate's Email <span className="text-destructive">*</span></Label>
               <Input
-                id="candidate-website"
-                type="url"
-                placeholder="https://..."
-                value={formState.candidateWebsite}
-                onChange={(e) => updateField("candidateWebsite", e.target.value)}
-                onBlur={() => markTouched("candidateWebsite")}
-                className={`sketch-border-light bg-background ${touched.candidateWebsite && formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                id="candidate-email"
+                type="email"
+                placeholder="candidate@email.com"
+                value={formState.candidateEmail}
+                onChange={(e) => updateField("candidateEmail", e.target.value)}
+                onBlur={() => markTouched("candidateEmail")}
+                className={`sketch-border-light bg-background ${touched.candidateEmail && (isFieldEmpty("candidateEmail") || (!isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()))) ? "border-destructive" : ""}`}
               />
-              {touched.candidateWebsite && formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) && (
-                <p className="text-xs text-destructive mt-1">Enter a valid URL starting with https://</p>
-              )}
+              <div className="h-5">
+                {touched.candidateEmail && isFieldEmpty("candidateEmail") && (
+                  <p className="text-xs text-destructive">Required</p>
+                )}
+                {touched.candidateEmail && !isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()) && (
+                  <p className="text-xs text-destructive">Please enter a valid email</p>
+                )}
+              </div>
             </div>
 
             {/* Row 4 */}
