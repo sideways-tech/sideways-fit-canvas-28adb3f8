@@ -43,7 +43,7 @@ const KraAdmin = () => {
 
       if (error) throw error;
       const unique = [...new Set((data || []).map((d: { discipline: string }) => d.discipline))];
-      return unique;
+      return unique as string[];
     },
   });
 
