@@ -39,7 +39,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
     queryKey: ["kra-definitions", department, hiringLevel],
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(
+        const { data, error } = (await withTimeout(
           (supabase as any)
             .from("kra_definitions")
             .select("*")
@@ -48,7 +48,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
             .order("sub_kra_order", { ascending: true }),
           4000,
           "Backend unavailable"
-        );
+        )) as { data: KraDefinition[] | null; error: any };
 
         if (error) throw error;
         return (data || []) as KraDefinition[];

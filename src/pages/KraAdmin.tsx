@@ -147,11 +147,11 @@ const KraAdmin = () => {
     deleteStoredKraDefinitions(disc);
 
     try {
-      const { error } = await withTimeout(
+      const { error } = (await withTimeout(
         (supabase as any).from("kra_definitions").delete().eq("discipline", disc),
         4000,
         "Backend unavailable"
-      );
+      )) as { error: any };
       if (error) throw error;
     } catch {
       // local delete already completed
