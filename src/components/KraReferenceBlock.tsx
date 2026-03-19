@@ -3,19 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookOpen, ChevronRight } from "lucide-react";
-import SketchCard from "./SketchCard";
 import HandwrittenLabel from "./HandwrittenLabel";
-
-interface KraDefinition {
-  id: string;
-  discipline: string;
-  kra_name: string;
-  kra_order: number;
-  sub_kra_name: string;
-  sub_kra_order: number;
-  level: string;
-  description: string;
-}
+import { getStoredKraDefinitions, type KraDefinition, withTimeout } from "@/lib/kraLocalStore";
 
 interface KraReferenceBlockProps {
   department: string;
@@ -46,21 +35,29 @@ const matchesDiscipline = (rowDiscipline: string, selectedDepartment: string) =>
 };
 
 const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) => {
-  const { data: allRows, isPending, isError } = useQuery({
+  const { data: allRows, isPending } = useQuery({
     queryKey: ["kra-definitions", department, hiringLevel],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("kra_definitions")
-        .select("*")
-        .eq("level", hiringLevel)
-        .order("kra_order", { ascending: true })
-        .order("sub_kra_order", { ascending: true });
+      try {
+        const { data, error } = await withTimeout(
+          (supabase as any)
+            .from("kra_definitions")
+            .select("*")
+            .eq("level", hiringLevel)
+            .order("kra_order", { ascending: true })
+            .order("sub_kra_order", { ascending: true }),
+          4000,
+          "Backend unavailable"
+        );
 
-      if (error) throw error;
-      return (data || []) as KraDefinition[];
+        if (error) throw error;
+        return (data || []) as KraDefinition[];
+      } catch {
+        return getStoredKraDefinitions().filter((row) => row.level === hiringLevel);
+      }
     },
     enabled: !!department && !!hiringLevel,
-    retry: 1,
+    retry: 0,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -69,14 +66,6 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
     return (
       <div className="mb-8 rounded-sm border border-border bg-card px-6 py-5">
         <p className="text-sm text-muted-foreground">Loading KRAs…</p>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="mb-8 rounded-sm border border-destructive/30 bg-card px-6 py-5">
-        <p className="text-sm text-destructive">Could not load KRAs right now.</p>
       </div>
     );
   }
