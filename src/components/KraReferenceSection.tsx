@@ -31,7 +31,7 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
   const discipline = DISCIPLINE_MAP[department] || department;
   const [expandedKras, setExpandedKras] = useState<Set<number>>(new Set());
 
-  const { data: kraData, isLoading } = useQuery({
+  const { data: kraData, isLoading, isError } = useQuery({
     queryKey: ["kra-definitions", discipline, hiringLevel],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,6 +45,8 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
       return data;
     },
     enabled: !!department && !!hiringLevel,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 
   if (!department || !hiringLevel) {
