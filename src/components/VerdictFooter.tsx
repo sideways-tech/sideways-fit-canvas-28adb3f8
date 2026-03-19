@@ -132,11 +132,11 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterPr
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex justify-center">
         <Button
           variant="outline"
           onClick={onArchive}
-          className="flex-1 sketch-border-light gap-2 h-12"
+          className="w-full sm:w-[40%] sketch-border-light gap-2 h-12"
         >
           <Archive className="w-4 h-4" />
           Save Report Card
