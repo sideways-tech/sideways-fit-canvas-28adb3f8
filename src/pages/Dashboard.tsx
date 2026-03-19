@@ -259,6 +259,34 @@ const Dashboard = () => {
                       <span className="text-muted-foreground">
                         {new Date(candidate.created_at).toLocaleDateString()}
                       </span>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                            title="Delete candidate"
+                          >
+                            <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete {candidate.name}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete this candidate and all their assessment rounds. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => handleDelete(candidate.id, candidate.name)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
 
