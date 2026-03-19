@@ -193,6 +193,9 @@ const SidewaysInterviewCanvas = () => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
+
   const handleSubmitAssessment = async () => {
     if (!formState.candidateName.trim()) {
       toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
