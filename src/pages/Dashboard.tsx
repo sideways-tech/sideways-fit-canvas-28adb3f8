@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
 import sidewaysLogo from "@/assets/sideways-logo.png";
