@@ -198,21 +198,32 @@ const SidewaysInterviewCanvas = () => {
   const isValidEmail = (v: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(v);
   const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
 
+  const requiredFields: { field: keyof FormState; label: string }[] = [
+    { field: "candidateName", label: "Candidate's Name" },
+    { field: "candidateRole", label: "Role hiring for" },
+    { field: "department", label: "Department" },
+    { field: "hiringLevel", label: "Hiring Level" },
+    { field: "interviewerName", label: "Interviewer Name" },
+    { field: "interviewerEmail", label: "Interviewer Email" },
+    { field: "interviewRound", label: "Round" },
+  ];
+
+  const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
+
   const handleSubmitAssessment = async () => {
-    if (!formState.candidateName.trim()) {
-      toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
+    // Mark all required fields as touched
+    const allTouched: Record<string, boolean> = { ...touched };
+    requiredFields.forEach(({ field }) => { allTouched[field] = true; });
+    setTouched(allTouched);
+
+    const firstMissing = requiredFields.find(({ field }) => isFieldEmpty(field));
+    if (firstMissing) {
+      toast({ title: "Missing info", description: `Please fill in "${firstMissing.label}".`, variant: "destructive" });
       return;
     }
-    if (!formState.interviewerName.trim()) {
-      toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
+    if (!isValidEmail(formState.interviewerEmail.trim())) {
+      toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
       return;
-    }
-    if (formState.interviewerEmail.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formState.interviewerEmail.trim())) {
-        toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
-        return;
-      }
     }
     if (formState.candidateWebsite.trim()) {
       try {
