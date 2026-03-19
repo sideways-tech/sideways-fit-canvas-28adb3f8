@@ -44,14 +44,14 @@ const KraAdmin = () => {
     queryKey: ["kra-disciplines"],
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(
+        const { data, error } = (await withTimeout(
           (supabase as any)
             .from("kra_definitions")
             .select("discipline")
             .order("discipline"),
           4000,
           "Backend unavailable"
-        );
+        )) as { data: { discipline: string }[] | null; error: any };
 
         if (error) throw error;
         return [...new Set((data || []).map((d: { discipline: string }) => d.discipline))] as string[];
