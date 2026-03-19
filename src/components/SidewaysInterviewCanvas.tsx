@@ -459,6 +459,9 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
+        {/* KRA Reference Block */}
+        <KraReferenceBlock department={formState.department} hiringLevel={formState.hiringLevel} />
+
         {/* A. Background */}
         <SketchCard className="mb-8" delay={0.15}>
           <div className="space-y-4">
