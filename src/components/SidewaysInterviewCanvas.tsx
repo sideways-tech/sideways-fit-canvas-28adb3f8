@@ -357,16 +357,20 @@ const SidewaysInterviewCanvas = () => {
         {/* Candidate Info */}
         <SketchCard className="mb-8" delay={0.1}>
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
-            {/* Row 1 */}
+             {/* Row 1 */}
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-name">Candidate's Name</Label>
+              <Label htmlFor="candidate-name">Candidate's Name <span className="text-destructive">*</span></Label>
               <Input
                 id="candidate-name"
                 placeholder="Enter name..."
                 value={formState.candidateName}
                 onChange={(e) => updateField("candidateName", e.target.value)}
-                className="sketch-border-light bg-background"
+                onBlur={() => markTouched("candidateName")}
+                className={`sketch-border-light bg-background ${touched.candidateName && isFieldEmpty("candidateName") ? "border-destructive" : ""}`}
               />
+              {touched.candidateName && isFieldEmpty("candidateName") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="candidate-role">Role hiring for</Label>
