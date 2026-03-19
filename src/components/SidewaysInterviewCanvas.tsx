@@ -185,6 +185,8 @@ const SidewaysInterviewCanvas = () => {
 
   const [cvFilePath, setCvFilePath] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const markTouched = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
 
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
@@ -427,9 +429,10 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="https://..."
                 value={formState.candidateWebsite}
                 onChange={(e) => updateField("candidateWebsite", e.target.value)}
-                className={`sketch-border-light bg-background ${formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                onBlur={() => markTouched("candidateWebsite")}
+                className={`sketch-border-light bg-background ${touched.candidateWebsite && formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
               />
-              {formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) && (
+              {touched.candidateWebsite && formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) && (
                 <p className="text-xs text-destructive mt-1">Enter a valid URL starting with https://</p>
               )}
             </div>
@@ -454,9 +457,10 @@ const SidewaysInterviewCanvas = () => {
                   placeholder="interviewer@sideways.com"
                   value={formState.interviewerEmail}
                   onChange={(e) => updateField("interviewerEmail", e.target.value)}
-                  className={`sketch-border-light bg-background ${formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                  onBlur={() => markTouched("interviewerEmail")}
+                  className={`sketch-border-light bg-background ${touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
-                {formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
+                {touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
                   <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
                 )}
               </div>
