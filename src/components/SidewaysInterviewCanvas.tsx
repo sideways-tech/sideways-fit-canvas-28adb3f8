@@ -457,9 +457,10 @@ const SidewaysInterviewCanvas = () => {
                   placeholder="interviewer@sideways.com"
                   value={formState.interviewerEmail}
                   onChange={(e) => updateField("interviewerEmail", e.target.value)}
-                  className={`sketch-border-light bg-background ${formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                  onBlur={() => markTouched("interviewerEmail")}
+                  className={`sketch-border-light bg-background ${touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
-                {formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
+                {touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
                   <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
                 )}
               </div>
