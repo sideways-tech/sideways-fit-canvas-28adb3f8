@@ -185,6 +185,8 @@ const SidewaysInterviewCanvas = () => {
 
   const [cvFilePath, setCvFilePath] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const markTouched = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
 
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
