@@ -376,7 +376,7 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <div className="space-y-1.5">
               <Label>Hiring Level</Label>
-              <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
+              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); if (value !== "L1") updateField("education", ""); }}>
                 <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
