@@ -452,6 +452,28 @@ const SidewaysInterviewCanvas = () => {
               )}
             </div>
 
+            {/* Row 1.5 - Candidate Email (full width) */}
+            <div className="sm:col-span-2 space-y-1.5">
+              <Label htmlFor="candidate-email">Candidate's Email <span className="text-destructive">*</span></Label>
+              <Input
+                id="candidate-email"
+                type="email"
+                placeholder="candidate@email.com"
+                value={formState.candidateEmail}
+                onChange={(e) => updateField("candidateEmail", e.target.value)}
+                onBlur={() => markTouched("candidateEmail")}
+                className={`sketch-border-light bg-background ${touched.candidateEmail && (isFieldEmpty("candidateEmail") || (!isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()))) ? "border-destructive" : ""}`}
+              />
+              <div className="h-5">
+                {touched.candidateEmail && isFieldEmpty("candidateEmail") && (
+                  <p className="text-xs text-destructive">Required</p>
+                )}
+                {touched.candidateEmail && !isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()) && (
+                  <p className="text-xs text-destructive">Please enter a valid email</p>
+                )}
+              </div>
+            </div>
+
             {/* Row 2 */}
             <div className="space-y-1.5">
               <Label>Department <span className="text-destructive">*</span></Label>
