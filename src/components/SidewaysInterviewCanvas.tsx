@@ -193,6 +193,9 @@ const SidewaysInterviewCanvas = () => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isValidUrl = (v: string) => { try { const u = new URL(v); return ["http:", "https:"].includes(u.protocol); } catch { return false; } };
+
   const handleSubmitAssessment = async () => {
     if (!formState.candidateName.trim()) {
       toast({ title: "Missing info", description: "Please enter the candidate's name.", variant: "destructive" });
@@ -424,8 +427,11 @@ const SidewaysInterviewCanvas = () => {
                 placeholder="https://..."
                 value={formState.candidateWebsite}
                 onChange={(e) => updateField("candidateWebsite", e.target.value)}
-                className="sketch-border-light bg-background"
+                className={`sketch-border-light bg-background ${formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
               />
+              {formState.candidateWebsite.trim() && !isValidUrl(formState.candidateWebsite.trim()) && (
+                <p className="text-xs text-destructive mt-1">Enter a valid URL starting with https://</p>
+              )}
             </div>
 
             {/* Row 4 */}
@@ -448,8 +454,11 @@ const SidewaysInterviewCanvas = () => {
                   placeholder="interviewer@sideways.com"
                   value={formState.interviewerEmail}
                   onChange={(e) => updateField("interviewerEmail", e.target.value)}
-                  className="sketch-border-light bg-background"
+                  className={`sketch-border-light bg-background ${formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
+                {formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
+                  <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
+                )}
               </div>
               <div className="space-y-1.5 shrink-0">
                 <Label>Round</Label>
