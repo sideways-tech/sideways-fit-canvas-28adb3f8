@@ -748,7 +748,7 @@ const SidewaysInterviewCanvas = () => {
               <HandwrittenLabel as="h3" className="text-4xl">The Verdict</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Based on the T-shaped culture fit criteria</p>
             </div>
-            <VerdictFooter verdict={verdict} scores={categoryScores} onArchive={handleArchive} onInvite={handleInvite} />
+            <VerdictFooter verdict={verdict} scores={categoryScores} onArchive={handleArchive} onInvite={handleInvite} isSaving={submitting} />
           </div>
         </SketchCard>
 
