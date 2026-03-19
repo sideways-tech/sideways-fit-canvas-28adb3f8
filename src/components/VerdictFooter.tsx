@@ -139,7 +139,7 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite }: VerdictFooterPr
           className="flex-1 sketch-border-light gap-2 h-12"
         >
           <Archive className="w-4 h-4" />
-          Send to Archive
+          Save Report Card
         </Button>
       </div>
     </motion.div>
