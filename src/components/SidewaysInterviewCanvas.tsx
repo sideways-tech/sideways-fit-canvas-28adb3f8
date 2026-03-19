@@ -37,6 +37,7 @@ type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
 interface FormState {
   candidateName: string;
+  candidateEmail: string;
   candidateRole: string;
   interviewerName: string;
   interviewerEmail: string;
