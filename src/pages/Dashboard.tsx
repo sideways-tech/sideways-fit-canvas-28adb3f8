@@ -99,7 +99,21 @@ const Dashboard = () => {
     });
   };
 
-  const getLatestVerdict = (assessments: Assessment[]) => {
+  const handleDelete = async (candidateId: string, candidateName: string) => {
+    try {
+      // Delete assessments first (foreign key)
+      await supabase.from("assessments").delete().eq("candidate_id", candidateId);
+      // Delete candidate
+      const { error } = await supabase.from("candidates").delete().eq("id", candidateId);
+      if (error) throw error;
+      toast.success(`${candidateName} has been deleted`);
+      queryClient.invalidateQueries({ queryKey: ["candidates-dashboard"] });
+    } catch (err) {
+      toast.error("Failed to delete candidate");
+    }
+  };
+
+
     const latest = assessments[assessments.length - 1];
     return latest?.verdict || null;
   };
