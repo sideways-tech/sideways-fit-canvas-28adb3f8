@@ -13,8 +13,7 @@ interface KraReferenceBlockProps {
 
 interface GroupedKra {
   kra_name: string;
-  kra_order: number;
-  subKras: { sub_kra_name: string; sub_kra_order: number; description: string }[];
+  subKras: { sub_kra_name: string; description: string }[];
 }
 
 const disciplineAliases: Record<string, string[]> = {
@@ -34,6 +33,13 @@ const matchesDiscipline = (rowDiscipline: string, selectedDepartment: string) =>
   return aliases.some((alias) => normalizedRow === normalizeText(alias));
 };
 
+const sortKraRows = (rows: KraDefinition[]) =>
+  [...rows].sort((a, b) => {
+    const kraCompare = a.kra_name.localeCompare(b.kra_name);
+    if (kraCompare !== 0) return kraCompare;
+    return a.sub_kra_name.localeCompare(b.sub_kra_name);
+  });
+
 const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) => {
   const { data: allRows, isPending } = useQuery({
     queryKey: ["kra-definitions", department, hiringLevel],
@@ -42,18 +48,16 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
         const { data, error } = (await withTimeout(
           (supabase as any)
             .from("kra_definitions")
-            .select("*")
-            .eq("level", hiringLevel)
-            .order("kra_order", { ascending: true })
-            .order("sub_kra_order", { ascending: true }),
+            .select("discipline, kra_name, sub_kra_name, level, description")
+            .eq("level", hiringLevel),
           4000,
           "Backend unavailable"
         )) as { data: KraDefinition[] | null; error: any };
 
         if (error) throw error;
-        return (data || []) as KraDefinition[];
+        return sortKraRows((data || []) as KraDefinition[]);
       } catch {
-        return getStoredKraDefinitions().filter((row) => row.level === hiringLevel);
+        return sortKraRows(getStoredKraDefinitions().filter((row) => row.level === hiringLevel));
       }
     },
     enabled: !!department && !!hiringLevel,
@@ -76,7 +80,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
 
   const matchingDisciplineRows = (allRows || []).filter((row) => matchesDiscipline(row.discipline, department));
   const sidewaysRows = (allRows || []).filter((row) => normalizeText(row.discipline) === normalizeText("_sideways_person"));
-  const combinedRows = [...matchingDisciplineRows, ...sidewaysRows];
+  const combinedRows = sortKraRows([...matchingDisciplineRows, ...sidewaysRows]);
 
   const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -98,7 +102,6 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
       seen.set(row.kra_name, grouped.length);
       grouped.push({
         kra_name: row.kra_name,
-        kra_order: row.kra_order,
         subKras: [],
       });
     }
@@ -106,7 +109,6 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
     const idx = seen.get(row.kra_name)!;
     grouped[idx].subKras.push({
       sub_kra_name: row.sub_kra_name,
-      sub_kra_order: row.sub_kra_order,
       description: row.description,
     });
   }
