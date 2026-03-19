@@ -36,6 +36,7 @@ const KraAdmin = () => {
   const [showCustom, setShowCustom] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [backendDown, setBackendDown] = useState(false);
   const queryClient = useQueryClient();
 
   const discipline = showCustom ? customDiscipline.trim().toLowerCase() : selectedDiscipline;
@@ -54,9 +55,12 @@ const KraAdmin = () => {
         )) as { data: { discipline: string }[] | null; error: any };
 
         if (error) throw error;
+        setBackendDown(false);
         return [...new Set((data || []).map((d: { discipline: string }) => d.discipline))] as string[];
       } catch {
-        return getStoredDisciplines();
+        setBackendDown(true);
+        const local = getStoredDisciplines();
+        return local;
       }
     },
   });
