@@ -257,7 +257,7 @@ const Dashboard = () => {
                         {candidate.assessments.length} round{candidate.assessments.length !== 1 ? "s" : ""}
                       </span>
                       <span className="text-muted-foreground">
-                        {new Date(candidate.created_at).toLocaleDateString()}
+                        {new Date(candidate.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
                       </span>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -346,7 +346,7 @@ const Dashboard = () => {
                               </a>
                             )}
                             <span className="text-muted-foreground text-xs">
-                              {new Date(a.created_at).toLocaleDateString()}
+                              {new Date(a.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
                             </span>
                           </div>
                         );
