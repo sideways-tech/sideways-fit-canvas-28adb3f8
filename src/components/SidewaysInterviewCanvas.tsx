@@ -37,6 +37,7 @@ type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
 interface FormState {
   candidateName: string;
+  candidateEmail: string;
   candidateRole: string;
   interviewerName: string;
   interviewerEmail: string;
@@ -151,6 +152,7 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
 const SidewaysInterviewCanvas = () => {
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
+    candidateEmail: "",
     candidateRole: "",
     interviewerName: "",
     interviewerEmail: "",
@@ -203,6 +205,7 @@ const SidewaysInterviewCanvas = () => {
 
   const requiredFields: { field: keyof FormState; label: string }[] = [
     { field: "candidateName", label: "Candidate's Name" },
+    { field: "candidateEmail", label: "Candidate's Email" },
     { field: "candidateRole", label: "Role hiring for" },
     { field: "department", label: "Department" },
     { field: "hiringLevel", label: "Hiring Level" },
@@ -222,6 +225,10 @@ const SidewaysInterviewCanvas = () => {
     const firstMissing = requiredFields.find(({ field }) => isFieldEmpty(field));
     if (firstMissing) {
       toast({ title: "Missing info", description: `Please fill in "${firstMissing.label}".`, variant: "destructive" });
+      return;
+    }
+    if (!isValidEmail(formState.candidateEmail.trim())) {
+      toast({ title: "Invalid email", description: "Please enter a valid candidate email address.", variant: "destructive" });
       return;
     }
     if (!isValidEmail(formState.interviewerEmail.trim())) {
@@ -244,14 +251,15 @@ const SidewaysInterviewCanvas = () => {
       const { data: existingCandidates } = await supabase
         .from("candidates")
         .select("id")
-        .eq("name", formState.candidateName.trim())
-        .eq("role", formState.candidateRole.trim() || "");
+        .eq("email", formState.candidateEmail.trim());
 
       let candidateId: string;
 
       if (existingCandidates && existingCandidates.length > 0) {
         candidateId = existingCandidates[0].id;
         await supabase.from("candidates").update({
+          name: formState.candidateName.trim(),
+          role: formState.candidateRole.trim() || null,
           department: formState.department || null,
           hiring_level: formState.hiringLevel || null,
           education: formState.education || null,
@@ -262,6 +270,7 @@ const SidewaysInterviewCanvas = () => {
           .from("candidates")
           .insert({
             name: formState.candidateName.trim(),
+            email: formState.candidateEmail.trim(),
             role: formState.candidateRole.trim() || null,
             department: formState.department || null,
             hiring_level: formState.hiringLevel || null,
@@ -441,6 +450,28 @@ const SidewaysInterviewCanvas = () => {
               {touched.candidateRole && isFieldEmpty("candidateRole") && (
                 <p className="text-xs text-destructive mt-1">Required</p>
               )}
+            </div>
+
+            {/* Row 1.5 - Candidate Email (full width) */}
+            <div className="sm:col-span-2 space-y-1.5">
+              <Label htmlFor="candidate-email">Candidate's Email <span className="text-destructive">*</span></Label>
+              <Input
+                id="candidate-email"
+                type="email"
+                placeholder="candidate@email.com"
+                value={formState.candidateEmail}
+                onChange={(e) => updateField("candidateEmail", e.target.value)}
+                onBlur={() => markTouched("candidateEmail")}
+                className={`sketch-border-light bg-background ${touched.candidateEmail && (isFieldEmpty("candidateEmail") || (!isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()))) ? "border-destructive" : ""}`}
+              />
+              <div className="h-5">
+                {touched.candidateEmail && isFieldEmpty("candidateEmail") && (
+                  <p className="text-xs text-destructive">Required</p>
+                )}
+                {touched.candidateEmail && !isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()) && (
+                  <p className="text-xs text-destructive">Please enter a valid email</p>
+                )}
+              </div>
             </div>
 
             {/* Row 2 */}
