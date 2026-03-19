@@ -26,6 +26,7 @@ import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
 import KraReferenceBlock from "./KraReferenceBlock";
+import ThankYouPage from "./ThankYouPage";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
