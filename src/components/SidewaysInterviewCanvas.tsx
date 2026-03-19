@@ -202,6 +202,11 @@ const SidewaysInterviewCanvas = () => {
       toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
       return;
     }
+    const emailValue = formState.interviewerEmail.trim();
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
 
     setSubmitting(true);
     try {
