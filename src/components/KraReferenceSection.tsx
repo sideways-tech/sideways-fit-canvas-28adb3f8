@@ -180,17 +180,25 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-3 space-y-2 border-t border-border/30">
+                      <div className="px-5 pb-4 pt-3 space-y-0 border-t border-border/30">
                         {group.sub_kras.map((sub, idx) => (
-                          <div key={idx} className="flex gap-3 py-2 first:pt-3">
-                            <div className="min-w-[140px] shrink-0">
-                              <p className="text-xs font-medium text-muted-foreground">
+                          <div
+                            key={idx}
+                            className={cn(
+                              "grid grid-cols-[160px_1fr] gap-4 py-3",
+                              idx !== group.sub_kras.length - 1 && "border-b border-border/15"
+                            )}
+                          >
+                            <div className="flex items-start">
+                              <span className="inline-block text-xs font-semibold tracking-wide uppercase text-accent-foreground bg-accent/20 px-2 py-1 rounded-sm leading-tight">
                                 {sub.sub_kra_name}
-                              </p>
+                              </span>
                             </div>
-                            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
+                            <p className="text-sm text-foreground/85 leading-relaxed">
                               {sub.description || (
-                                <span className="italic text-muted-foreground">Not applicable at this level</span>
+                                <span className="italic text-muted-foreground text-xs">
+                                  Not applicable at this level
+                                </span>
                               )}
                             </p>
                           </div>
