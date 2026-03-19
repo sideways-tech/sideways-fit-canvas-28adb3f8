@@ -51,7 +51,7 @@ const KraAdmin = () => {
   const { data: kraSummary } = useQuery({
     queryKey: ["kra-summary", discipline],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("kra_definitions")
         .select("kra_name, kra_order, level")
         .eq("discipline", discipline)
