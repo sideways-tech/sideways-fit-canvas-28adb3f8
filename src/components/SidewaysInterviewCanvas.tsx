@@ -408,9 +408,9 @@ const SidewaysInterviewCanvas = () => {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label>Hiring Level</Label>
-              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); if (value !== "L1") updateField("education", ""); }}>
-                <SelectTrigger className="sketch-border-light bg-background h-11">
+              <Label>Hiring Level <span className="text-destructive">*</span></Label>
+              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); markTouched("hiringLevel"); if (value !== "L1") updateField("education", ""); }}>
+                <SelectTrigger className={`sketch-border-light bg-background h-11 ${touched.hiringLevel && isFieldEmpty("hiringLevel") ? "border-destructive" : ""}`} onBlur={() => markTouched("hiringLevel")}>
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -423,6 +423,9 @@ const SidewaysInterviewCanvas = () => {
                   <SelectItem value="L7">L7</SelectItem>
                 </SelectContent>
               </Select>
+              {touched.hiringLevel && isFieldEmpty("hiringLevel") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
 
             {/* Row 3 */}
