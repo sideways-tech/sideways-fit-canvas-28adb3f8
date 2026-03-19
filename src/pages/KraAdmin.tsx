@@ -36,6 +36,7 @@ const KraAdmin = () => {
   const [showCustom, setShowCustom] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [backendDown, setBackendDown] = useState(false);
   const queryClient = useQueryClient();
 
   const discipline = showCustom ? customDiscipline.trim().toLowerCase() : selectedDiscipline;
@@ -54,9 +55,12 @@ const KraAdmin = () => {
         )) as { data: { discipline: string }[] | null; error: any };
 
         if (error) throw error;
+        setBackendDown(false);
         return [...new Set((data || []).map((d: { discipline: string }) => d.discipline))] as string[];
       } catch {
-        return getStoredDisciplines();
+        setBackendDown(true);
+        const local = getStoredDisciplines();
+        return local;
       }
     },
   });
@@ -256,10 +260,26 @@ const KraAdmin = () => {
           <div className="space-y-4">
             <HandwrittenLabel as="h3" className="text-3xl">Uploaded Disciplines</HandwrittenLabel>
 
+            {backendDown && (
+              <div className="rounded-sm border border-dashed border-destructive/40 bg-destructive/5 px-4 py-3">
+                <p className="text-sm text-destructive">
+                  ⚠️ The backend is currently unreachable. Your previously uploaded data is safe — it will reappear once the connection recovers. Any new uploads will be saved locally in this browser in the meantime.
+                </p>
+              </div>
+            )}
+
             {loadingDisciplines ? (
-              <p className="text-sm text-muted-foreground">Loading…</p>
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <p className="text-sm text-muted-foreground">Loading…</p>
+              </div>
             ) : !existingDisciplines?.length ? (
-              <p className="text-sm text-muted-foreground">No KRA data uploaded yet.</p>
+              <p className="text-sm text-muted-foreground">
+                {backendDown ? "No locally cached KRA data found." : "No KRA data uploaded yet."}
+              </p>
             ) : (
               <div className="space-y-2">
                 {existingDisciplines.map((disc) => (
