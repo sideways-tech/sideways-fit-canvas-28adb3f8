@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
+import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 interface Assessment {
@@ -48,6 +54,7 @@ const Dashboard = () => {
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [verdictFilter, setVerdictFilter] = useState<string>("all");
   const [expandedCandidates, setExpandedCandidates] = useState<Set<string>>(new Set());
+  const queryClient = useQueryClient();
 
   const { data: candidates, isLoading } = useQuery({
     queryKey: ["candidates-dashboard"],
@@ -90,6 +97,20 @@ const Dashboard = () => {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  };
+
+  const handleDelete = async (candidateId: string, candidateName: string) => {
+    try {
+      // Delete assessments first (foreign key)
+      await supabase.from("assessments").delete().eq("candidate_id", candidateId);
+      // Delete candidate
+      const { error } = await supabase.from("candidates").delete().eq("id", candidateId);
+      if (error) throw error;
+      toast.success(`${candidateName} has been deleted`);
+      queryClient.invalidateQueries({ queryKey: ["candidates-dashboard"] });
+    } catch (err) {
+      toast.error("Failed to delete candidate");
+    }
   };
 
   const getLatestVerdict = (assessments: Assessment[]) => {
@@ -238,6 +259,34 @@ const Dashboard = () => {
                       <span className="text-muted-foreground">
                         {new Date(candidate.created_at).toLocaleDateString()}
                       </span>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                            title="Delete candidate"
+                          >
+                            <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete {candidate.name}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete this candidate and all their assessment rounds. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => handleDelete(candidate.id, candidate.name)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
 
