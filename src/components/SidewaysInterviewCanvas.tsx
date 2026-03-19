@@ -366,7 +366,7 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <div className="space-y-1.5">
               <Label>Hiring Level</Label>
-              <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
+              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); if (value !== "L1") updateField("education", ""); }}>
                 <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
@@ -384,10 +384,14 @@ const SidewaysInterviewCanvas = () => {
 
             {/* Row 3 */}
             <div className="space-y-1.5">
-              <Label>Education</Label>
-              <Select value={formState.education} onValueChange={(value) => updateField("education", value)}>
-                <SelectTrigger className="sketch-border-light bg-background h-11">
-                  <SelectValue placeholder="Select education..." />
+              <Label className={formState.hiringLevel !== "L1" ? "text-muted-foreground" : ""}>Education</Label>
+              <Select
+                value={formState.education}
+                onValueChange={(value) => updateField("education", value)}
+                disabled={formState.hiringLevel !== "L1"}
+              >
+                <SelectTrigger className={`sketch-border-light bg-background h-11 ${formState.hiringLevel !== "L1" ? "opacity-50 cursor-not-allowed" : ""}`}>
+                  <SelectValue placeholder={formState.hiringLevel !== "L1" ? "Only for L1" : "Select education..."} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="graduate">Graduate</SelectItem>
