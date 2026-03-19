@@ -479,7 +479,7 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <div className="flex items-end gap-3">
               <div className="flex-1 space-y-1.5">
-                <Label htmlFor="interviewer-email">Interviewer Email</Label>
+                <Label htmlFor="interviewer-email">Interviewer Email <span className="text-destructive">*</span></Label>
                 <Input
                   id="interviewer-email"
                   type="email"
@@ -487,9 +487,12 @@ const SidewaysInterviewCanvas = () => {
                   value={formState.interviewerEmail}
                   onChange={(e) => updateField("interviewerEmail", e.target.value)}
                   onBlur={() => markTouched("interviewerEmail")}
-                  className={`sketch-border-light bg-background ${touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) ? "border-destructive focus:ring-destructive" : ""}`}
+                  className={`sketch-border-light bg-background ${touched.interviewerEmail && (isFieldEmpty("interviewerEmail") || !isValidEmail(formState.interviewerEmail.trim())) ? "border-destructive focus:ring-destructive" : ""}`}
                 />
-                {touched.interviewerEmail && formState.interviewerEmail.trim() && !isValidEmail(formState.interviewerEmail.trim()) && (
+                {touched.interviewerEmail && isFieldEmpty("interviewerEmail") && (
+                  <p className="text-xs text-destructive mt-1">Required</p>
+                )}
+                {touched.interviewerEmail && !isFieldEmpty("interviewerEmail") && !isValidEmail(formState.interviewerEmail.trim()) && (
                   <p className="text-xs text-destructive mt-1">Enter a valid email address</p>
                 )}
               </div>
