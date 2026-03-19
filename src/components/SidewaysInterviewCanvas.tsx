@@ -235,15 +235,6 @@ const SidewaysInterviewCanvas = () => {
       toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
       return;
     }
-    if (formState.candidateWebsite.trim()) {
-      try {
-        const url = new URL(formState.candidateWebsite.trim());
-        if (!["http:", "https:"].includes(url.protocol)) throw new Error();
-      } catch {
-        toast({ title: "Invalid URL", description: "Please enter a valid portfolio URL starting with https://", variant: "destructive" });
-        return;
-      }
-    }
 
     setSubmitting(true);
     try {
