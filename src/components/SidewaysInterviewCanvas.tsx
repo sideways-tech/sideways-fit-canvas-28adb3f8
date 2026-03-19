@@ -350,7 +350,7 @@ const SidewaysInterviewCanvas = () => {
           </p>
           <div className="pt-4">
             <h1 className="text-2xl font-semibold">Culture & Talent Assessment</h1>
-            <p className="text-muted-foreground">The "Can't Be Templated" Fit Test</p>
+            
           </div>
         </motion.header>
 
