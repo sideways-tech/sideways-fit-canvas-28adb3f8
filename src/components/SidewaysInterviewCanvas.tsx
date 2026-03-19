@@ -258,6 +258,8 @@ const SidewaysInterviewCanvas = () => {
       if (existingCandidates && existingCandidates.length > 0) {
         candidateId = existingCandidates[0].id;
         await supabase.from("candidates").update({
+          name: formState.candidateName.trim(),
+          role: formState.candidateRole.trim() || null,
           department: formState.department || null,
           hiring_level: formState.hiringLevel || null,
           education: formState.education || null,
