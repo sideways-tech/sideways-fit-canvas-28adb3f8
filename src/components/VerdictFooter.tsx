@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { Archive, Sparkles, XCircle, ThumbsDown, ThumbsUp, Award } from "lucide-react";
+import { Archive, Sparkles, XCircle, ThumbsDown, ThumbsUp, Award, Loader2 } from "lucide-react";
 
 type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
