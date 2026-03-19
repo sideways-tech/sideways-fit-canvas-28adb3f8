@@ -433,7 +433,7 @@ const SidewaysInterviewCanvas = () => {
               <div className="space-y-1.5 shrink-0">
                 <Label>Round</Label>
                 <Select value={formState.interviewRound} onValueChange={(value) => updateField("interviewRound", value)}>
-                  <SelectTrigger className="sketch-border-light bg-background h-11 w-20 rounded-full text-center text-sm">
+                  <SelectTrigger className="sketch-border-light bg-highlighter/30 h-11 w-20 rounded-full text-center text-sm font-medium">
                     <SelectValue placeholder="R" />
                   </SelectTrigger>
                   <SelectContent>
