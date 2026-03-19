@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, BookOpen } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 
@@ -27,42 +26,24 @@ interface KraGroup {
   sub_kras: { sub_kra_name: string; description: string | null }[];
 }
 
-const KRA_QUERY_TIMEOUT_MS = 8000;
-
 const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionProps) => {
   const discipline = DISCIPLINE_MAP[department] || department;
   const [expandedKras, setExpandedKras] = useState<Set<number>>(new Set());
 
-  const { data: kraData, isLoading, isError, error } = useQuery({
+  const { data: kraData, isLoading } = useQuery({
     queryKey: ["kra-definitions", discipline, hiringLevel],
     queryFn: async () => {
-      const controller = new AbortController();
-      const timeoutId = globalThis.setTimeout(() => controller.abort(), KRA_QUERY_TIMEOUT_MS);
+      const { data, error } = await supabase
+        .from("kra_definitions")
+        .select("kra_number, kra_name, sub_kra_name, description")
+        .eq("discipline", discipline)
+        .eq("level", hiringLevel)
+        .order("kra_number");
 
-      try {
-        const { data, error } = await supabase
-          .from("kra_definitions")
-          .select("kra_number, kra_name, sub_kra_name, description")
-          .eq("discipline", discipline)
-          .eq("level", hiringLevel)
-          .order("kra_number")
-          .abortSignal(controller.signal);
-
-        if (error) throw error;
-        return data ?? [];
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") {
-          throw new Error("KRA lookup timed out");
-        }
-        throw err;
-      } finally {
-        globalThis.clearTimeout(timeoutId);
-      }
+      if (error) throw error;
+      return data;
     },
     enabled: !!department && !!hiringLevel,
-    retry: false,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
   });
 
   if (!department || !hiringLevel) {
@@ -120,21 +101,6 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
           <div className="h-8 bg-muted rounded w-1/3" />
           <div className="h-4 bg-muted rounded w-full" />
           <div className="h-4 bg-muted rounded w-2/3" />
-        </div>
-      </SketchCard>
-    );
-  }
-
-  if (isError) {
-    const message = error instanceof Error && error.message === "KRA lookup timed out"
-      ? `KRA data took too long to load for ${discipline} at ${hiringLevel}. This usually means the backend query is stuck, not that data exists.`
-      : `Could not load KRA data for ${discipline} at ${hiringLevel}.`;
-
-    return (
-      <SketchCard className="mb-8" delay={0.12}>
-        <div className="flex items-center gap-3 text-destructive py-6 justify-center">
-          <BookOpen className="w-5 h-5" />
-          <p className="text-sm italic">{message}</p>
         </div>
       </SketchCard>
     );
@@ -214,25 +180,17 @@ const KraReferenceSection = ({ department, hiringLevel }: KraReferenceSectionPro
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 pb-4 pt-3 space-y-0 border-t border-border/30">
+                      <div className="px-4 pb-3 space-y-2 border-t border-border/30">
                         {group.sub_kras.map((sub, idx) => (
-                          <div
-                            key={idx}
-                            className={cn(
-                              "grid grid-cols-[160px_1fr] gap-4 py-3",
-                              idx !== group.sub_kras.length - 1 && "border-b border-border/15"
-                            )}
-                          >
-                            <div className="flex items-start">
-                              <span className="inline-block text-xs font-semibold tracking-wide uppercase text-accent-foreground bg-accent/20 px-2 py-1 rounded-sm leading-tight">
+                          <div key={idx} className="flex gap-3 py-2 first:pt-3">
+                            <div className="min-w-[140px] shrink-0">
+                              <p className="text-xs font-medium text-muted-foreground">
                                 {sub.sub_kra_name}
-                              </span>
+                              </p>
                             </div>
-                            <p className="text-sm text-foreground/85 leading-relaxed">
+                            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
                               {sub.description || (
-                                <span className="italic text-muted-foreground text-xs">
-                                  Not applicable at this level
-                                </span>
+                                <span className="italic text-muted-foreground">Not applicable at this level</span>
                               )}
                             </p>
                           </div>

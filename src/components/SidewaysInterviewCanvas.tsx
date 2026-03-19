@@ -202,16 +202,6 @@ const SidewaysInterviewCanvas = () => {
       toast({ title: "Missing info", description: "Please enter the interviewer's name.", variant: "destructive" });
       return;
     }
-    const emailValue = formState.interviewerEmail.trim();
-    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
-      return;
-    }
-    const websiteValue = formState.candidateWebsite.trim();
-    if (websiteValue && !/^https?:\/\/.+\..+/.test(websiteValue)) {
-      toast({ title: "Invalid URL", description: "Please enter a valid website URL starting with http:// or https://.", variant: "destructive" });
-      return;
-    }
 
     setSubmitting(true);
     try {
@@ -376,7 +366,7 @@ const SidewaysInterviewCanvas = () => {
             </div>
             <div className="space-y-1.5">
               <Label>Hiring Level</Label>
-              <Select value={formState.hiringLevel} onValueChange={(value) => { updateField("hiringLevel", value); if (value !== "L1") updateField("education", ""); }}>
+              <Select value={formState.hiringLevel} onValueChange={(value) => updateField("hiringLevel", value)}>
                 <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select level..." />
                 </SelectTrigger>
@@ -395,8 +385,8 @@ const SidewaysInterviewCanvas = () => {
             {/* Row 3 */}
             <div className="space-y-1.5">
               <Label>Education</Label>
-              <Select value={formState.education} onValueChange={(value) => updateField("education", value)} disabled={formState.hiringLevel !== "L1"}>
-                <SelectTrigger className="sketch-border-light bg-background h-11 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Select value={formState.education} onValueChange={(value) => updateField("education", value)}>
+                <SelectTrigger className="sketch-border-light bg-background h-11">
                   <SelectValue placeholder="Select education..." />
                 </SelectTrigger>
                 <SelectContent>
