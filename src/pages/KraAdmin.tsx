@@ -65,7 +65,7 @@ const KraAdmin = () => {
     queryKey: ["kra-summary", discipline],
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(
+        const { data, error } = (await withTimeout(
           (supabase as any)
             .from("kra_definitions")
             .select("kra_name, kra_order, level")
@@ -73,7 +73,7 @@ const KraAdmin = () => {
             .order("kra_order", { ascending: true }),
           4000,
           "Backend unavailable"
-        );
+        )) as { data: { kra_name: string; kra_order: number; level: string }[] | null; error: any };
 
         if (error) throw error;
 
