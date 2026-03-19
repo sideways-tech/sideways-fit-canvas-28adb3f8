@@ -36,7 +36,7 @@ const KraAdmin = () => {
   const { data: existingDisciplines, isLoading: loadingDisciplines } = useQuery({
     queryKey: ["kra-disciplines"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("kra_definitions")
         .select("discipline")
         .order("discipline");
