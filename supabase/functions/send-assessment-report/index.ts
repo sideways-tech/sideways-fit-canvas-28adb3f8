@@ -318,7 +318,6 @@ function buildEmailHtml(data: {
         <!-- Motivation Notes -->
         ${d.motivation_reason ? `<tr><td>${noteBlock('Motivation Reason', d.motivation_reason, '🔥')}</td></tr>` : ''}
         ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Sideways Motivation Reason', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
-        ${d.sideways_website_feedback ? `<tr><td>${noteBlock('Sideways Website Feedback', d.sideways_website_feedback, '🌐')}</td></tr>` : ''}
 
         ${data.hasCv ? `
         <!-- CV Notice -->

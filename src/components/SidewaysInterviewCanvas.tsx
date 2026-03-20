@@ -784,7 +784,6 @@ const SidewaysInterviewCanvas = () => {
               depthOfCraft={formState.depthOfCraft}
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
-              problemSolvingApproach={formState.problemSolvingApproach}
               professionalBreadth={formState.professionalBreadth}
             />
           </div>

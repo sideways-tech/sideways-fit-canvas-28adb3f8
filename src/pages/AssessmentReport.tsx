@@ -258,7 +258,6 @@ const AssessmentReport = () => {
         </div>
 
         {/* Mindset Notes */}
-        <NoteBlock title="Sideways Website Feedback" text={a.sideways_website_feedback} />
         <NoteBlock title="Industry Motivation — Reason" text={a.motivation_reason} />
         <NoteBlock title="Sideways Motivation — Reason" text={a.sideways_motivation_reason} />
 
