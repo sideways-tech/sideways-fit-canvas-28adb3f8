@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { v4 as uuidv4 } from 'npm:uuid@9'
-import { encode as base64Encode } from 'https://deno.land/std@0.208.0/encoding/base64.ts'
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -227,7 +227,7 @@ function buildEmailHtml(data: {
   verdict: string
   scores: { person: number; professional: number; mindset: number; overall: number }
   dimensions: Record<string, any>
-  hasCv: boolean
+  cvDownloadUrl: string | null
 }): string {
   const v = verdictConfig[data.verdict] || verdictConfig['lean-no']
   const deptDisplay = (data.department || '').replace(/-/g, ' / ').replace(/\b\w/g, c => c.toUpperCase())
@@ -354,12 +354,13 @@ function buildEmailHtml(data: {
         ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Why Sideways / Work Critique', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
         ${d.sideways_website_feedback && d.sideways_website_feedback !== d.sideways_motivation_reason ? `<tr><td>${noteBlock('Additional Sideways Work Feedback', d.sideways_website_feedback, '🧭')}</td></tr>` : ''}
 
-        ${data.hasCv ? `
-        <!-- CV Notice -->
+        ${data.cvDownloadUrl ? `
+        <!-- CV Download Link -->
         <tr><td>
           <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;margin-bottom:16px;">
             <tr><td style="padding:14px 24px;text-align:center;">
-              <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 Candidate's CV / Resume is attached to this email</p>
+              <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 <a href="${escapeHtml(data.cvDownloadUrl)}" style="color:#1d4ed8;text-decoration:underline;">Download Candidate's CV / Resume</a></p>
+              <p style="margin:4px 0 0;font-size:11px;color:#64748b;">Link valid for 7 days</p>
             </td></tr>
           </table>
         </td></tr>` : ''}
@@ -445,37 +446,22 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Download CV if available
-    let attachments: Array<{ filename: string; content: string; content_type: string }> = []
+    // Generate signed CV download URL if available
+    let cvDownloadUrl: string | null = null
     const cvPath = assessmentData.cv_file_path
     if (cvPath) {
       try {
-        const { data: fileData, error: fileError } = await supabase.storage
+        const { data: signedData, error: signedError } = await supabase.storage
           .from('cvs')
-          .download(cvPath)
+          .createSignedUrl(cvPath, 60 * 60 * 24 * 7) // 7 days
 
-        if (!fileError && fileData) {
-          const arrayBuffer = await fileData.arrayBuffer()
-          const base64Content = base64Encode(new Uint8Array(arrayBuffer))
-          const fileName = cvPath.split('/').pop() || 'resume'
-          const ext = fileName.split('.').pop()?.toLowerCase() || ''
-          const contentTypeMap: Record<string, string> = {
-            pdf: 'application/pdf',
-            doc: 'application/msword',
-            docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          }
-          const contentType = contentTypeMap[ext] || 'application/octet-stream'
-
-          attachments.push({
-            filename: `${candidateData.name.replace(/[^a-zA-Z0-9 ]/g, '').trim()}_CV.${ext}`,
-            content: base64Content,
-            content_type: contentType,
-          })
+        if (!signedError && signedData?.signedUrl) {
+          cvDownloadUrl = signedData.signedUrl
         } else {
-          console.warn('Could not download CV:', fileError?.message)
+          console.warn('Could not create signed CV URL:', signedError?.message)
         }
       } catch (cvErr) {
-        console.warn('CV download error:', cvErr instanceof Error ? cvErr.message : String(cvErr))
+        console.warn('CV signed URL error:', cvErr instanceof Error ? cvErr.message : String(cvErr))
       }
     }
 
@@ -519,7 +505,7 @@ Deno.serve(async (req) => {
         recent_read_example: assessmentData.recent_read_example,
         aesthetics_process_note: assessmentData.aesthetics_process_note,
       },
-      hasCv: attachments.length > 0,
+      cvDownloadUrl,
     })
 
     // Unsubscribe token
@@ -550,9 +536,6 @@ Deno.serve(async (req) => {
       unsubscribe_token: unsubToken,
     }
 
-    if (attachments.length > 0) {
-      payload.attachments = attachments
-    }
 
     const { error: enqueueError } = await supabase.rpc('enqueue_email', {
       queue_name: 'transactional_emails',
