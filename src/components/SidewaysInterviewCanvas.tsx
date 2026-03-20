@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Sparkles } from "lucide-react";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import BackgroundSection from "./BackgroundSection";
@@ -685,7 +685,8 @@ const SidewaysInterviewCanvas = () => {
 
             {/* Interests & Passions — freeform capture */}
             <div className="space-y-2 p-4 bg-muted/20 rounded-lg sketch-border-light">
-              <Label htmlFor="interests-passions-notes" className="text-sm font-medium">
+              <Label htmlFor="interests-passions-notes" className="text-sm font-medium flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-highlighter" />
                 Interests & Passions — Notes
               </Label>
               <p className="text-xs text-muted-foreground">
