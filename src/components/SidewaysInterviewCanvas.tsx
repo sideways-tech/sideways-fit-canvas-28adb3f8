@@ -743,11 +743,7 @@ const SidewaysInterviewCanvas = () => {
               sidewaysReason={formState.sidewaysMotivationReason}
               onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
-            />
-            <SidewaysWorkSection
-              sidewaysWebsiteFeedback={formState.sidewaysWebsiteFeedback}
               honestyLevel={formState.honestyLevel}
-              onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
             />
           </div>
