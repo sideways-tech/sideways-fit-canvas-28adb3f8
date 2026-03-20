@@ -126,13 +126,13 @@ function buildEmailHtml(data: {
   ${data.dimensions.background_notes ? `
   <div style="background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;border:1px solid #e8e4de;">
     <h3 style="margin:0 0 8px;font-size:16px;color:#222;">Background Notes</h3>
-    <p style="margin:0;font-size:13px;color:#555;white-space:pre-line;">${data.dimensions.background_notes}</p>
+    <p style="margin:0;font-size:13px;color:#555;white-space:pre-line;">${escapeHtml(data.dimensions.background_notes)}</p>
   </div>` : ''}
 
   ${data.dimensions.professional_dive_notes ? `
   <div style="background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;border:1px solid #e8e4de;">
     <h3 style="margin:0 0 8px;font-size:16px;color:#222;">Professional Deep Dive</h3>
-    <p style="margin:0;font-size:13px;color:#555;white-space:pre-line;">${data.dimensions.professional_dive_notes}</p>
+    <p style="margin:0;font-size:13px;color:#555;white-space:pre-line;">${escapeHtml(data.dimensions.professional_dive_notes)}</p>
   </div>` : ''}
 
   <!-- Footer -->
