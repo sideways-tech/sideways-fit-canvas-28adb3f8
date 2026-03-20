@@ -1,37 +1,61 @@
 
 
-## Problem Diagnosis
+## Consolidation Plan
 
-The email_send_log shows every assessment email fails with:
+### My recommendation on the Sideways questions
 
-```text
-Email API error: 404 {"type":"run_not_found","message":"Run not found or expired"}
-```
+You're right to question the overlap. Currently there are two separate boxes in Section D:
 
-**Root cause:** The `send-assessment-report` function generates a random `run_id` via `uuidv4()` and includes it in the queue payload. When `process-email-queue` calls `sendLovableEmail`, it passes this fabricated `run_id` to the email API, which rejects it because no such run exists on the server.
+1. **"Why Sideways?" textarea** — "What specifically about Sideways appeals to them? Any Indian / international examples they found inspirational?"
+2. **"Sideways Work" textarea** — "What caught their eye? What would they change? What did they genuinely dislike?" + Honesty Meter
 
-For transactional emails sent without a pre-created email run, the payload must omit `run_id` and instead use an `idempotency_key`. The email API will then create a run inline.
+Both are asking "what do you think of Sideways?" — one framed as motivation, the other as website critique. **I recommend merging them into a single box.** Here's why:
 
-## Plan
+- The interviewer naturally captures both in one conversation flow — "Have you seen our work? What did you think? Why do you want to be here?"
+- The Honesty Meter (flattery/diplomatic/honest) is the grade for *how* they answered — it should sit right below the combined textarea
+- The Sideways Motivation MCQ (generic/culture-fit/sideways-specific) grades *how specific* their knowledge is
 
-### Step 1: Fix the email payload in `send-assessment-report`
+So the consolidated "Why Sideways?" block becomes:
+1. One textarea with prompt: "Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work? Any Indian/international examples they found inspirational?"
+2. Honesty Meter — how honest were they about our work?
+3. Sideways Motivation MCQ — how Sideways-specific was their motivation?
 
-In `supabase/functions/send-assessment-report/index.ts`, change the enqueued payload:
+This eliminates the separate `SidewaysWorkSection` component entirely. The `sidewaysWebsiteFeedback` field merges into `sidewaysMotivationReason` (single combined textarea).
 
-- **Remove** `run_id: uuidv4()` — this is the field causing the 404
-- **Add** `idempotency_key: messageId` — uses the existing UUID as a deduplication key, which triggers inline run creation on the API side
+### Changes
 
-The rest of the payload (`to`, `from`, `sender_domain`, `subject`, `html`, `text`, `purpose`, `label`, `message_id`) stays the same.
+**1. Merge SidewaysWorkSection into IndustryMotivationSection**
 
-### Step 2: Redeploy the edge function
+- Move the Honesty Meter into the "Why Sideways?" sub-block of `IndustryMotivationSection`, placed between the textarea and the MCQ radio group
+- Update the textarea prompt to combine both sets of questions
+- Remove `SidewaysWorkSection` component entirely
 
-Deploy `send-assessment-report` so the fix takes effect.
+**2. Remove problemSolvingApproach slider from ProfessionalDeepDiveSection**
 
-### Step 3: Verify
+- Delete the `problemSolvingApproach` entry from the sliders array
+- Remove the prop and handler from the component interface
+- The Diagnostic Mindset MCQ in Section E already covers this
 
-Check edge function logs and email_send_log after a test submission to confirm emails transition from `pending` to `sent`.
+**3. Update SidewaysInterviewCanvas**
 
----
+- Remove `SidewaysWorkSection` import and usage
+- Pass `honestyLevel` and its handler into `IndustryMotivationSection` instead
+- Stop passing `problemSolvingApproach` to `ProfessionalDeepDiveSection`
+- Update `calculateCategoryScores`: redistribute Professional score weights across remaining 4 dimensions (remove 0.17 from problemSolving, spread to others)
 
-**Technical detail:** The Lovable email API requires either a valid pre-existing `run_id` (from a prior API call) or an `idempotency_key` with `purpose: "transactional"` (to create a run inline). The current code fabricates a UUID for `run_id`, which the API cannot find, hence the 404.
+**4. Update both reports (dashboard + email)**
+
+- Remove `problemSolvingApproach` row from professional section
+- Remove separate "Sideways Website Feedback" note block (now merged into Sideways Motivation Reason)
+- Adjust Professional score average display (4 sliders + resilience instead of 5 + resilience)
+
+**Files modified:**
+- `src/components/IndustryMotivationSection.tsx` — absorb honesty meter + combined textarea
+- `src/components/ProfessionalDeepDiveSection.tsx` — remove problemSolvingApproach slider
+- `src/components/SidewaysInterviewCanvas.tsx` — rewire props, update scoring, remove SidewaysWorkSection
+- `src/pages/AssessmentReport.tsx` — remove redundant rows
+- `supabase/functions/send-assessment-report/index.ts` — remove redundant rows from email
+- Delete `src/components/SidewaysWorkSection.tsx`
+
+**No database migration needed** — columns remain in the table, new assessments simply won't populate the removed fields.
 
