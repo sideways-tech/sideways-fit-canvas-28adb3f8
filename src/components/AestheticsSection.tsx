@@ -76,7 +76,7 @@ const AestheticsSection = ({
             ? "Design sensibility detected!"
             : interest >= 50
             ? "Appreciates good design"
-            : "Utilitarian mindset"}
+            : "Functional mindset"}
         </span>
       </div>
 
