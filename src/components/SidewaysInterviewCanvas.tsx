@@ -479,18 +479,24 @@ const SidewaysInterviewCanvas = () => {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-role">Role hiring for <span className="text-destructive">*</span></Label>
+              <Label htmlFor="candidate-email">Candidate's Email <span className="text-destructive">*</span></Label>
               <Input
-                id="candidate-role"
-                placeholder="Position applying for..."
-                value={formState.candidateRole}
-                onChange={(e) => updateField("candidateRole", e.target.value)}
-                onBlur={() => markTouched("candidateRole")}
-                className={`sketch-border-light bg-background ${touched.candidateRole && isFieldEmpty("candidateRole") ? "border-destructive" : ""}`}
+                id="candidate-email"
+                type="email"
+                placeholder="candidate@email.com"
+                value={formState.candidateEmail}
+                onChange={(e) => updateField("candidateEmail", e.target.value)}
+                onBlur={() => markTouched("candidateEmail")}
+                className={`sketch-border-light bg-background ${touched.candidateEmail && (isFieldEmpty("candidateEmail") || (!isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()))) ? "border-destructive" : ""}`}
               />
-              {touched.candidateRole && isFieldEmpty("candidateRole") && (
-                <p className="text-xs text-destructive mt-1">Required</p>
-              )}
+              <div className="h-5">
+                {touched.candidateEmail && isFieldEmpty("candidateEmail") && (
+                  <p className="text-xs text-destructive">Required</p>
+                )}
+                {touched.candidateEmail && !isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()) && (
+                  <p className="text-xs text-destructive">Please enter a valid email</p>
+                )}
+              </div>
             </div>
 
 
@@ -554,24 +560,18 @@ const SidewaysInterviewCanvas = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="candidate-email">Candidate's Email <span className="text-destructive">*</span></Label>
+              <Label htmlFor="candidate-role">Role hiring for <span className="text-destructive">*</span></Label>
               <Input
-                id="candidate-email"
-                type="email"
-                placeholder="candidate@email.com"
-                value={formState.candidateEmail}
-                onChange={(e) => updateField("candidateEmail", e.target.value)}
-                onBlur={() => markTouched("candidateEmail")}
-                className={`sketch-border-light bg-background ${touched.candidateEmail && (isFieldEmpty("candidateEmail") || (!isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()))) ? "border-destructive" : ""}`}
+                id="candidate-role"
+                placeholder="Position applying for..."
+                value={formState.candidateRole}
+                onChange={(e) => updateField("candidateRole", e.target.value)}
+                onBlur={() => markTouched("candidateRole")}
+                className={`sketch-border-light bg-background ${touched.candidateRole && isFieldEmpty("candidateRole") ? "border-destructive" : ""}`}
               />
-              <div className="h-5">
-                {touched.candidateEmail && isFieldEmpty("candidateEmail") && (
-                  <p className="text-xs text-destructive">Required</p>
-                )}
-                {touched.candidateEmail && !isFieldEmpty("candidateEmail") && !isValidEmail(formState.candidateEmail.trim()) && (
-                  <p className="text-xs text-destructive">Please enter a valid email</p>
-                )}
-              </div>
+              {touched.candidateRole && isFieldEmpty("candidateRole") && (
+                <p className="text-xs text-destructive mt-1">Required</p>
+              )}
             </div>
 
             {/* Row 4 */}
