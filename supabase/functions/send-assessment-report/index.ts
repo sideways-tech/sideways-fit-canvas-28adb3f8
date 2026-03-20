@@ -354,12 +354,13 @@ function buildEmailHtml(data: {
         ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Why Sideways / Work Critique', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
         ${d.sideways_website_feedback && d.sideways_website_feedback !== d.sideways_motivation_reason ? `<tr><td>${noteBlock('Additional Sideways Work Feedback', d.sideways_website_feedback, '🧭')}</td></tr>` : ''}
 
-        ${data.hasCv ? `
-        <!-- CV Notice -->
+        ${data.cvDownloadUrl ? `
+        <!-- CV Download Link -->
         <tr><td>
           <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;margin-bottom:16px;">
             <tr><td style="padding:14px 24px;text-align:center;">
-              <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 Candidate's CV / Resume is attached to this email</p>
+              <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 <a href="${escapeHtml(data.cvDownloadUrl)}" style="color:#1d4ed8;text-decoration:underline;">Download Candidate's CV / Resume</a></p>
+              <p style="margin:4px 0 0;font-size:11px;color:#64748b;">Link valid for 7 days</p>
             </td></tr>
           </table>
         </td></tr>` : ''}
