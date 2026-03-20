@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
     })
 
     const payload = {
-      run_id: uuidv4(),
+      idempotency_key: messageId,
       to: interviewerEmail,
       from: `Sideways Assessments <assessments@notify.hiring.sideways.co.in>`,
       sender_domain: 'notify.hiring.sideways.co.in',
