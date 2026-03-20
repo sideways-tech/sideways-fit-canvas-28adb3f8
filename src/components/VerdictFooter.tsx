@@ -143,7 +143,7 @@ const VerdictFooter = ({ verdict, scores, onArchive, onInvite, isSaving = false 
           {isSaving ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Saving Assessment Report…
+              Saving Report Card…
             </>
           ) : (
             <>
