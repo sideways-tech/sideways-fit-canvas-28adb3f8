@@ -227,7 +227,7 @@ function buildEmailHtml(data: {
   verdict: string
   scores: { person: number; professional: number; mindset: number; overall: number }
   dimensions: Record<string, any>
-  hasCv: boolean
+  cvDownloadUrl: string | null
 }): string {
   const v = verdictConfig[data.verdict] || verdictConfig['lean-no']
   const deptDisplay = (data.department || '').replace(/-/g, ' / ').replace(/\b\w/g, c => c.toUpperCase())
