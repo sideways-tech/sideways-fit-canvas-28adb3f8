@@ -17,80 +17,149 @@ function escapeHtml(str: string | number | null | undefined): string {
     .replace(/'/g, '&#39;')
 }
 
+// --- Color helpers matching dashboard logic ---
+function scoreColor(s: number): string {
+  return s >= 60 ? '#16a34a' : s >= 40 ? '#d97706' : '#dc2626'
+}
+function scoreBg(s: number): string {
+  return s >= 60 ? '#dcfce7' : s >= 40 ? '#fef3c7' : '#fef2f2'
+}
+function getSliderLabel(value: number): string {
+  if (value <= 20) return 'Low'
+  if (value <= 40) return 'Fair'
+  if (value <= 60) return 'Good'
+  if (value <= 80) return 'Strong'
+  return 'Excellent'
+}
+function formatCategorical(value: string | null): string {
+  if (!value) return ''
+  return value.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+function diagnosticDisplay(v: string | null): string {
+  if (!v) return 'Not assessed'
+  if (v === 'diagnostician') return 'Diagnostician'
+  if (v === 'clarifier') return 'Clarifier'
+  return 'Order Taker'
+}
+function honestyDisplay(v: string | null): string {
+  if (!v) return 'Not assessed'
+  if (v === 'honest') return 'Constructive Critique'
+  if (v === 'diplomatic') return 'Diplomatic'
+  return 'Flattery'
+}
+function motivationDisplay(v: string | null): string {
+  if (!v) return 'Not assessed'
+  if (v === 'passionate') return 'Deep Connection'
+  if (v === 'practical') return 'Practical Reasons'
+  return 'Unclear'
+}
+function sidewaysMotivationDisplay(v: string | null): string {
+  if (!v) return 'Not assessed'
+  if (v === 'sideways-specific') return 'Sideways-Specific'
+  if (v === 'culture-fit') return 'Culture Fit'
+  return 'Generic'
+}
+
 const verdictConfig: Record<string, { label: string; emoji: string; bg: string; border: string; text: string; desc: string }> = {
-  'strong-no':  { label: 'Strong No',  emoji: '✕', bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', desc: 'Not a fit for Sideways' },
-  'lean-no':    { label: 'Lean No',    emoji: '→', bg: '#fff7ed', border: '#fdba74', text: '#ea580c', desc: 'Below the bar — revisit if they grow' },
-  'lean-yes':   { label: 'Lean Yes',   emoji: '✓', bg: '#f0fdf4', border: '#86efac', text: '#16a34a', desc: 'Above the bar — worth a second look' },
-  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Trusted Advisor Material' },
+  'strong-no':  { label: 'Strong No',  emoji: '✕', bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', desc: 'Significant gaps across key dimensions. The candidate is unlikely to thrive in a diagnostic, T-shaped culture.' },
+  'lean-no':    { label: 'Lean No',    emoji: '↓', bg: '#fff7ed', border: '#fdba74', text: '#ea580c', desc: 'Some promising signals but one or more categories fall short. Consider reconnecting in 6–12 months.' },
+  'lean-yes':   { label: 'Lean Yes',   emoji: '✓', bg: '#f0fdf4', border: '#86efac', text: '#16a34a', desc: 'Clears the minimum thresholds across all categories. A follow-up conversation or work trial is recommended.' },
+  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!' },
 }
 
-function scoreBar(score: number, label: string): string {
+// --- Email HTML building blocks ---
+
+function card(content: string, mb = '16px'): string {
+  return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:${mb};"><tr><td style="padding:24px 28px;">${content}</td></tr></table>`
+}
+
+function sectionTitle(icon: string, title: string): string {
+  return `<p style="margin:0 0 16px;font-size:15px;font-weight:700;color:#0f172a;">${icon} ${escapeHtml(title)}</p>`
+}
+
+function categoryScoreBlock(label: string, score: number): string {
   const s = Number(score) || 0
-  const color = s >= 70 ? '#16a34a' : s >= 50 ? '#ea580c' : '#dc2626'
-  const bgColor = s >= 70 ? '#dcfce7' : s >= 50 ? '#fff7ed' : '#fef2f2'
+  const color = scoreColor(s)
+  const bg = scoreBg(s)
   return `
-    <tr>
-      <td style="padding:10px 0;">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr>
-            <td style="font-size:13px;color:#64748b;font-weight:500;padding-bottom:6px;">${escapeHtml(label)}</td>
-            <td style="font-size:14px;font-weight:700;color:${color};text-align:right;padding-bottom:6px;">${s}/100</td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              <div style="background:${bgColor};border-radius:100px;height:10px;overflow:hidden;">
-                <div style="width:${s}%;height:100%;background:${color};border-radius:100px;"></div>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>`
+  <td style="width:25%;padding:0 4px;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
+      <tr><td style="padding:14px 12px;text-align:center;">
+        <p style="margin:0;font-size:11px;color:#64748b;font-weight:500;">${escapeHtml(label)}</p>
+        <p style="margin:6px 0;font-size:28px;font-weight:800;color:${color};line-height:1;">${s}</p>
+        <div style="background:${bg};border-radius:100px;height:6px;overflow:hidden;margin-top:8px;">
+          <div style="width:${s}%;height:100%;background:${color};border-radius:100px;"></div>
+        </div>
+      </td></tr>
+    </table>
+  </td>`
 }
 
-function dimensionRow(label: string, value: string | number | null, icon: string = '·'): string {
-  if (value === null || value === undefined || value === '') return ''
-  return `<tr>
-    <td style="padding:10px 16px;font-size:13px;color:#94a3b8;border-bottom:1px solid #f1f5f9;width:40%;">${icon} ${escapeHtml(label)}</td>
-    <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#1e293b;border-bottom:1px solid #f1f5f9;">${escapeHtml(value)}</td>
+function sliderRow(icon: string, label: string, value: number | null): string {
+  if (value === null || value === undefined) return ''
+  const v = Number(value) || 0
+  const color = scoreColor(v)
+  const bg = scoreBg(v)
+  const desc = getSliderLabel(v)
+  return `
+  <tr>
+    <td style="padding:8px 0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td style="font-size:13px;color:#475569;width:40%;">${icon} ${escapeHtml(label)}</td>
+          <td style="width:35%;padding:0 12px;">
+            <div style="background:${bg};border-radius:100px;height:8px;overflow:hidden;">
+              <div style="width:${v}%;height:100%;background:${color};border-radius:100px;"></div>
+            </div>
+          </td>
+          <td style="font-size:12px;font-weight:600;color:${color};text-align:right;width:25%;white-space:nowrap;">${desc} (${v})</td>
+        </tr>
+      </table>
+    </td>
   </tr>`
 }
 
-function formatCategorical(value: string | null): string {
-  if (!value) return '—'
-  return value.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+function detailRow(label: string, value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '' || value === '—') return ''
+  return `
+  <tr>
+    <td style="padding:8px 0;font-size:13px;color:#94a3b8;border-bottom:1px solid #f1f5f9;width:40%;vertical-align:top;">${escapeHtml(label)}</td>
+    <td style="padding:8px 0 8px 12px;font-size:13px;font-weight:600;color:#1e293b;border-bottom:1px solid #f1f5f9;vertical-align:top;">${escapeHtml(value)}</td>
+  </tr>`
 }
 
-function notesBlock(title: string, notes: string | null, icon: string): string {
-  if (!notes) return ''
+function noteBlock(title: string, text: string | null, icon: string): string {
+  if (!text) return ''
   return `
-  <div style="margin-bottom:16px;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;">
-      <tr>
-        <td style="padding:20px 24px;">
-          <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1e293b;">${icon} ${escapeHtml(title)}</p>
-          <p style="margin:0;font-size:13px;color:#475569;line-height:1.6;white-space:pre-line;">${escapeHtml(notes)}</p>
-        </td>
-      </tr>
-    </table>
-  </div>`
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;margin-bottom:12px;">
+    <tr><td style="padding:16px 20px;">
+      <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#1e293b;">${icon} ${escapeHtml(title)}</p>
+      <p style="margin:0;font-size:13px;color:#475569;line-height:1.7;white-space:pre-line;">${escapeHtml(text)}</p>
+    </td></tr>
+  </table>`
 }
 
 function buildEmailHtml(data: {
   candidateName: string
   candidateRole: string
+  candidateEmail: string
+  candidateEducation: string
+  candidateWebsite: string
   department: string
   hiringLevel: string
   interviewerName: string
+  interviewerEmail: string
   roundNumber: number
+  createdAt: string
   verdict: string
   scores: { person: number; professional: number; mindset: number; overall: number }
   dimensions: Record<string, any>
   hasCv: boolean
 }): string {
   const v = verdictConfig[data.verdict] || verdictConfig['lean-no']
-  const overallScore = Number(data.scores.overall) || 0
   const deptDisplay = (data.department || '').replace(/-/g, ' / ').replace(/\b\w/g, c => c.toUpperCase())
+  const dateStr = data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+  const d = data.dimensions
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -100,174 +169,136 @@ function buildEmailHtml(data: {
   <meta name="color-scheme" content="light">
   <title>Assessment Report — ${escapeHtml(data.candidateName)}</title>
 </head>
-<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
 
-<!-- Preheader text (hidden) -->
 <div style="display:none;max-height:0;overflow:hidden;">
-  ${escapeHtml(data.candidateName)} · ${v.label} · Overall ${overallScore}/100
+  ${escapeHtml(data.candidateName)} · ${v.label} · Overall ${data.scores.overall}/100
 </div>
 
-<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f8fafc;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f1f5f9;">
   <tr>
     <td align="center" style="padding:32px 16px;">
-      <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;">
 
-        <!-- Logo / Header -->
+        <!-- Header -->
         <tr>
           <td style="padding:0 0 24px;text-align:center;">
-            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#94a3b8;">Sideways</p>
-            <p style="margin:2px 0 0;font-size:10px;letter-spacing:1px;color:#cbd5e1;">CULTURE & TALENT FIT ASSESSMENT</p>
+            <p style="margin:0;font-size:13px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#0f172a;">SIDEWAYS</p>
+            <p style="margin:4px 0 0;font-size:11px;letter-spacing:1.5px;color:#94a3b8;text-transform:uppercase;">Assessment Report</p>
           </td>
         </tr>
 
-        <!-- Candidate Hero Card -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;">
-              <tr>
-                <td style="padding:28px 28px 20px;">
-                  <p style="margin:0;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.3px;">${escapeHtml(data.candidateName)}</p>
-                  <p style="margin:4px 0 0;font-size:14px;color:#64748b;">${escapeHtml(data.candidateRole || 'Role not specified')}${deptDisplay ? ` · ${escapeHtml(deptDisplay)}` : ''}</p>
-                  <table cellpadding="0" cellspacing="0" border="0" style="margin-top:12px;">
-                    <tr>
-                      <td style="background:#f1f5f9;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#64748b;margin-right:8px;">Level: ${escapeHtml(data.hiringLevel || '—')}</td>
-                      <td style="width:8px;"></td>
-                      <td style="background:#f1f5f9;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#64748b;">Round ${Number(data.roundNumber) || 1}</td>
-                      <td style="width:8px;"></td>
-                      <td style="background:#f1f5f9;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#64748b;">${escapeHtml(data.interviewerName)}</td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr><td style="height:16px;"></td></tr>
+        <!-- Candidate Info Card -->
+        <tr><td>
+          ${card(`
+            <p style="margin:0;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.3px;">${escapeHtml(data.candidateName)}</p>
+            <p style="margin:4px 0 0;font-size:14px;color:#64748b;">${escapeHtml(data.candidateRole || 'Role not specified')}${deptDisplay ? ` · ${deptDisplay}` : ''}${data.hiringLevel ? ` · ${escapeHtml(data.hiringLevel)}` : ''}</p>
+            ${data.candidateEmail ? `<p style="margin:4px 0 0;font-size:13px;color:#94a3b8;">${escapeHtml(data.candidateEmail)}</p>` : ''}
+            ${data.candidateEducation ? `<p style="margin:2px 0 0;font-size:13px;color:#94a3b8;">Education: ${escapeHtml(data.candidateEducation)}</p>` : ''}
+            ${data.candidateWebsite ? `<p style="margin:2px 0 0;font-size:13px;color:#94a3b8;">Website: ${escapeHtml(data.candidateWebsite)}</p>` : ''}
+            <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Round ${Number(data.roundNumber) || 1} · Interviewer: ${escapeHtml(data.interviewerName)}${data.interviewerEmail ? ` (${escapeHtml(data.interviewerEmail)})` : ''} · ${dateStr}</p>
+          `)}
+        </td></tr>
 
         <!-- Verdict Banner -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${v.bg};border-radius:16px;border:2px solid ${v.border};">
-              <tr>
-                <td style="padding:24px 28px;text-align:center;">
-                  <p style="margin:0;font-size:32px;font-weight:900;color:${v.text};letter-spacing:-0.5px;">${v.emoji} ${v.label}</p>
-                  <p style="margin:6px 0 0;font-size:14px;color:${v.text};opacity:0.8;">${v.desc}</p>
-                </td>
-              </tr>
+        <tr><td>
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${v.bg};border-radius:12px;border:2px solid ${v.border};margin-bottom:16px;">
+            <tr><td style="padding:28px;text-align:center;">
+              <p style="margin:0;font-size:36px;font-weight:900;color:${v.text};letter-spacing:-0.5px;">${v.emoji} ${v.label}</p>
+              <p style="margin:8px 0 0;font-size:13px;color:${v.text};line-height:1.5;">${v.desc}</p>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- Category Scores Grid (4 columns) -->
+        <tr><td>
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:16px;">
+            <tr>
+              ${categoryScoreBlock('The Person', data.scores.person)}
+              ${categoryScoreBlock('The Professional', data.scores.professional)}
+              ${categoryScoreBlock('Mindset', data.scores.mindset)}
+              ${categoryScoreBlock('Overall', data.scores.overall)}
+            </tr>
+          </table>
+        </td></tr>
+
+        <!-- ACT 1: The Person -->
+        <tr><td>
+          ${card(`
+            ${sectionTitle('👤', 'Act 1 · The Person')}
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              ${sliderRow('🤝', 'Interested in Others', d.interested_in_others)}
+              ${sliderRow('📚', 'Reading Breadth', d.reads_widely)}
+              ${sliderRow('🔬', 'T-Shape Depth', d.depth_score)}
+              ${sliderRow('🎨', 'Aesthetics Interest', d.aesthetics_interest)}
             </table>
-          </td>
-        </tr>
+            ${d.depth_topic ? `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:8px;">${detailRow('Depth Topic', d.depth_topic)}</table>` : ''}
+            ${d.recent_read_example ? `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:4px;">${detailRow('Recent Read / Example', d.recent_read_example)}</table>` : ''}
+          `)}
+        </td></tr>
 
-        <tr><td style="height:16px;"></td></tr>
+        <!-- Interests & Passions Note -->
+        ${d.interests_passions_notes ? `<tr><td>${noteBlock('Interests & Passions', d.interests_passions_notes, '✨')}</td></tr>` : ''}
 
-        <!-- Overall Score Highlight -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
-              <tr>
-                <td style="padding:24px 28px;text-align:center;">
-                  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;">Overall Score</p>
-                  <p style="margin:8px 0 4px;font-size:48px;font-weight:900;color:${overallScore >= 70 ? '#16a34a' : overallScore >= 50 ? '#ea580c' : '#dc2626'};letter-spacing:-2px;line-height:1;">${overallScore}</p>
-                  <p style="margin:0;font-size:12px;color:#94a3b8;">out of 100</p>
-                </td>
-              </tr>
+        <!-- Background Notes -->
+        ${d.background_notes ? `<tr><td>${noteBlock('Background Notes', d.background_notes, '📝')}</td></tr>` : ''}
+
+        <!-- ACT 2: The Professional -->
+        <tr><td>
+          ${card(`
+            ${sectionTitle('💼', 'Act 2 · The Professional')}
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              ${sliderRow('⚒️', 'Depth of Craft', d.depth_of_craft)}
+              ${sliderRow('🗣️', 'Articulation Skill', d.articulation_skill)}
+              ${sliderRow('📁', 'Portfolio Quality', d.portfolio_quality)}
+              ${sliderRow('🧩', 'Problem Solving', d.problem_solving_approach)}
+              ${sliderRow('🌐', 'Professional Breadth', d.professional_breadth)}
             </table>
-          </td>
-        </tr>
+            ${d.resilience_score !== null && d.resilience_score !== undefined ? `
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:8px;">
+              ${detailRow('Willingness to Iterate', `${d.resilience_score}/5`)}
+            </table>` : ''}
+          `)}
+        </td></tr>
 
-        <tr><td style="height:16px;"></td></tr>
+        <!-- Professional Deep Dive Note -->
+        ${d.professional_dive_notes ? `<tr><td>${noteBlock('Professional Deep Dive', d.professional_dive_notes, '🔍')}</td></tr>` : ''}
 
-        <!-- Category Scores -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
-              <tr>
-                <td style="padding:24px 28px;">
-                  <p style="margin:0 0 16px;font-size:14px;font-weight:700;color:#1e293b;">📊 Category Breakdown</p>
-                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                    ${scoreBar(data.scores.person, 'The Person')}
-                    ${scoreBar(data.scores.professional, 'The Professional')}
-                    ${scoreBar(data.scores.mindset, 'Mindset & Alignment')}
-                  </table>
-                </td>
-              </tr>
+        <!-- Aesthetics Process Note -->
+        ${d.aesthetics_process_note ? `<tr><td>${noteBlock('Aesthetics Process Note', d.aesthetics_process_note, '🎨')}</td></tr>` : ''}
+
+        <!-- ACT 3: Mindset & Alignment -->
+        <tr><td>
+          ${card(`
+            ${sectionTitle('🧠', 'Act 3 · Mindset & Alignment')}
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              ${detailRow('Diagnostic Level', diagnosticDisplay(d.diagnostic_level))}
+              ${detailRow('Honesty Level', honestyDisplay(d.honesty_level))}
+              ${detailRow('Industry Motivation', motivationDisplay(d.motivation_level))}
+              ${detailRow('Sideways Motivation', sidewaysMotivationDisplay(d.sideways_motivation_level))}
             </table>
-          </td>
-        </tr>
+          `)}
+        </td></tr>
 
-        <tr><td style="height:16px;"></td></tr>
-
-        <!-- Dimension Details -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;">
-              <tr>
-                <td style="padding:24px 28px 8px;">
-                  <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:#1e293b;">📋 Assessment Dimensions</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:0 12px 16px;">
-                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                    ${dimensionRow('Interested in Others', data.dimensions.interested_in_others, '🤝')}
-                    ${dimensionRow('Reads Widely', data.dimensions.reads_widely, '📚')}
-                    ${dimensionRow('Depth Score', data.dimensions.depth_score, '🔬')}
-                    ${dimensionRow('Depth Topic', data.dimensions.depth_topic, '💡')}
-                    ${dimensionRow('Aesthetics Interest', data.dimensions.aesthetics_interest, '🎨')}
-                    ${dimensionRow('Depth of Craft', data.dimensions.depth_of_craft, '⚒️')}
-                    ${dimensionRow('Articulation Skill', data.dimensions.articulation_skill, '🗣️')}
-                    ${dimensionRow('Portfolio Quality', data.dimensions.portfolio_quality, '📁')}
-                    ${dimensionRow('Problem Solving', data.dimensions.problem_solving_approach, '🧩')}
-                    ${dimensionRow('Professional Breadth', data.dimensions.professional_breadth, '🌐')}
-                    ${dimensionRow('Resilience', data.dimensions.resilience_score, '💪')}
-                    ${dimensionRow('Diagnostic Level', formatCategorical(data.dimensions.diagnostic_level), '🩺')}
-                    ${dimensionRow('Honesty Level', formatCategorical(data.dimensions.honesty_level), '⚖️')}
-                    ${dimensionRow('Motivation', formatCategorical(data.dimensions.motivation_level), '🔥')}
-                    ${dimensionRow('Sideways Motivation', formatCategorical(data.dimensions.sideways_motivation_level), '🎯')}
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr><td style="height:16px;"></td></tr>
-
-        <!-- Notes Sections -->
-        <tr>
-          <td>
-            ${notesBlock('Background Notes', data.dimensions.background_notes, '📝')}
-            ${notesBlock('Professional Deep Dive', data.dimensions.professional_dive_notes, '🔍')}
-            ${notesBlock('Interests & Passions', data.dimensions.interests_passions_notes, '✨')}
-            ${notesBlock('Sideways Website Feedback', data.dimensions.sideways_website_feedback, '🌐')}
-            ${notesBlock('Motivation Reason', data.dimensions.motivation_reason, '🔥')}
-            ${notesBlock('Sideways Motivation Reason', data.dimensions.sideways_motivation_reason, '🎯')}
-            ${notesBlock('Recent Read Example', data.dimensions.recent_read_example, '📖')}
-            ${notesBlock('Aesthetics Process Note', data.dimensions.aesthetics_process_note, '🎨')}
-          </td>
-        </tr>
+        <!-- Motivation Notes -->
+        ${d.motivation_reason ? `<tr><td>${noteBlock('Motivation Reason', d.motivation_reason, '🔥')}</td></tr>` : ''}
+        ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Sideways Motivation Reason', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
+        ${d.sideways_website_feedback ? `<tr><td>${noteBlock('Sideways Website Feedback', d.sideways_website_feedback, '🌐')}</td></tr>` : ''}
 
         ${data.hasCv ? `
-        <!-- CV Attachment Notice -->
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#eff6ff;border-radius:12px;border:1px solid #bfdbfe;">
-              <tr>
-                <td style="padding:16px 24px;text-align:center;">
-                  <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 Candidate's CV/Resume is attached to this email</p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td style="height:16px;"></td></tr>
-        ` : ''}
+        <!-- CV Notice -->
+        <tr><td>
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;margin-bottom:16px;">
+            <tr><td style="padding:14px 24px;text-align:center;">
+              <p style="margin:0;font-size:13px;color:#1d4ed8;font-weight:600;">📎 Candidate's CV / Resume is attached to this email</p>
+            </td></tr>
+          </table>
+        </td></tr>` : ''}
 
         <!-- Footer -->
         <tr>
           <td style="padding:24px 0;text-align:center;">
-            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#cbd5e1;">Sideways</p>
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#cbd5e1;">Sideways</p>
             <p style="margin:4px 0 0;font-size:11px;color:#cbd5e1;">Creative Problem Solving Outfit</p>
             <p style="margin:8px 0 0;font-size:10px;color:#e2e8f0;">This is an internal assessment report. Please do not forward.</p>
           </td>
@@ -282,13 +313,14 @@ function buildEmailHtml(data: {
 </html>`
 }
 
+// --- Main handler ---
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Verify authentication
     const authHeader = req.headers.get('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -309,6 +341,7 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -333,8 +366,6 @@ Deno.serve(async (req) => {
         if (!fileError && fileData) {
           const arrayBuffer = await fileData.arrayBuffer()
           const base64Content = base64Encode(new Uint8Array(arrayBuffer))
-          
-          // Determine filename and content type
           const fileName = cvPath.split('/').pop() || 'resume'
           const ext = fileName.split('.').pop()?.toLowerCase() || ''
           const contentTypeMap: Record<string, string> = {
@@ -361,10 +392,15 @@ Deno.serve(async (req) => {
     const html = buildEmailHtml({
       candidateName: candidateData.name,
       candidateRole: candidateData.role || '',
+      candidateEmail: candidateData.email || '',
+      candidateEducation: candidateData.education || '',
+      candidateWebsite: candidateData.website || '',
       department: candidateData.department || '',
       hiringLevel: candidateData.hiring_level || '',
       interviewerName: assessmentData.interviewer_name,
+      interviewerEmail: assessmentData.interviewer_email || interviewerEmail,
       roundNumber: assessmentData.round_number,
+      createdAt: new Date().toISOString(),
       verdict,
       scores,
       dimensions: {
@@ -395,14 +431,13 @@ Deno.serve(async (req) => {
       hasCv: attachments.length > 0,
     })
 
-    // Generate or retrieve unsubscribe token for the recipient
+    // Unsubscribe token
     const unsubToken = uuidv4()
     const { error: upsertError } = await supabase.from('email_unsubscribe_tokens').upsert(
       { email: interviewerEmail, token: unsubToken },
       { onConflict: 'email' }
     )
     if (upsertError) {
-      // If upsert fails (e.g. no unique constraint on email), just insert
       await supabase.from('email_unsubscribe_tokens').insert({
         email: interviewerEmail,
         token: unsubToken,
@@ -416,7 +451,7 @@ Deno.serve(async (req) => {
       sender_domain: 'notify.hiring.sideways.co.in',
       subject: `Assessment Report: ${candidateData.name} — Round ${assessmentData.round_number}`,
       html,
-      text: `Assessment report for ${candidateData.name}. Verdict: ${verdict}. Overall score: ${scores.overall}. View the full report in the Sideways Dashboard.`,
+      text: `Assessment report for ${candidateData.name}. Verdict: ${verdict}. Overall score: ${scores.overall}/100. Person: ${scores.person}, Professional: ${scores.professional}, Mindset: ${scores.mindset}.`,
       purpose: 'transactional',
       label: 'assessment_report',
       message_id: messageId,
