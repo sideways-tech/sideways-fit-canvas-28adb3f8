@@ -78,7 +78,7 @@ const ResilienceRating = ({ value, onChange }: ResilienceRatingProps) => {
         className="p-3 bg-hire/10 rounded-lg text-center sketch-border-light">
         
           <HandwrittenLabel className="text-3xl text-hire">
-            Ready for the Circus! 🎪
+            Built for iteration ✦
           </HandwrittenLabel>
         </motion.div>
       }

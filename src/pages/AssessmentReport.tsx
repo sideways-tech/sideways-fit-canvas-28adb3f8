@@ -30,11 +30,11 @@ const sidewaysMotivationOptions: Record<string, { label: string; description: st
   "sideways-specific": { label: "Specific to Sideways", description: "Knows our work, references projects, articulates unique draw" },
 };
 const resilienceDescriptions: Record<number, string> = {
-  1: "Took it personally, couldn't let go",
-  2: "Struggled but eventually moved on",
-  3: "Accepted feedback professionally",
-  4: "Iterated well, learned from it",
-  5: "Circus Ready! Kills darlings gracefully",
+  1: "Got defensive — struggled to separate self from work",
+  2: "Took it hard, but eventually found a way forward",
+  3: "Handled it professionally — no drama, moved on",
+  4: "Embraced the feedback and came back stronger",
+  5: "Thrives on iteration — treats every critique as fuel",
 };
 
 function scoreColor(s: number) {

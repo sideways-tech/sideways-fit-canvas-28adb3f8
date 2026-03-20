@@ -103,7 +103,7 @@ const verdictConfig: Record<string, { label: string; emoji: string; bg: string; 
   'strong-no':  { label: 'Strong No',  emoji: '✕', bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', desc: 'Significant gaps across key dimensions. The candidate is unlikely to thrive in a diagnostic, T-shaped culture.' },
   'lean-no':    { label: 'Lean No',    emoji: '↓', bg: '#fff7ed', border: '#fdba74', text: '#ea580c', desc: 'Some promising signals but one or more categories fall short. Consider reconnecting in 6–12 months.' },
   'lean-yes':   { label: 'Lean Yes',   emoji: '✓', bg: '#f0fdf4', border: '#86efac', text: '#16a34a', desc: 'Clears the minimum thresholds across all categories. A follow-up conversation or work trial is recommended.' },
-  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!' },
+  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. A natural fit.' },
 }
 
 // --- Email HTML building blocks ---
