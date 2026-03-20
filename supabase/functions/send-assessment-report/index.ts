@@ -446,37 +446,22 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Download CV if available
-    let attachments: Array<{ filename: string; content: string; content_type: string }> = []
+    // Generate signed CV download URL if available
+    let cvDownloadUrl: string | null = null
     const cvPath = assessmentData.cv_file_path
     if (cvPath) {
       try {
-        const { data: fileData, error: fileError } = await supabase.storage
+        const { data: signedData, error: signedError } = await supabase.storage
           .from('cvs')
-          .download(cvPath)
+          .createSignedUrl(cvPath, 60 * 60 * 24 * 7) // 7 days
 
-        if (!fileError && fileData) {
-          const arrayBuffer = await fileData.arrayBuffer()
-          const base64Content = base64Encode(new Uint8Array(arrayBuffer))
-          const fileName = cvPath.split('/').pop() || 'resume'
-          const ext = fileName.split('.').pop()?.toLowerCase() || ''
-          const contentTypeMap: Record<string, string> = {
-            pdf: 'application/pdf',
-            doc: 'application/msword',
-            docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          }
-          const contentType = contentTypeMap[ext] || 'application/octet-stream'
-
-          attachments.push({
-            filename: `${candidateData.name.replace(/[^a-zA-Z0-9 ]/g, '').trim()}_CV.${ext}`,
-            content: base64Content,
-            content_type: contentType,
-          })
+        if (!signedError && signedData?.signedUrl) {
+          cvDownloadUrl = signedData.signedUrl
         } else {
-          console.warn('Could not download CV:', fileError?.message)
+          console.warn('Could not create signed CV URL:', signedError?.message)
         }
       } catch (cvErr) {
-        console.warn('CV download error:', cvErr instanceof Error ? cvErr.message : String(cvErr))
+        console.warn('CV signed URL error:', cvErr instanceof Error ? cvErr.message : String(cvErr))
       }
     }
 
@@ -520,7 +505,7 @@ Deno.serve(async (req) => {
         recent_read_example: assessmentData.recent_read_example,
         aesthetics_process_note: assessmentData.aesthetics_process_note,
       },
-      hasCv: attachments.length > 0,
+      cvDownloadUrl,
     })
 
     // Unsubscribe token
