@@ -167,7 +167,7 @@ const ScoresSummary = ({
         { label: "Depth (Non-Work)", status: depthTopic ? getScoreStatus(depthScore) : "not-assessed", displayValue: depthTopic ? getSliderLabel(depthScore) : "No topic", sliderValue: depthTopic ? depthScore : undefined, icon: Lightbulb },
         { label: "Reads Widely", status: getScoreStatus(readsWidely), displayValue: getSliderLabel(readsWidely), sliderValue: readsWidely, icon: BookOpen },
         { label: "Interested in Others", status: getScoreStatus(interestedInOthers), displayValue: getSliderLabel(interestedInOthers), sliderValue: interestedInOthers, icon: Users },
-        { label: "Art & Aesthetics", status: getScoreStatus(aestheticsInterest), displayValue: getSliderLabel(aestheticsInterest), sliderValue: aestheticsInterest, icon: Palette },
+        { label: "Art, Aesthetics & Design", status: getScoreStatus(aestheticsInterest), displayValue: getSliderLabel(aestheticsInterest), sliderValue: aestheticsInterest, icon: Palette },
       ],
     },
     {
