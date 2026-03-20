@@ -12,16 +12,6 @@ import {
   Wrench,
   Mic,
   Briefcase,
-  Lightbulb,
-  Users,
-  BookOpen,
-  Shield,
-  Star,
-  Palette,
-  Heart,
-  Wrench,
-  Mic,
-  Briefcase,
   Compass,
 } from "lucide-react";
 
