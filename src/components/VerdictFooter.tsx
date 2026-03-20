@@ -55,7 +55,7 @@ const verdictConfig = {
     bgColor: "bg-hire/10",
     textColor: "text-hire",
     description:
-      "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!",
+      "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. A natural fit.",
   },
 };
 

@@ -60,11 +60,11 @@ function sidewaysMotivationInfo(v: string | null): { label: string; desc: string
   return { label: 'Generic — Could Be Any Agency', desc: 'No specific reason', color: '#dc2626' }
 }
 const resilienceDescs: Record<number, string> = {
-  1: 'Took it personally, couldn\'t let go',
-  2: 'Struggled but eventually moved on',
-  3: 'Accepted feedback professionally',
-  4: 'Iterated well, learned from it',
-  5: 'Circus Ready! Kills darlings gracefully',
+  1: 'Got defensive — struggled to separate self from work',
+  2: 'Took it hard, but eventually found a way forward',
+  3: 'Handled it professionally — no drama, moved on',
+  4: 'Embraced the feedback and came back stronger',
+  5: 'Thrives on iteration — treats every critique as fuel',
 }
 
 function mcqRow(label: string, info: { label: string; desc: string; color: string }): string {
@@ -103,7 +103,7 @@ const verdictConfig: Record<string, { label: string; emoji: string; bg: string; 
   'strong-no':  { label: 'Strong No',  emoji: '✕', bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', desc: 'Significant gaps across key dimensions. The candidate is unlikely to thrive in a diagnostic, T-shaped culture.' },
   'lean-no':    { label: 'Lean No',    emoji: '↓', bg: '#fff7ed', border: '#fdba74', text: '#ea580c', desc: 'Some promising signals but one or more categories fall short. Consider reconnecting in 6–12 months.' },
   'lean-yes':   { label: 'Lean Yes',   emoji: '✓', bg: '#f0fdf4', border: '#86efac', text: '#16a34a', desc: 'Clears the minimum thresholds across all categories. A follow-up conversation or work trial is recommended.' },
-  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!' },
+  'strong-yes': { label: 'Strong Yes', emoji: '★', bg: '#f0fdf4', border: '#4ade80', text: '#15803d', desc: 'Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. A natural fit.' },
 }
 
 // --- Email HTML building blocks ---
