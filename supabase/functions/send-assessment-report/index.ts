@@ -536,9 +536,6 @@ Deno.serve(async (req) => {
       unsubscribe_token: unsubToken,
     }
 
-    if (attachments.length > 0) {
-      payload.attachments = attachments
-    }
 
     const { error: enqueueError } = await supabase.rpc('enqueue_email', {
       queue_name: 'transactional_emails',
