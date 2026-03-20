@@ -325,7 +325,7 @@ const SidewaysInterviewCanvas = () => {
       }
 
       // Insert assessment
-      const { error: aErr } = await supabase.from("assessments").insert({
+      const { data: savedAssessment, error: aErr } = await supabase.from("assessments").insert({
         candidate_id: candidateId,
         round_number: parseInt(formState.interviewRound),
         interviewer_name: formState.interviewerName.trim(),
@@ -359,7 +359,7 @@ const SidewaysInterviewCanvas = () => {
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
         verdict,
-      });
+      }).select("*").single();
 
       if (aErr) throw aErr;
 
@@ -368,36 +368,8 @@ const SidewaysInterviewCanvas = () => {
         try {
           await supabase.functions.invoke("send-assessment-report", {
             body: {
+              assessmentId: savedAssessment.id,
               interviewerEmail: formState.interviewerEmail.trim(),
-              candidateData: {
-                name: formState.candidateName.trim(),
-                role: formState.candidateRole.trim() || null,
-                department: formState.department || null,
-                hiring_level: formState.hiringLevel || null,
-              },
-              assessmentData: {
-                interviewer_name: formState.interviewerName.trim(),
-                round_number: parseInt(formState.interviewRound),
-                interested_in_others: formState.interestedInOthers,
-                reads_widely: formState.readsWidely,
-                depth_score: formState.depthScore,
-                depth_topic: formState.depthTopic || null,
-                aesthetics_interest: formState.aestheticsInterest,
-                depth_of_craft: formState.depthOfCraft,
-                articulation_skill: formState.articulationSkill,
-                portfolio_quality: formState.portfolioQuality,
-                problem_solving_approach: formState.problemSolvingApproach,
-                professional_breadth: formState.professionalBreadth,
-                resilience_score: formState.resilienceScore,
-                diagnostic_level: formState.diagnosticLevel || null,
-                honesty_level: formState.honestyLevel || null,
-                motivation_level: formState.motivationLevel || null,
-                sideways_motivation_level: formState.sidewaysMotivationLevel || null,
-                background_notes: formState.backgroundNotes || null,
-                professional_dive_notes: formState.professionalDiveNotes || null,
-              },
-              scores: categoryScores,
-              verdict,
             },
           });
         } catch {

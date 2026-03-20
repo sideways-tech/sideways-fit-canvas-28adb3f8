@@ -258,8 +258,11 @@ const AssessmentReport = () => {
         </div>
 
         {/* Mindset Notes */}
-        <NoteBlock title="Industry Motivation — Reason" text={a.motivation_reason} />
-        <NoteBlock title="Sideways Motivation — Reason" text={a.sideways_motivation_reason} />
+         <NoteBlock title="Why This Industry — Reason" text={a.motivation_reason} />
+         <NoteBlock title="Why Sideways / Work Critique" text={a.sideways_motivation_reason || a.sideways_website_feedback} />
+         {a.sideways_motivation_reason && a.sideways_website_feedback && a.sideways_website_feedback !== a.sideways_motivation_reason && (
+           <NoteBlock title="Additional Sideways Work Feedback" text={a.sideways_website_feedback} />
+         )}
 
         {/* Footer */}
         <div className="text-center py-6 text-xs text-muted-foreground/60">
