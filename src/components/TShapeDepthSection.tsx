@@ -2,6 +2,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
+import { Flame } from "lucide-react";
 
 interface TShapeDepthSectionProps {
   depthTopic: string;
@@ -17,9 +18,16 @@ const TShapeDepthSection = ({
   onDepthScoreChange,
 }: TShapeDepthSectionProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
+      <div className="flex items-center gap-2">
+        <Flame className="w-5 h-5 text-highlighter" />
+        <Label className="text-sm font-medium">
+          Non-Work Obsession
+        </Label>
+      </div>
+
       <div className="space-y-2">
-        <Label htmlFor="depth-topic" className="text-sm font-medium">
+        <Label htmlFor="depth-topic" className="text-xs text-muted-foreground">
           What's their obsession? (Non-work topic)
         </Label>
         <Input
