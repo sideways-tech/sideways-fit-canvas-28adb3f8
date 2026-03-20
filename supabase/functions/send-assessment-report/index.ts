@@ -290,7 +290,6 @@ function buildEmailHtml(data: {
               ${sliderRow('⚒️', 'Depth of Craft', d.depth_of_craft)}
               ${sliderRow('🗣️', 'Articulation Skill', d.articulation_skill)}
               ${sliderRow('📁', 'Portfolio Quality', d.portfolio_quality)}
-              ${sliderRow('🧩', 'Problem Solving', d.problem_solving_approach)}
               ${sliderRow('🌐', 'Professional Breadth', d.professional_breadth)}
             </table>
             ${starRow('Willingness to Iterate (Resilience)', d.resilience_score)}
