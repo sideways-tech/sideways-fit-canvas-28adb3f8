@@ -139,7 +139,7 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
                 <AccordionItem key={`${kra.kra_name}-${i}`} value={`kra-${i}`} className="border-ink/10">
                   <AccordionTrigger className="py-3 text-left text-sm font-semibold hover:no-underline">
                     <span className="flex items-center gap-2 text-left">
-                      <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/10 text-xs font-bold">
+                      <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-yellow-400/30 text-xs font-bold">
                         {i + 1}
                       </span>
                       {kra.kra_name}
