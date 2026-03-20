@@ -35,29 +35,68 @@ function formatCategorical(value: string | null): string {
   if (!value) return ''
   return value.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
-function diagnosticDisplay(v: string | null): string {
-  if (!v) return 'Not assessed'
-  if (v === 'diagnostician') return 'Diagnostician'
-  if (v === 'clarifier') return 'Clarifier'
-  return 'Order Taker'
+function diagnosticInfo(v: string | null): { label: string; desc: string; color: string } {
+  if (!v) return { label: 'Not assessed', desc: '', color: '#94a3b8' }
+  if (v === 'diagnostician') return { label: 'Diagnostician', desc: 'Challenged the premise / Asked "Why"', color: '#16a34a' }
+  if (v === 'clarifier') return { label: 'Clarifier', desc: 'Asked superficial process questions', color: '#d97706' }
+  return { label: 'Order Taker', desc: 'Asked about timeline/budget only', color: '#dc2626' }
 }
-function honestyDisplay(v: string | null): string {
-  if (!v) return 'Not assessed'
-  if (v === 'honest') return 'Constructive Critique'
-  if (v === 'diplomatic') return 'Diplomatic'
-  return 'Flattery'
+function honestyInfo(v: string | null): { label: string; desc: string; color: string } {
+  if (!v) return { label: 'Not assessed', desc: '', color: '#94a3b8' }
+  if (v === 'honest') return { label: 'Constructive Critique', desc: 'The Birbal Standard — Truth to power', color: '#16a34a' }
+  if (v === 'diplomatic') return { label: 'Diplomatic', desc: 'Balanced but guarded feedback', color: '#d97706' }
+  return { label: 'Flattery', desc: 'Only positive things, avoided critique', color: '#dc2626' }
 }
-function motivationDisplay(v: string | null): string {
-  if (!v) return 'Not assessed'
-  if (v === 'passionate') return 'Deep Connection'
-  if (v === 'practical') return 'Practical Reasons'
-  return 'Unclear'
+function motivationInfo(v: string | null): { label: string; desc: string; color: string } {
+  if (!v) return { label: 'Not assessed', desc: '', color: '#94a3b8' }
+  if (v === 'passionate') return { label: 'Deep Connection', desc: 'Clear passion for problem-solving, creativity, or impact', color: '#16a34a' }
+  if (v === 'practical') return { label: 'Practical Reasons', desc: 'Career growth, industry reputation, learning opportunity', color: '#d97706' }
+  return { label: 'Unclear / Generic', desc: "Couldn't articulate why", color: '#dc2626' }
 }
-function sidewaysMotivationDisplay(v: string | null): string {
-  if (!v) return 'Not assessed'
-  if (v === 'sideways-specific') return 'Sideways-Specific'
-  if (v === 'culture-fit') return 'Culture Fit'
-  return 'Generic'
+function sidewaysMotivationInfo(v: string | null): { label: string; desc: string; color: string } {
+  if (!v) return { label: 'Not assessed', desc: '', color: '#94a3b8' }
+  if (v === 'sideways-specific') return { label: 'Specific to Sideways', desc: 'Knows our work, references projects, articulates unique draw', color: '#16a34a' }
+  if (v === 'culture-fit') return { label: 'Culture Fit', desc: 'Resonates with values, work style, or team vibe', color: '#d97706' }
+  return { label: 'Generic — Could Be Any Agency', desc: 'No specific reason', color: '#dc2626' }
+}
+const resilienceDescs: Record<number, string> = {
+  1: 'Took it personally, couldn\'t let go',
+  2: 'Struggled but eventually moved on',
+  3: 'Accepted feedback professionally',
+  4: 'Iterated well, learned from it',
+  5: 'Circus Ready! Kills darlings gracefully',
+}
+
+function mcqRow(label: string, info: { label: string; desc: string; color: string }): string {
+  if (info.label === 'Not assessed') return ''
+  return `
+  <tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+      <td style="font-size:13px;color:#64748b;width:40%;vertical-align:top;">${escapeHtml(label)}</td>
+      <td style="text-align:right;vertical-align:top;">
+        <p style="margin:0;font-size:13px;font-weight:700;color:${info.color};">${escapeHtml(info.label)}</p>
+        ${info.desc ? `<p style="margin:2px 0 0;font-size:11px;color:#94a3b8;">${escapeHtml(info.desc)}</p>` : ''}
+      </td>
+    </tr></table>
+  </td></tr>`
+}
+
+function starRow(label: string, value: number | null): string {
+  if (!value || value === 0) return ''
+  const filled = '★'.repeat(value)
+  const empty = '☆'.repeat(5 - value)
+  const color = value >= 4 ? '#16a34a' : value >= 3 ? '#d97706' : '#dc2626'
+  const desc = resilienceDescs[value] || ''
+  return `
+  <tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+      <td style="font-size:13px;color:#64748b;width:40%;vertical-align:top;">${escapeHtml(label)}</td>
+      <td style="text-align:right;vertical-align:top;">
+        <p style="margin:0;font-size:16px;color:${color};letter-spacing:2px;">${filled}${empty} <span style="font-size:13px;font-weight:700;">${value}/5</span></p>
+        ${desc ? `<p style="margin:2px 0 0;font-size:11px;color:#94a3b8;">${escapeHtml(desc)}</p>` : ''}
+      </td>
+    </tr></table>
+  </td></tr>`
 }
 
 const verdictConfig: Record<string, { label: string; emoji: string; bg: string; border: string; text: string; desc: string }> = {
