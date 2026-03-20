@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -14,6 +14,10 @@ interface CvUploadProps {
 const CvUpload = ({ candidateName, onUploadComplete, currentFilePath }: CvUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const displayName = fileName || currentFilePath?.split("/").pop();
+  const hasFile = !!displayName;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,29 +50,48 @@ const CvUpload = ({ candidateName, onUploadComplete, currentFilePath }: CvUpload
     setUploading(false);
   };
 
+  const handleRemove = () => {
+    setFileName(null);
+    onUploadComplete("");
+    if (inputRef.current) inputRef.current.value = "";
+    toast({ title: "CV Removed", description: "You can now upload a new file." });
+  };
+
   return (
-    <div className="space-y-2 text-right">
-      <Label>Upload CV</Label>
-      <div className="flex items-center gap-3 justify-end">
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">Upload CV</Label>
+
+      {hasFile ? (
+        <div className="flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
+          <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <span className="min-w-0 flex-1 truncate text-sm">{displayName}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-destructive"
+            onClick={handleRemove}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Remove file</span>
+          </Button>
+        </div>
+      ) : (
         <Button
           type="button"
           variant="outline"
-          className="sketch-border-light gap-2"
+          className="w-full justify-center gap-2 border-dashed"
           disabled={uploading}
-          onClick={() => document.getElementById("cv-upload-input")?.click()}
+          onClick={() => inputRef.current?.click()}
         >
-          <Upload className="w-4 h-4" />
-          {uploading ? "Uploading..." : "Choose File"}
+          <Upload className="h-4 w-4" />
+          {uploading ? "Uploading…" : "Choose File"}
         </Button>
-        {(fileName || currentFilePath) && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <FileText className="w-4 h-4" />
-            <span>{fileName || currentFilePath?.split("/").pop()}</span>
-          </div>
-        )}
-      </div>
+      )}
+
       <input
-        id="cv-upload-input"
+        ref={inputRef}
         type="file"
         accept=".pdf,.doc,.docx"
         className="hidden"
