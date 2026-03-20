@@ -395,6 +395,19 @@ Deno.serve(async (req) => {
       hasCv: attachments.length > 0,
     })
 
+    // Generate or retrieve unsubscribe token for the recipient
+    const unsubToken = uuidv4()
+    await supabase.from('email_unsubscribe_tokens').upsert(
+      { email: interviewerEmail, token: unsubToken },
+      { onConflict: 'email' }
+    ).throwOnError().catch(() => {
+      // If upsert fails (e.g. no unique constraint on email), just insert
+      return supabase.from('email_unsubscribe_tokens').insert({
+        email: interviewerEmail,
+        token: unsubToken,
+      })
+    })
+
     const payload: Record<string, any> = {
       idempotency_key: messageId,
       to: interviewerEmail,
@@ -407,6 +420,7 @@ Deno.serve(async (req) => {
       label: 'assessment_report',
       message_id: messageId,
       queued_at: new Date().toISOString(),
+      unsubscribe_token: unsubToken,
     }
 
     if (attachments.length > 0) {
