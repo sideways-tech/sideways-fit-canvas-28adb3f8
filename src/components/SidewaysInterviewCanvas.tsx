@@ -15,7 +15,7 @@ import BackgroundSection from "./BackgroundSection";
 import DiagnosticSection from "./DiagnosticSection";
 import InterestedInOthersSection from "./InterestedInOthersSection";
 import ReadingBreadthSection from "./ReadingBreadthSection";
-import SidewaysWorkSection from "./SidewaysWorkSection";
+
 import ProfessionalDeepDiveSection from "./ProfessionalDeepDiveSection";
 import TShapeVisualizer from "./TShapeVisualizer";
 import TShapeDepthSection from "./TShapeDepthSection";
