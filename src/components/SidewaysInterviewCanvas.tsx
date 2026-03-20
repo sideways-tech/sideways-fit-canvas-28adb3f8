@@ -817,7 +817,7 @@ const SidewaysInterviewCanvas = () => {
         >
           <img src={sidewaysLogo} alt="Sideways" className="h-8 mx-auto mb-2 opacity-50" />
           <p>Creative Problem Solving Outfit</p>
-          <Link to="/dashboard" className="inline-flex items-center gap-1.5 mt-4 opacity-40 hover:opacity-70 transition-opacity text-xs">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 mt-4 text-sm font-bold text-foreground hover:text-primary transition-colors">
             <LayoutDashboard className="w-4 h-4" />
             <span>Dashboard</span>
           </Link>
