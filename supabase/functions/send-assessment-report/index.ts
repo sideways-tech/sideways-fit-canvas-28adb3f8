@@ -79,9 +79,9 @@ function buildEmailHtml(data: {
 
   <!-- Candidate Card -->
   <div style="background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;border:1px solid #e8e4de;">
-    <h2 style="margin:0 0 4px;font-size:20px;color:#222;">${data.candidateName}</h2>
-    <p style="margin:0;font-size:14px;color:#888;">${data.candidateRole || 'Role not specified'} · ${(data.department || '').replace(/-/g, ' / ').replace(/\b\w/g, c => c.toUpperCase())} · ${data.hiringLevel}</p>
-    <p style="margin:8px 0 0;font-size:13px;color:#aaa;">Round ${data.roundNumber} · Interviewer: ${data.interviewerName}</p>
+    <h2 style="margin:0 0 4px;font-size:20px;color:#222;">${escapeHtml(data.candidateName)}</h2>
+    <p style="margin:0;font-size:14px;color:#888;">${escapeHtml(data.candidateRole || 'Role not specified')} · ${escapeHtml((data.department || '').replace(/-/g, ' / ').replace(/\b\w/g, c => c.toUpperCase()))} · ${escapeHtml(data.hiringLevel)}</p>
+    <p style="margin:8px 0 0;font-size:13px;color:#aaa;">Round ${Number(data.roundNumber) || 1} · Interviewer: ${escapeHtml(data.interviewerName)}</p>
   </div>
 
   <!-- Verdict -->
