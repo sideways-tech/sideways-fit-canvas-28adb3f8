@@ -84,10 +84,10 @@ const AestheticsSection = ({
       <div className="space-y-3">
         <Label htmlFor="process-note" className="text-sm font-medium flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-highlighter" />
-          Process of Creation
+          Process of Design / Creation.
         </Label>
         <p className="text-xs text-muted-foreground">
-          Did they show curiosity about how things are made? Note any examples shared.
+          Did they show curiosity about how things are designed or cerated? Note any examples shared.
         </p>
         <Textarea
           id="process-note"
