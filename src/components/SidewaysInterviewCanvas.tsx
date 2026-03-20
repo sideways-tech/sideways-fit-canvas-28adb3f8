@@ -91,15 +91,14 @@ const calculateCategoryScores = (state: FormState): CategoryScores => {
       state.depthScore) / 4
   );
 
-  // ACT 2: The Professional (6 dimensions, weighted)
+  // ACT 2: The Professional (5 dimensions, weighted)
   const resilienceNormalized = ((state.resilienceScore - 1) / 4) * 100; // 1-5 → 0-100
   const professional = Math.round(
-    state.depthOfCraft * 0.22 +
-    state.articulationSkill * 0.18 +
-    state.portfolioQuality * 0.18 +
-    state.problemSolvingApproach * 0.17 +
-    state.professionalBreadth * 0.15 +
-    resilienceNormalized * 0.10
+    state.depthOfCraft * 0.27 +
+    state.articulationSkill * 0.22 +
+    state.portfolioQuality * 0.22 +
+    state.professionalBreadth * 0.17 +
+    resilienceNormalized * 0.12
   );
 
   // ACT 3: Mindset & Alignment (4 categorical dimensions)
