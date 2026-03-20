@@ -308,10 +308,10 @@ function buildEmailHtml(data: {
           ${card(`
             ${sectionTitle('🧠', 'Act 3 · Mindset & Alignment')}
             <table cellpadding="0" cellspacing="0" border="0" width="100%">
-              ${detailRow('Diagnostic Level', diagnosticDisplay(d.diagnostic_level))}
-              ${detailRow('Honesty Level', honestyDisplay(d.honesty_level))}
-              ${detailRow('Industry Motivation', motivationDisplay(d.motivation_level))}
-              ${detailRow('Sideways Motivation', sidewaysMotivationDisplay(d.sideways_motivation_level))}
+              ${mcqRow('Diagnostic Mindset', diagnosticInfo(d.diagnostic_level))}
+              ${mcqRow('Honesty Level', honestyInfo(d.honesty_level))}
+              ${mcqRow('Industry Motivation', motivationInfo(d.motivation_level))}
+              ${mcqRow('Sideways Motivation', sidewaysMotivationInfo(d.sideways_motivation_level))}
             </table>
           `)}
         </td></tr>
