@@ -1,36 +1,33 @@
 
 
-## Rewrite Resilience & Verdict Text
+## Three Changes
 
-### What's changing
+### 1. Default all sliders to 0
 
-Replace all "Circus" references and rewrite the resilience star descriptions with warm-but-professional language that actually describes iterative resilience in a creative context.
+In `src/components/SidewaysInterviewCanvas.tsx`, change the initial `FormState` values from `30` to `0` for these fields (lines 165–180):
+- `interestedInOthers`: 30 → 0
+- `readsWidely`: 30 → 0
+- `depthOfCraft`: 30 → 0
+- `articulationSkill`: 30 → 0
+- `portfolioQuality`: 30 → 0
+- `problemSolvingApproach`: 30 → 0
+- `professionalBreadth`: 30 → 0
+- `depthScore`: 30 → 0
+- `aestheticsInterest`: 30 → 0
 
-### Proposed new copy
+`resilienceScore` is already 0 — no change needed.
 
-**Resilience star descriptions:**
+### 2. Add bounding box around Aesthetics section
 
-| Stars | New text |
-|---|---|
-| 1 | "Got defensive — struggled to separate self from work" |
-| 2 | "Took it hard, but eventually found a way forward" |
-| 3 | "Handled it professionally — no drama, moved on" |
-| 4 | "Embraced the feedback and came back stronger" |
-| 5 | "Thrives on iteration — treats every critique as fuel" |
+In `src/components/AestheticsSection.tsx`, wrap the outer `<div>` with the same styling used by `InterestedInOthersSection` — add `p-4 bg-muted/20 rounded-lg sketch-border-light` to the container, and add a header row with a `Palette` icon and label, matching the pattern of the other bounded sections.
 
-**Summary banner (score 4–5):**
-> "Built for iteration" (replaces "Ready for the Circus! 🎪")
+### 3. Rename "Interest in Art & Aesthetics" → "Interest in Art, Aesthetics & Design"
 
-**Verdict strong-yes description:**
-> "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. A natural fit."
-(replaces "Ready for the Circus!")
+Update the label text in `src/components/AestheticsSection.tsx` (line 27). Also search for and update any matching references in `AssessmentReport.tsx` and the email edge function.
 
 ### Files to update
-
-1. **`src/components/ResilienceRating.tsx`** — star descriptions (lines 63–69), banner text (line 81)
-2. **`src/pages/AssessmentReport.tsx`** — `resilienceDescriptions` (lines 32–38), strong-yes verdict description (line 9)
-3. **`supabase/functions/send-assessment-report/index.ts`** — `resilienceDescs` (lines 62–68), strong-yes verdict description (line 106)
-4. **`src/components/VerdictFooter.tsx`** — strong-yes description (line 58)
-
-No database or structural changes needed — text-only updates across 4 files.
+1. `src/components/SidewaysInterviewCanvas.tsx` — default values to 0
+2. `src/components/AestheticsSection.tsx` — bounding box + rename label
+3. `src/pages/AssessmentReport.tsx` — rename label if referenced
+4. `supabase/functions/send-assessment-report/index.ts` — rename label if referenced
 
