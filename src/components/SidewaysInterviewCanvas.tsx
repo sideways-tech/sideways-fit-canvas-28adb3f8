@@ -15,7 +15,7 @@ import BackgroundSection from "./BackgroundSection";
 import DiagnosticSection from "./DiagnosticSection";
 import InterestedInOthersSection from "./InterestedInOthersSection";
 import ReadingBreadthSection from "./ReadingBreadthSection";
-import SidewaysWorkSection from "./SidewaysWorkSection";
+
 import ProfessionalDeepDiveSection from "./ProfessionalDeepDiveSection";
 import TShapeVisualizer from "./TShapeVisualizer";
 import TShapeDepthSection from "./TShapeDepthSection";
@@ -91,15 +91,14 @@ const calculateCategoryScores = (state: FormState): CategoryScores => {
       state.depthScore) / 4
   );
 
-  // ACT 2: The Professional (6 dimensions, weighted)
+  // ACT 2: The Professional (5 dimensions, weighted)
   const resilienceNormalized = ((state.resilienceScore - 1) / 4) * 100; // 1-5 → 0-100
   const professional = Math.round(
-    state.depthOfCraft * 0.22 +
-    state.articulationSkill * 0.18 +
-    state.portfolioQuality * 0.18 +
-    state.problemSolvingApproach * 0.17 +
-    state.professionalBreadth * 0.15 +
-    resilienceNormalized * 0.10
+    state.depthOfCraft * 0.27 +
+    state.articulationSkill * 0.22 +
+    state.portfolioQuality * 0.22 +
+    state.professionalBreadth * 0.17 +
+    resilienceNormalized * 0.12
   );
 
   // ACT 3: Mindset & Alignment (4 categorical dimensions)
@@ -707,13 +706,11 @@ const SidewaysInterviewCanvas = () => {
               depthOfCraft={formState.depthOfCraft}
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
-              problemSolvingApproach={formState.problemSolvingApproach}
               professionalBreadth={formState.professionalBreadth}
               professionalDiveNotes={formState.professionalDiveNotes}
               onDepthOfCraftChange={(value) => updateField("depthOfCraft", value)}
               onArticulationSkillChange={(value) => updateField("articulationSkill", value)}
               onPortfolioQualityChange={(value) => updateField("portfolioQuality", value)}
-              onProblemSolvingApproachChange={(value) => updateField("problemSolvingApproach", value)}
               onProfessionalBreadthChange={(value) => updateField("professionalBreadth", value)}
               onNotesChange={(value) => updateField("professionalDiveNotes", value)}
             />
@@ -746,11 +743,7 @@ const SidewaysInterviewCanvas = () => {
               sidewaysReason={formState.sidewaysMotivationReason}
               onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
-            />
-            <SidewaysWorkSection
-              sidewaysWebsiteFeedback={formState.sidewaysWebsiteFeedback}
               honestyLevel={formState.honestyLevel}
-              onFeedbackChange={(value) => updateField("sidewaysWebsiteFeedback", value)}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
             />
           </div>
@@ -791,7 +784,6 @@ const SidewaysInterviewCanvas = () => {
               depthOfCraft={formState.depthOfCraft}
               articulationSkill={formState.articulationSkill}
               portfolioQuality={formState.portfolioQuality}
-              problemSolvingApproach={formState.problemSolvingApproach}
               professionalBreadth={formState.professionalBreadth}
             />
           </div>

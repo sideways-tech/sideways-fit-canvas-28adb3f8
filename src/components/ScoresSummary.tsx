@@ -12,7 +12,6 @@ import {
   Wrench,
   Mic,
   Briefcase,
-  Puzzle,
   Compass,
 } from "lucide-react";
 
@@ -35,7 +34,6 @@ interface ScoresSummaryProps {
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
-  problemSolvingApproach: number;
   professionalBreadth: number;
 }
 
@@ -100,7 +98,6 @@ const ScoresSummary = ({
   depthOfCraft,
   articulationSkill,
   portfolioQuality,
-  problemSolvingApproach,
   professionalBreadth,
 }: ScoresSummaryProps) => {
 
@@ -180,7 +177,6 @@ const ScoresSummary = ({
         { label: "Professional Breadth", status: getScoreStatus(professionalBreadth), displayValue: getSliderLabel(professionalBreadth), sliderValue: professionalBreadth, icon: Compass },
         { label: "Articulation", status: getScoreStatus(articulationSkill), displayValue: getSliderLabel(articulationSkill), sliderValue: articulationSkill, icon: Mic },
         { label: "Portfolio Quality", status: getScoreStatus(portfolioQuality), displayValue: getSliderLabel(portfolioQuality), sliderValue: portfolioQuality, icon: Briefcase },
-        { label: "Problem-Solving", status: getScoreStatus(problemSolvingApproach), displayValue: getSliderLabel(problemSolvingApproach), sliderValue: problemSolvingApproach, icon: Puzzle },
         { label: "Willingness to Iterate", status: getResilienceStatus(), displayValue: resilienceScore === 0 ? "Not rated" : `${resilienceScore}/5`, icon: Star },
       ],
     },

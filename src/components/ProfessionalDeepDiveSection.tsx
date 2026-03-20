@@ -2,19 +2,17 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { Wrench, Mic, Briefcase, Puzzle, Compass } from "lucide-react";
+import { Wrench, Mic, Briefcase, Compass } from "lucide-react";
 
 interface ProfessionalDeepDiveSectionProps {
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
-  problemSolvingApproach: number;
   professionalBreadth: number;
   professionalDiveNotes: string;
   onDepthOfCraftChange: (value: number) => void;
   onArticulationSkillChange: (value: number) => void;
   onPortfolioQualityChange: (value: number) => void;
-  onProblemSolvingApproachChange: (value: number) => void;
   onProfessionalBreadthChange: (value: number) => void;
   onNotesChange: (value: string) => void;
 }
@@ -37,14 +35,6 @@ const sliders = [
     high: "Outstanding work",
   },
   {
-    key: "problemSolvingApproach" as const,
-    label: "Problem-Solving Approach",
-    description: "Did they show how they think through challenges, not just final output?",
-    icon: Puzzle,
-    low: "Shows only outputs",
-    high: "Reveals the thinking",
-  },
-  {
     key: "depthOfCraft" as const,
     label: "Depth of Craft",
     description: "How deep is their mastery in their core domain?",
@@ -61,17 +51,16 @@ const sliders = [
     high: "Cross-disciplinary curiosity",
   },
 ];
+
 const ProfessionalDeepDiveSection = ({
   depthOfCraft,
   articulationSkill,
   portfolioQuality,
-  problemSolvingApproach,
   professionalBreadth,
   professionalDiveNotes,
   onDepthOfCraftChange,
   onArticulationSkillChange,
   onPortfolioQualityChange,
-  onProblemSolvingApproachChange,
   onProfessionalBreadthChange,
   onNotesChange,
 }: ProfessionalDeepDiveSectionProps) => {
@@ -79,7 +68,6 @@ const ProfessionalDeepDiveSection = ({
     depthOfCraft,
     articulationSkill,
     portfolioQuality,
-    problemSolvingApproach,
     professionalBreadth,
   };
 
@@ -87,12 +75,11 @@ const ProfessionalDeepDiveSection = ({
     depthOfCraft: onDepthOfCraftChange,
     articulationSkill: onArticulationSkillChange,
     portfolioQuality: onPortfolioQualityChange,
-    problemSolvingApproach: onProblemSolvingApproachChange,
     professionalBreadth: onProfessionalBreadthChange,
   };
 
   const avgScore = Math.round(
-    (depthOfCraft + articulationSkill + portfolioQuality + problemSolvingApproach) / 4
+    (depthOfCraft + articulationSkill + portfolioQuality + professionalBreadth) / 4
   );
 
   return (
