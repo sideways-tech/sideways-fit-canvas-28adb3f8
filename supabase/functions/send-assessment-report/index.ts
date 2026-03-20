@@ -178,6 +178,40 @@ function noteBlock(title: string, text: string | null, icon: string): string {
   </table>`
 }
 
+async function loadAssessmentEmailData(
+  supabase: ReturnType<typeof createClient>,
+  assessmentId: string,
+) {
+  const { data: assessmentData, error: assessmentError } = await supabase
+    .from('assessments')
+    .select('*')
+    .eq('id', assessmentId)
+    .single()
+
+  if (assessmentError) throw assessmentError
+
+  const { data: candidateData, error: candidateError } = await supabase
+    .from('candidates')
+    .select('*')
+    .eq('id', assessmentData.candidate_id)
+    .single()
+
+  if (candidateError) throw candidateError
+
+  return {
+    assessmentData,
+    candidateData,
+    interviewerEmail: assessmentData.interviewer_email,
+    scores: {
+      person: assessmentData.person_score ?? 0,
+      professional: assessmentData.professional_score ?? 0,
+      mindset: assessmentData.mindset_score ?? 0,
+      overall: assessmentData.overall_score ?? 0,
+    },
+    verdict: assessmentData.verdict,
+  }
+}
+
 function buildEmailHtml(data: {
   candidateName: string
   candidateRole: string
@@ -206,7 +240,7 @@ function buildEmailHtml(data: {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Assessment Report — ${escapeHtml(data.candidateName)}</title>
+  <title>Hiring Assessment Report — ${escapeHtml(data.candidateName)}</title>
 </head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
 
@@ -223,7 +257,7 @@ function buildEmailHtml(data: {
         <tr>
           <td style="padding:0 0 24px;text-align:center;">
             <p style="margin:0;font-size:13px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#0f172a;">SIDEWAYS</p>
-            <p style="margin:4px 0 0;font-size:11px;letter-spacing:1.5px;color:#94a3b8;text-transform:uppercase;">Assessment Report</p>
+            <p style="margin:4px 0 0;font-size:11px;letter-spacing:1.5px;color:#94a3b8;text-transform:uppercase;">Hiring Assessment Report</p>
           </td>
         </tr>
 
@@ -316,8 +350,9 @@ function buildEmailHtml(data: {
         </td></tr>
 
         <!-- Motivation Notes -->
-        ${d.motivation_reason ? `<tr><td>${noteBlock('Motivation Reason', d.motivation_reason, '🔥')}</td></tr>` : ''}
-        ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Sideways Motivation Reason', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
+        ${d.motivation_reason ? `<tr><td>${noteBlock('Why This Industry — Reason', d.motivation_reason, '🔥')}</td></tr>` : ''}
+        ${d.sideways_motivation_reason ? `<tr><td>${noteBlock('Why Sideways / Work Critique', d.sideways_motivation_reason, '🎯')}</td></tr>` : ''}
+        ${d.sideways_website_feedback && d.sideways_website_feedback !== d.sideways_motivation_reason ? `<tr><td>${noteBlock('Additional Sideways Work Feedback', d.sideways_website_feedback, '🧭')}</td></tr>` : ''}
 
         ${data.hasCv ? `
         <!-- CV Notice -->
@@ -380,7 +415,29 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    const { assessmentData, candidateData, scores, verdict, interviewerEmail } = await req.json()
+    const body = await req.json()
+
+    let assessmentData = body.assessmentData
+    let candidateData = body.candidateData
+    let scores = body.scores
+    let verdict = body.verdict
+    let interviewerEmail = body.interviewerEmail
+
+    if (body.assessmentId) {
+      const hydrated = await loadAssessmentEmailData(supabase, body.assessmentId)
+      assessmentData = hydrated.assessmentData
+      candidateData = hydrated.candidateData
+      scores = hydrated.scores
+      verdict = hydrated.verdict
+      interviewerEmail = hydrated.interviewerEmail || interviewerEmail
+    }
+
+    if (!assessmentData || !candidateData || !scores || !verdict) {
+      return new Response(JSON.stringify({ error: 'Missing assessment payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
 
     if (!interviewerEmail) {
       return new Response(JSON.stringify({ skipped: true, reason: 'no_email' }), {
@@ -434,7 +491,7 @@ Deno.serve(async (req) => {
       interviewerName: assessmentData.interviewer_name,
       interviewerEmail: assessmentData.interviewer_email || interviewerEmail,
       roundNumber: assessmentData.round_number,
-      createdAt: new Date().toISOString(),
+      createdAt: assessmentData.created_at || new Date().toISOString(),
       verdict,
       scores,
       dimensions: {
@@ -483,7 +540,7 @@ Deno.serve(async (req) => {
       to: interviewerEmail,
       from: `Sideways Assessments <assessments@notify.hiring.sideways.co.in>`,
       sender_domain: 'notify.hiring.sideways.co.in',
-      subject: `Assessment Report: ${candidateData.name} — Round ${assessmentData.round_number}`,
+      subject: `Hiring Assessment Report: ${candidateData.name} — Round ${assessmentData.round_number}`,
       html,
       text: `Assessment report for ${candidateData.name}. Verdict: ${verdict}. Overall score: ${scores.overall}/100. Person: ${scores.person}, Professional: ${scores.professional}, Mindset: ${scores.mindset}.`,
       purpose: 'transactional',
