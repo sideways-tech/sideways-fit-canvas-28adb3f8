@@ -550,7 +550,7 @@ const SidewaysInterviewCanvas = () => {
                 disabled={formState.hiringLevel !== "L1"}
               >
                 <SelectTrigger className={`sketch-border-light bg-background h-11 ${formState.hiringLevel !== "L1" ? "opacity-50 cursor-not-allowed" : ""}`}>
-                  <SelectValue placeholder={formState.hiringLevel !== "L1" ? "Only for L1" : "Select education..."} />
+                  <SelectValue placeholder="Select education..." />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="graduate">Graduate</SelectItem>
