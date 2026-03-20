@@ -6,7 +6,7 @@ const verdictConfig: Record<string, { label: string; emoji: string; bgClass: str
   "strong-no": { label: "Strong No", emoji: "✕", bgClass: "bg-red-50", borderClass: "border-red-300", textClass: "text-red-600", description: "Significant gaps across key dimensions. The candidate is unlikely to thrive in a diagnostic, T-shaped culture." },
   "lean-no": { label: "Lean No", emoji: "↓", bgClass: "bg-orange-50", borderClass: "border-orange-300", textClass: "text-orange-600", description: "Some promising signals but one or more categories fall short. Consider reconnecting in 6–12 months." },
   "lean-yes": { label: "Lean Yes", emoji: "✓", bgClass: "bg-green-50", borderClass: "border-green-300", textClass: "text-green-600", description: "Clears the minimum thresholds across all categories. A follow-up conversation or work trial is recommended." },
-  "strong-yes": { label: "Strong Yes", emoji: "★", bgClass: "bg-green-50", borderClass: "border-green-400", textClass: "text-green-700", description: "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. Ready for the Circus!" },
+  "strong-yes": { label: "Strong Yes", emoji: "★", bgClass: "bg-green-50", borderClass: "border-green-400", textClass: "text-green-700", description: "Diagnostic mindset, T-shaped curiosity, and genuine alignment with Sideways culture. A natural fit." },
 };
 
 const diagnosticOptions: Record<string, { label: string; description: string }> = {
