@@ -240,7 +240,6 @@ const AssessmentReport = () => {
           <SliderRow label="Depth of Craft" value={a.depth_of_craft} />
           <SliderRow label="Articulation Skill" value={a.articulation_skill} />
           <SliderRow label="Portfolio Quality" value={a.portfolio_quality} />
-          <SliderRow label="Problem Solving" value={a.problem_solving_approach} />
           <SliderRow label="Professional Breadth" value={a.professional_breadth} />
           <StarRating label="Willingness to Iterate (Resilience)" value={a.resilience_score} />
         </div>
