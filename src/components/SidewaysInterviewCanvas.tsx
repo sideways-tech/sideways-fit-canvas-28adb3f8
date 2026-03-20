@@ -662,6 +662,23 @@ const SidewaysInterviewCanvas = () => {
               onInterestChange={(value) => updateField("aestheticsInterest", value)}
               onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
             />
+
+            {/* Interests & Passions — freeform capture */}
+            <div className="space-y-2 p-4 bg-muted/20 rounded-lg sketch-border-light">
+              <Label htmlFor="interests-passions-notes" className="text-sm font-medium">
+                Interests & Passions — Notes
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Favourite books, films, podcasts, hobbies, side projects, rabbit holes — anything that stood out about who this person is beyond work.
+              </p>
+              <Textarea
+                id="interests-passions-notes"
+                placeholder="e.g. Obsessed with architecture documentaries, reads Murakami, runs a pottery Instagram..."
+                value={formState.interestsPassionsNotes}
+                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
+                className="min-h-[100px] bg-background"
+              />
+            </div>
           </div>
         </SketchCard>
 
