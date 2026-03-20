@@ -19,12 +19,19 @@ const AestheticsSection = ({
   onProcessNoteChange,
 }: AestheticsSectionProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 bg-muted/20 rounded-lg sketch-border-light">
+      <div className="flex items-center gap-2">
+        <Palette className="w-5 h-5 text-highlighter" />
+        <Label className="text-sm font-medium">
+          Interest in Art, Aesthetics & Design
+        </Label>
+      </div>
+
       {/* Interest Level */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <HandwrittenLabel className="text-2xl text-muted-foreground">
-            Interest in Art & Aesthetics
+            Aesthetic sensibility
           </HandwrittenLabel>
           <span className="text-sm font-medium tabular-nums">{interest}%</span>
         </div>

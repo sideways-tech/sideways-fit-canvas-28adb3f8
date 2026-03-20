@@ -303,7 +303,7 @@ function buildEmailHtml(data: {
               ${sliderRow('🤝', 'Interested in Others', d.interested_in_others)}
               ${sliderRow('📚', 'Reading Breadth', d.reads_widely)}
               ${sliderRow('🔬', 'T-Shape Depth', d.depth_score)}
-              ${sliderRow('🎨', 'Aesthetics Interest', d.aesthetics_interest)}
+              ${sliderRow('🎨', 'Art, Aesthetics &amp; Design', d.aesthetics_interest)}
             </table>
             ${d.depth_topic ? `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:8px;">${detailRow('Depth Topic', d.depth_topic)}</table>` : ''}
             ${d.recent_read_example ? `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:4px;">${detailRow('Recent Read / Example', d.recent_read_example)}</table>` : ''}

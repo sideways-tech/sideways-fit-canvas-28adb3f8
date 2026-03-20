@@ -254,7 +254,7 @@ const AssessmentReport = () => {
           <SliderRow icon="🤝" label="Interested in Others" value={a.interested_in_others} />
           <SliderRow icon="📚" label="Reading Breadth" value={a.reads_widely} />
           <SliderRow icon="🔬" label="T-Shape Depth" value={a.depth_score} />
-          <SliderRow icon="🎨" label="Aesthetics Interest" value={a.aesthetics_interest} />
+          <SliderRow icon="🎨" label="Art, Aesthetics & Design" value={a.aesthetics_interest} />
           {a.depth_topic && <DetailRow label="Depth Topic" value={a.depth_topic} />}
           {a.recent_read_example && <DetailRow label="Recent Read / Example" value={a.recent_read_example} />}
         </Card>
