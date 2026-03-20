@@ -6,6 +6,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
+function escapeHtml(str: string | number | null | undefined): string {
+  if (str === null || str === undefined) return ''
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 const verdictLabels: Record<string, { label: string; color: string; desc: string }> = {
   'strong-no': { label: 'Strong No', color: '#e74c3c', desc: 'Not a fit for Sideways' },
   'lean-no': { label: 'Lean No', color: '#e67e22', desc: 'Below the bar — revisit if they grow' },
@@ -14,15 +24,17 @@ const verdictLabels: Record<string, { label: string; color: string; desc: string
 }
 
 function scoreBar(score: number, label: string): string {
-  const color = score >= 60 ? '#27ae60' : score >= 40 ? '#f39c12' : '#e74c3c'
+  const safeLabel = escapeHtml(label)
+  const safeScore = Number(score) || 0
+  const color = safeScore >= 60 ? '#27ae60' : safeScore >= 40 ? '#f39c12' : '#e74c3c'
   return `
     <div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-        <span style="font-size:13px;color:#555;">${label}</span>
-        <span style="font-size:13px;font-weight:700;color:${color};">${score}</span>
+        <span style="font-size:13px;color:#555;">${safeLabel}</span>
+        <span style="font-size:13px;font-weight:700;color:${color};">${safeScore}</span>
       </div>
       <div style="background:#eee;border-radius:8px;height:8px;overflow:hidden;">
-        <div style="width:${score}%;height:100%;background:${color};border-radius:8px;"></div>
+        <div style="width:${safeScore}%;height:100%;background:${color};border-radius:8px;"></div>
       </div>
     </div>`
 }
@@ -30,8 +42,8 @@ function scoreBar(score: number, label: string): string {
 function dimensionRow(label: string, value: string | number | null): string {
   if (value === null || value === undefined || value === '') return ''
   return `<tr>
-    <td style="padding:6px 12px;font-size:13px;color:#555;border-bottom:1px solid #f0f0f0;">${label}</td>
-    <td style="padding:6px 12px;font-size:13px;font-weight:600;color:#333;border-bottom:1px solid #f0f0f0;">${value}</td>
+    <td style="padding:6px 12px;font-size:13px;color:#555;border-bottom:1px solid #f0f0f0;">${escapeHtml(label)}</td>
+    <td style="padding:6px 12px;font-size:13px;font-weight:600;color:#333;border-bottom:1px solid #f0f0f0;">${escapeHtml(value)}</td>
   </tr>`
 }
 
