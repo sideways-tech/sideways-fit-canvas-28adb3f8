@@ -293,10 +293,7 @@ function buildEmailHtml(data: {
               ${sliderRow('🧩', 'Problem Solving', d.problem_solving_approach)}
               ${sliderRow('🌐', 'Professional Breadth', d.professional_breadth)}
             </table>
-            ${d.resilience_score !== null && d.resilience_score !== undefined ? `
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:8px;">
-              ${detailRow('Willingness to Iterate', `${d.resilience_score}/5`)}
-            </table>` : ''}
+            ${starRow('Willingness to Iterate (Resilience)', d.resilience_score)}
           `)}
         </td></tr>
 
