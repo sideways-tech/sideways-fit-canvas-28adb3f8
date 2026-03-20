@@ -263,12 +263,21 @@ const SidewaysInterviewCanvas = () => {
     { field: "interviewRound", label: "Round" },
   ];
 
+  const requiredSelections: { field: keyof FormState; label: string; section: string }[] = [
+    { field: "diagnosticLevel", label: "Diagnostic Mindset", section: "Section E" },
+    { field: "honestyLevel", label: "Honesty Meter", section: "Section D" },
+    { field: "motivationLevel", label: "Industry Motivation", section: "Section D" },
+    { field: "sidewaysMotivationLevel", label: "Sideways Motivation", section: "Section D" },
+  ];
+
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
 
   const handleSubmitAssessment = async () => {
     // Mark all required fields as touched
     const allTouched: Record<string, boolean> = { ...touched };
     requiredFields.forEach(({ field }) => { allTouched[field] = true; });
+    requiredSelections.forEach(({ field }) => { allTouched[field as string] = true; });
+    allTouched["resilienceScore"] = true;
     setTouched(allTouched);
 
     const firstMissing = requiredFields.find(({ field }) => isFieldEmpty(field));
@@ -282,6 +291,17 @@ const SidewaysInterviewCanvas = () => {
     }
     if (!isValidEmail(formState.interviewerEmail.trim())) {
       toast({ title: "Invalid email", description: "Please enter a valid interviewer email address.", variant: "destructive" });
+      return;
+    }
+
+    // Validate MCQs & widgets
+    const missedSelection = requiredSelections.find(({ field }) => isFieldEmpty(field));
+    if (missedSelection) {
+      toast({ title: "Missing selection", description: `Please select an option for "${missedSelection.label}" in ${missedSelection.section}.`, variant: "destructive" });
+      return;
+    }
+    if (formState.resilienceScore === 0) {
+      toast({ title: "Missing rating", description: `Please rate "Resilience Score" (star rating) in Section C.`, variant: "destructive" });
       return;
     }
 
