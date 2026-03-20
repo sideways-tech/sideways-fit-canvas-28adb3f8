@@ -3,10 +3,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import HandwrittenLabel from "./HandwrittenLabel";
+import HonestyMeter from "./HonestyMeter";
 import { Target, TrendingUp, Heart, Compass, Building2, Sparkles, Shuffle } from "lucide-react";
 
 type MotivationLevel = "unclear" | "practical" | "passionate";
 type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
+type HonestyLevel = "flattery" | "diplomatic" | "honest";
 
 interface IndustryMotivationSectionProps {
   level: MotivationLevel | "";
@@ -17,6 +19,8 @@ interface IndustryMotivationSectionProps {
   sidewaysReason: string;
   onSidewaysLevelChange: (level: SidewaysMotivationLevel) => void;
   onSidewaysReasonChange: (reason: string) => void;
+  honestyLevel: HonestyLevel | "";
+  onHonestyChange: (value: HonestyLevel) => void;
 }
 
 const industryOptions = [
@@ -76,6 +80,8 @@ const IndustryMotivationSection = ({
   sidewaysReason,
   onSidewaysLevelChange,
   onSidewaysReasonChange,
+  honestyLevel,
+  onHonestyChange,
 }: IndustryMotivationSectionProps) => {
   return (
     <div className="space-y-6">
@@ -89,7 +95,6 @@ const IndustryMotivationSection = ({
           Capture their specific reason for choosing this industry/role
         </p>
 
-        {/* Textarea first — capture their answer */}
         <Textarea
           id="motivation-reason"
           placeholder="What did they say about why they want to work in creative problem-solving?"
@@ -98,7 +103,6 @@ const IndustryMotivationSection = ({
           className="sketch-border-light bg-background min-h-[80px] resize-none"
         />
 
-        {/* Then grade with MCQ */}
         <Label className="text-xs text-muted-foreground">
           Based on their answer, how would you rate their industry motivation?
         </Label>
@@ -159,7 +163,7 @@ const IndustryMotivationSection = ({
         )}
       </div>
 
-      {/* Why Sideways? sub-block */}
+      {/* Why Sideways? sub-block — consolidated with website feedback */}
       <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Building2 className="w-5 h-5 text-highlighter" />
@@ -169,21 +173,29 @@ const IndustryMotivationSection = ({
           Do they know who we are and why they want to be here specifically?
         </p>
 
-        {/* Textarea first — capture their answer */}
+        {/* Combined textarea — motivation + website critique */}
         <div className="space-y-2">
           <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-            What specifically about Sideways appeals to them? Any Indian / international examples they found inspirational?
+            Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work? Any Indian / international examples they found inspirational?
           </Label>
           <Textarea
             id="sideways-reason"
-            placeholder="E.g., 'Loved the XYZ campaign', 'Resonated with the problem-solving approach', 'Knows someone here'..."
+            placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section', 'Found the Amul work inspiring'..."
             value={sidewaysReason}
             onChange={(e) => onSidewaysReasonChange(e.target.value)}
-            className="sketch-border-light bg-background min-h-[80px] resize-none"
+            className="sketch-border-light bg-background min-h-[100px] resize-none"
           />
         </div>
 
-        {/* Then grade with MCQ */}
+        {/* Honesty Meter — how honest were they about our work? */}
+        <div className="space-y-3 pt-2">
+          <Label className="text-sm font-medium">
+            Their take on Sideways work — how honest were they?
+          </Label>
+          <HonestyMeter value={honestyLevel} onChange={onHonestyChange} />
+        </div>
+
+        {/* Sideways Motivation MCQ */}
         <Label className="text-xs text-muted-foreground">
           Based on their answer, how Sideways-specific was their motivation?
         </Label>
