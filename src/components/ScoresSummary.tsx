@@ -44,7 +44,6 @@ interface ScoresSummaryProps {
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
-  problemSolvingApproach: number;
   professionalBreadth: number;
 }
 
