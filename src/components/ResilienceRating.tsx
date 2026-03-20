@@ -62,11 +62,11 @@ const ResilienceRating = ({ value, onChange }: ResilienceRatingProps) => {
         {/* Rating Description */}
         <div className="text-center text-sm text-muted-foreground min-h-[2.5rem]">
           {value === 0 && "Click stars to rate"}
-          {value === 1 && "😬 Took it personally, couldn't let go"}
-          {value === 2 && "😕 Struggled but eventually moved on"}
-          {value === 3 && "😐 Accepted feedback professionally"}
-          {value === 4 && "🙂 Iterated well, learned from it"}
-          {value === 5 && "🎪 Circus Ready! Kills darlings gracefully"}
+          {value === 1 && "Got defensive — struggled to separate self from work"}
+          {value === 2 && "Took it hard, but eventually found a way forward"}
+          {value === 3 && "Handled it professionally — no drama, moved on"}
+          {value === 4 && "Embraced the feedback and came back stronger"}
+          {value === 5 && "Thrives on iteration — treats every critique as fuel"}
         </div>
       </div>
 
