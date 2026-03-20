@@ -108,7 +108,6 @@ const ScoresSummary = ({
   depthOfCraft,
   articulationSkill,
   portfolioQuality,
-  problemSolvingApproach,
   professionalBreadth,
 }: ScoresSummaryProps) => {
 
