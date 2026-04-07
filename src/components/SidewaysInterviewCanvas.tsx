@@ -69,6 +69,8 @@ interface FormState {
   motivationReason: string;
   sidewaysMotivationLevel: SidewaysMotivationLevel | "";
   sidewaysMotivationReason: string;
+  indianExamples: string;
+  internationalExamples: string;
 }
 
 interface CategoryScores {
@@ -183,6 +185,8 @@ const SidewaysInterviewCanvas = () => {
     motivationReason: "",
     sidewaysMotivationLevel: "",
     sidewaysMotivationReason: "",
+    indianExamples: "",
+    internationalExamples: "",
   });
 
   const [cvFilePath, setCvFilePath] = useState<string>("");
@@ -755,6 +759,10 @@ const SidewaysInterviewCanvas = () => {
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
               honestyLevel={formState.honestyLevel}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
+              indianExamples={formState.indianExamples}
+              onIndianExamplesChange={(value) => updateField("indianExamples", value)}
+              internationalExamples={formState.internationalExamples}
+              onInternationalExamplesChange={(value) => updateField("internationalExamples", value)}
             />
           </div>
         </SketchCard>
