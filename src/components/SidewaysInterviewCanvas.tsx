@@ -21,7 +21,8 @@ import TShapeVisualizer from "./TShapeVisualizer";
 import TShapeDepthSection from "./TShapeDepthSection";
 import ResilienceRating from "./ResilienceRating";
 import AestheticsSection from "./AestheticsSection";
-import IndustryMotivationSection from "./IndustryMotivationSection";
+import IndustryMotivationBlock from "./IndustryMotivationBlock";
+import SidewaysMotivationBlock from "./SidewaysMotivationBlock";
 import ScoresSummary from "./ScoresSummary";
 import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
@@ -268,10 +269,10 @@ const SidewaysInterviewCanvas = () => {
   ];
 
   const requiredSelections: { field: keyof FormState; label: string; section: string }[] = [
-    { field: "diagnosticLevel", label: "Diagnostic Mindset", section: "Section E" },
-    { field: "honestyLevel", label: "Honesty Meter", section: "Section D" },
+    { field: "diagnosticLevel", label: "Diagnostic Mindset", section: "Section F" },
+    { field: "honestyLevel", label: "Honesty Meter", section: "Section E" },
     { field: "motivationLevel", label: "Industry Motivation", section: "Section D" },
-    { field: "sidewaysMotivationLevel", label: "Sideways Motivation", section: "Section D" },
+    { field: "sidewaysMotivationLevel", label: "Sideways Motivation", section: "Section E" },
   ];
 
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
@@ -744,18 +745,30 @@ const SidewaysInterviewCanvas = () => {
 
         {/* ACT 3: THE FIT */}
 
-        {/* D. Why This Industry & Why Sideways */}
+        {/* D. Why This Industry */}
         <SketchCard className="mb-8" delay={0.4}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">D. Why This Industry & Why Sideways</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Why this industry, why Sideways — and can they be honest about it?</p>
+              <HandwrittenLabel as="h3" className="text-4xl">D. Why This Industry</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Why did they choose this industry or role?</p>
             </div>
-            <IndustryMotivationSection
+            <IndustryMotivationBlock
               level={formState.motivationLevel}
               reason={formState.motivationReason}
               onLevelChange={(value) => updateField("motivationLevel", value)}
               onReasonChange={(value) => updateField("motivationReason", value)}
+            />
+          </div>
+        </SketchCard>
+
+        {/* E. Why Sideways */}
+        <SketchCard className="mb-8" delay={0.45}>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <HandwrittenLabel as="h3" className="text-4xl">E. Why Sideways</HandwrittenLabel>
+              <p className="text-sm text-muted-foreground">Do they know who we are — and can they be honest about it?</p>
+            </div>
+            <SidewaysMotivationBlock
               sidewaysLevel={formState.sidewaysMotivationLevel}
               sidewaysReason={formState.sidewaysMotivationReason}
               onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
@@ -770,11 +783,11 @@ const SidewaysInterviewCanvas = () => {
           </div>
         </SketchCard>
 
-        {/* E. Diagnostic Mindset — Post-interview grading */}
+        {/* F. Diagnostic Mindset — Post-interview grading */}
         <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">E. Diagnostic Mindset</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">F. Diagnostic Mindset</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Looking back at the full conversation — did they ask 'Why' before 'How'?</p>
             </div>
             <DiagnosticSection
