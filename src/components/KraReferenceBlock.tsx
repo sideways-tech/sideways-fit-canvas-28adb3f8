@@ -17,12 +17,11 @@ interface GroupedKra {
 }
 
 const disciplineAliases: Record<string, string[]> = {
+  "creative-copy-art": ["creative-copy-art", "creative", "copy", "copywriting", "art"],
+  "creative-design": ["creative-design", "creative design", "product-design", "product design", "design"],
+  "account-management": ["account-management", "account management", "servicing", "client servicing"],
   strategy: ["strategy", "brand strategy", "strategic planning"],
-  creative: ["creative"],
-  copy: ["copy", "copywriting"],
   "tech-ux": ["tech-ux", "tech / ux", "tech/ux", "ux", "technology", "tech"],
-  "product-design": ["product-design", "product design", "design"],
-  servicing: ["servicing", "client servicing", "account management"],
 };
 
 const normalizeText = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -82,7 +81,14 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
   const sidewaysRows = (allRows || []).filter((row) => normalizeText(row.discipline) === normalizeText("_sideways_person"));
   const combinedRows = sortKraRows([...matchingDisciplineRows, ...sidewaysRows]);
 
-  const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const departmentDisplayNames: Record<string, string> = {
+    "creative-copy-art": "Creative (Copy & Art)",
+    "creative-design": "Creative Design",
+    "account-management": "Account Management",
+    strategy: "Strategy",
+    "tech-ux": "Tech / UX",
+  };
+  const departmentLabel = departmentDisplayNames[department] || department.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   if (combinedRows.length === 0) {
     return (

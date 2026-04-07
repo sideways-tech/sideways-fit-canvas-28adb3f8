@@ -507,12 +507,11 @@ const SidewaysInterviewCanvas = () => {
                   <SelectValue placeholder="Select department..." />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="creative-copy-art">Creative (Copy & Art)</SelectItem>
+                  <SelectItem value="creative-design">Creative Design</SelectItem>
+                  <SelectItem value="account-management">Account Management</SelectItem>
                   <SelectItem value="strategy">Strategy</SelectItem>
-                  <SelectItem value="creative">Creative</SelectItem>
-                  <SelectItem value="copy">Copy</SelectItem>
                   <SelectItem value="tech-ux">Tech / UX</SelectItem>
-                  <SelectItem value="product-design">Product Design</SelectItem>
-                  <SelectItem value="servicing">Servicing</SelectItem>
                 </SelectContent>
               </Select>
               {touched.department && isFieldEmpty("department") && (

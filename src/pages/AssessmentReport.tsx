@@ -203,7 +203,14 @@ const AssessmentReport = () => {
 
   const { assessment: a, candidate: c } = data;
   const v = a.verdict ? verdictConfig[a.verdict] : null;
-  const deptDisplay = (c.department || "").replace(/-/g, " / ").replace(/\b\w/g, (ch) => ch.toUpperCase());
+  const deptDisplayNames: Record<string, string> = {
+    "creative-copy-art": "Creative (Copy & Art)",
+    "creative-design": "Creative Design",
+    "account-management": "Account Management",
+    strategy: "Strategy",
+    "tech-ux": "Tech / UX",
+  };
+  const deptDisplay = deptDisplayNames[c.department || ""] || (c.department || "").replace(/-/g, " ").replace(/\b\w/g, (ch) => ch.toUpperCase());
 
   return (
     <div className="min-h-screen bg-slate-100 print:bg-white">
