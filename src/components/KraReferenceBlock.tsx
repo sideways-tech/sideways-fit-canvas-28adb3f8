@@ -17,12 +17,11 @@ interface GroupedKra {
 }
 
 const disciplineAliases: Record<string, string[]> = {
+  "creative-copy-art": ["creative-copy-art", "creative", "copy", "copywriting", "art"],
+  "creative-design": ["creative-design", "creative design", "product-design", "product design", "design"],
+  "account-management": ["account-management", "account management", "servicing", "client servicing"],
   strategy: ["strategy", "brand strategy", "strategic planning"],
-  creative: ["creative"],
-  copy: ["copy", "copywriting"],
   "tech-ux": ["tech-ux", "tech / ux", "tech/ux", "ux", "technology", "tech"],
-  "product-design": ["product-design", "product design", "design"],
-  servicing: ["servicing", "client servicing", "account management"],
 };
 
 const normalizeText = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
