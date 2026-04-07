@@ -377,7 +377,11 @@ const SidewaysInterviewCanvas = () => {
         motivation_level: formState.motivationLevel || null,
         motivation_reason: formState.motivationReason || null,
         sideways_motivation_level: formState.sidewaysMotivationLevel || null,
-        sideways_motivation_reason: formState.sidewaysMotivationReason || null,
+        sideways_motivation_reason: [
+          formState.sidewaysMotivationReason,
+          formState.indianExamples ? `[Indian Examples] ${formState.indianExamples}` : "",
+          formState.internationalExamples ? `[International Examples] ${formState.internationalExamples}` : "",
+        ].filter(Boolean).join("\n\n") || null,
         person_score: categoryScores.person,
         professional_score: categoryScores.professional,
         mindset_score: categoryScores.mindset,
