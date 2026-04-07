@@ -69,6 +69,8 @@ interface FormState {
   motivationReason: string;
   sidewaysMotivationLevel: SidewaysMotivationLevel | "";
   sidewaysMotivationReason: string;
+  indianExamples: string;
+  internationalExamples: string;
 }
 
 interface CategoryScores {
@@ -183,6 +185,8 @@ const SidewaysInterviewCanvas = () => {
     motivationReason: "",
     sidewaysMotivationLevel: "",
     sidewaysMotivationReason: "",
+    indianExamples: "",
+    internationalExamples: "",
   });
 
   const [cvFilePath, setCvFilePath] = useState<string>("");
@@ -373,7 +377,11 @@ const SidewaysInterviewCanvas = () => {
         motivation_level: formState.motivationLevel || null,
         motivation_reason: formState.motivationReason || null,
         sideways_motivation_level: formState.sidewaysMotivationLevel || null,
-        sideways_motivation_reason: formState.sidewaysMotivationReason || null,
+        sideways_motivation_reason: [
+          formState.sidewaysMotivationReason,
+          formState.indianExamples ? `[Indian Examples] ${formState.indianExamples}` : "",
+          formState.internationalExamples ? `[International Examples] ${formState.internationalExamples}` : "",
+        ].filter(Boolean).join("\n\n") || null,
         person_score: categoryScores.person,
         professional_score: categoryScores.professional,
         mindset_score: categoryScores.mindset,
@@ -687,10 +695,10 @@ const SidewaysInterviewCanvas = () => {
             <div className="space-y-2 p-4 bg-muted/20 rounded-lg sketch-border-light">
               <Label htmlFor="interests-passions-notes" className="text-sm font-medium flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-highlighter" />
-                Interests & Passions — Notes
+                Broader Interests & Cultural Diet
               </Label>
               <p className="text-xs text-muted-foreground">
-                Favourite books, films, podcasts, hobbies, side projects, rabbit holes — anything that stood out about who this person is beyond work.
+                Beyond the one obsession above — what else do they consume or dabble in? Books, films, podcasts, hobbies, side projects, cultural interests.
               </p>
               <Textarea
                 id="interests-passions-notes"
@@ -755,6 +763,10 @@ const SidewaysInterviewCanvas = () => {
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
               honestyLevel={formState.honestyLevel}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
+              indianExamples={formState.indianExamples}
+              onIndianExamplesChange={(value) => updateField("indianExamples", value)}
+              internationalExamples={formState.internationalExamples}
+              onInternationalExamplesChange={(value) => updateField("internationalExamples", value)}
             />
           </div>
         </SketchCard>

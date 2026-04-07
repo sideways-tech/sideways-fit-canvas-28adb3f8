@@ -21,6 +21,10 @@ interface IndustryMotivationSectionProps {
   onSidewaysReasonChange: (reason: string) => void;
   honestyLevel: HonestyLevel | "";
   onHonestyChange: (value: HonestyLevel) => void;
+  indianExamples: string;
+  onIndianExamplesChange: (value: string) => void;
+  internationalExamples: string;
+  onInternationalExamplesChange: (value: string) => void;
 }
 
 const industryOptions = [
@@ -82,6 +86,10 @@ const IndustryMotivationSection = ({
   onSidewaysReasonChange,
   honestyLevel,
   onHonestyChange,
+  indianExamples,
+  onIndianExamplesChange,
+  internationalExamples,
+  onInternationalExamplesChange,
 }: IndustryMotivationSectionProps) => {
   return (
     <div className="space-y-6">
@@ -97,7 +105,7 @@ const IndustryMotivationSection = ({
 
         <Textarea
           id="motivation-reason"
-          placeholder="What did they say about why they want to work in creative problem-solving?"
+          placeholder="What did they say about why they want to work in this industry or role?"
           value={reason}
           onChange={(e) => onReasonChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[80px] resize-none"
@@ -173,17 +181,45 @@ const IndustryMotivationSection = ({
           Do they know who we are and why they want to be here specifically?
         </p>
 
-        {/* Combined textarea — motivation + website critique */}
+        {/* Main textarea — motivation + website critique */}
         <div className="space-y-2">
           <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-            Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work? Any Indian / international examples they found inspirational?
+            Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
           </Label>
           <Textarea
             id="sideways-reason"
-            placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section', 'Found the Amul work inspiring'..."
+            placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section'..."
             value={sidewaysReason}
             onChange={(e) => onSidewaysReasonChange(e.target.value)}
             className="sketch-border-light bg-background min-h-[100px] resize-none"
+          />
+        </div>
+
+        {/* Indian inspirational examples */}
+        <div className="space-y-2">
+          <Label htmlFor="indian-examples" className="text-xs text-muted-foreground">
+            🇮🇳 Indian campaigns or work they found inspirational
+          </Label>
+          <Textarea
+            id="indian-examples"
+            placeholder="E.g., 'The Amul topicals', 'Swiggy's voice of hunger', 'Fevicol's long-running print work'..."
+            value={indianExamples}
+            onChange={(e) => onIndianExamplesChange(e.target.value)}
+            className="sketch-border-light bg-background min-h-[80px] resize-none"
+          />
+        </div>
+
+        {/* International inspirational examples */}
+        <div className="space-y-2">
+          <Label htmlFor="international-examples" className="text-xs text-muted-foreground">
+            🌍 International campaigns or work they found inspirational
+          </Label>
+          <Textarea
+            id="international-examples"
+            placeholder="E.g., 'Apple's Shot on iPhone', 'Nike's Dream Crazy', 'Spotify Wrapped'..."
+            value={internationalExamples}
+            onChange={(e) => onInternationalExamplesChange(e.target.value)}
+            className="sketch-border-light bg-background min-h-[80px] resize-none"
           />
         </div>
 

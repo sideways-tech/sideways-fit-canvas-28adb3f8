@@ -1,5 +1,5 @@
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import { Flame } from "lucide-react";
@@ -28,14 +28,14 @@ const TShapeDepthSection = ({
 
       <div className="space-y-2">
         <Label htmlFor="depth-topic" className="text-xs text-muted-foreground">
-          What's their obsession? (Non-work topic)
+          What's the one thing they can't stop talking about outside of work? A single deep rabbit hole.
         </Label>
-        <Input
+        <Textarea
           id="depth-topic"
-          placeholder="e.g., 18th Century Pottery, Carnatic Music, Retro Gaming, Bird Watching..."
+          placeholder="e.g., 18th Century Pottery, Carnatic Music, Retro Gaming, Bird Watching — describe what they said about it..."
           value={depthTopic}
           onChange={(e) => onDepthTopicChange(e.target.value)}
-          className="sketch-border-light bg-background"
+          className="sketch-border-light bg-background min-h-[100px] resize-none"
         />
       </div>
       
