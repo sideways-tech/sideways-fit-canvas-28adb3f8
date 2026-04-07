@@ -1,33 +1,43 @@
 
 
-## Three Changes
+## Split Section D into Two Big Blocks + Reorder "Why Sideways"
 
-### 1. Default all sliders to 0
+### What we're doing
+Taking the single "D. Why This Industry & Why Sideways" card and splitting it into two separate `SketchCard` blocks, while also reordering the "Why Sideways" content to follow the capture-then-grade pattern.
 
-In `src/components/SidewaysInterviewCanvas.tsx`, change the initial `FormState` values from `30` to `0` for these fields (lines 165–180):
-- `interestedInOthers`: 30 → 0
-- `readsWidely`: 30 → 0
-- `depthOfCraft`: 30 → 0
-- `articulationSkill`: 30 → 0
-- `portfolioQuality`: 30 → 0
-- `problemSolvingApproach`: 30 → 0
-- `professionalBreadth`: 30 → 0
-- `depthScore`: 30 → 0
-- `aestheticsInterest`: 30 → 0
+### Structure after the change
 
-`resilienceScore` is already 0 — no change needed.
+**Card D: Why This Industry?**
+- Textarea — capture their reason
+- MCQ — rate motivation level
+- Celebration banner if "passionate"
 
-### 2. Add bounding box around Aesthetics section
+**Card E: Why Sideways?**
+- Textarea — General (explored sideways.co.in? appeals? critique?)
+- Textarea — Indian campaign examples
+- Textarea — International campaign examples
+- Honesty Meter — how honest were they?
+- MCQ — how Sideways-specific was their motivation?
+- Celebration banner if "sideways-specific"
 
-In `src/components/AestheticsSection.tsx`, wrap the outer `<div>` with the same styling used by `InterestedInOthersSection` — add `p-4 bg-muted/20 rounded-lg sketch-border-light` to the container, and add a header row with a `Palette` icon and label, matching the pattern of the other bounded sections.
+Current E (Diagnostic Mindset) becomes **F**, and subsequent sections shift accordingly.
 
-### 3. Rename "Interest in Art & Aesthetics" → "Interest in Art, Aesthetics & Design"
+### Files to change
 
-Update the label text in `src/components/AestheticsSection.tsx` (line 27). Also search for and update any matching references in `AssessmentReport.tsx` and the email edge function.
+1. **`src/components/IndustryMotivationSection.tsx`**
+   - Split into two exported components: `IndustryMotivationBlock` and `SidewaysMotivationBlock`
+   - Each gets only its relevant props
+   - Remove the internal bounding-box wrappers (the cards themselves provide the visual container)
+   - Reorder "Why Sideways" elements: all textareas first, then honesty meter, then MCQ
 
-### Files to update
-1. `src/components/SidewaysInterviewCanvas.tsx` — default values to 0
-2. `src/components/AestheticsSection.tsx` — bounding box + rename label
-3. `src/pages/AssessmentReport.tsx` — rename label if referenced
-4. `supabase/functions/send-assessment-report/index.ts` — rename label if referenced
+2. **`src/components/SidewaysInterviewCanvas.tsx`**
+   - Replace single SketchCard D with two SketchCards (D + E)
+   - Import both new components
+   - Re-letter E → F for Diagnostic Mindset
+   - Update `requiredSelections` section labels if they reference lettering
+
+3. **`src/pages/AssessmentReport.tsx`**
+   - Update any section headers that reference the old lettering (D, E → D, E, F)
+
+No state, props, or data changes — same fields, same save logic, purely visual reorganization.
 
