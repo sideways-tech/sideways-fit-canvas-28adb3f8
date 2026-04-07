@@ -81,7 +81,14 @@ const KraReferenceBlock = ({ department, hiringLevel }: KraReferenceBlockProps) 
   const sidewaysRows = (allRows || []).filter((row) => normalizeText(row.discipline) === normalizeText("_sideways_person"));
   const combinedRows = sortKraRows([...matchingDisciplineRows, ...sidewaysRows]);
 
-  const departmentLabel = department.replace(/-/g, " / ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const departmentDisplayNames: Record<string, string> = {
+    "creative-copy-art": "Creative (Copy & Art)",
+    "creative-design": "Creative Design",
+    "account-management": "Account Management",
+    strategy: "Strategy",
+    "tech-ux": "Tech / UX",
+  };
+  const departmentLabel = departmentDisplayNames[department] || department.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   if (combinedRows.length === 0) {
     return (
