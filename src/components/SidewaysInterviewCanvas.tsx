@@ -687,10 +687,10 @@ const SidewaysInterviewCanvas = () => {
             <div className="space-y-2 p-4 bg-muted/20 rounded-lg sketch-border-light">
               <Label htmlFor="interests-passions-notes" className="text-sm font-medium flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-highlighter" />
-                Interests & Passions — Notes
+                Broader Interests & Cultural Diet
               </Label>
               <p className="text-xs text-muted-foreground">
-                Favourite books, films, podcasts, hobbies, side projects, rabbit holes — anything that stood out about who this person is beyond work.
+                Beyond the one obsession above — what else do they consume or dabble in? Books, films, podcasts, hobbies, side projects, cultural interests.
               </p>
               <Textarea
                 id="interests-passions-notes"
