@@ -276,7 +276,6 @@ const SidewaysInterviewCanvas = () => {
     { field: "department", label: "Department" },
     { field: "hiringLevel", label: "Hiring Level" },
     { field: "interviewerName", label: "Interviewer Name" },
-    { field: "interviewerEmail", label: "Interviewer Email" },
     { field: "interviewRound", label: "Round" },
   ];
 
