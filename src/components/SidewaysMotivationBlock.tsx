@@ -51,10 +51,8 @@ const SidewaysMotivationBlock = ({
   onSidewaysReasonChange,
   honestyLevel,
   onHonestyChange,
-  indianExamples,
-  onIndianExamplesChange,
-  internationalExamples,
-  onInternationalExamplesChange,
+  campaignExamples,
+  onCampaignExamplesChange,
 }: SidewaysMotivationBlockProps) => {
   return (
     <div className="space-y-4">
@@ -82,30 +80,17 @@ const SidewaysMotivationBlock = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="indian-examples" className="text-xs text-muted-foreground">
-          🇮🇳 Indian campaigns or work they found inspirational
+        <Label htmlFor="campaign-examples" className="text-xs text-muted-foreground">
+          Campaigns or creative work (Indian or international) they find inspirational
         </Label>
         <HintTextarea
-          id="indian-examples"
-          hint="Indian campaigns they admire — Amul topicals, Swiggy, Fevicol, etc."
-          placeholder="E.g., 'The Amul topicals', 'Swiggy's voice of hunger', 'Fevicol's long-running print work'..."
-          value={indianExamples}
-          onChange={(e) => onIndianExamplesChange(e.target.value)}
-          className="sketch-border-light bg-background min-h-[80px] resize-none"
+          id="campaign-examples"
+          hint="Campaigns they admire — Amul, Fevicol, Apple, Nike, Spotify Wrapped, etc."
+          placeholder="E.g., 'Amul topicals', 'Swiggy's voice of hunger', 'Apple's Shot on iPhone', 'Spotify Wrapped'..."
+          value={campaignExamples}
+          onChange={(e) => onCampaignExamplesChange(e.target.value)}
+          className="sketch-border-light bg-background min-h-[100px] resize-none"
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="international-examples" className="text-xs text-muted-foreground">
-          🌍 International campaigns or work they found inspirational
-        </Label>
-        <HintTextarea
-          id="international-examples"
-          hint="Global work they admire — Apple, Nike, Spotify Wrapped, etc."
-          placeholder="E.g., 'Apple's Shot on iPhone', 'Nike's Dream Crazy', 'Spotify Wrapped'..."
-          value={internationalExamples}
-          onChange={(e) => onInternationalExamplesChange(e.target.value)}
-          className="sketch-border-light bg-background min-h-[80px] resize-none"
         />
       </div>
 
