@@ -7,19 +7,15 @@ import { Flame } from "lucide-react";
 interface TShapeDepthSectionProps {
   depthTopic: string;
   depthScore: number;
-  interestsPassionsNotes: string;
   onDepthTopicChange: (topic: string) => void;
   onDepthScoreChange: (score: number) => void;
-  onInterestsPassionsNotesChange: (notes: string) => void;
 }
 
 const TShapeDepthSection = ({
   depthTopic,
   depthScore,
-  interestsPassionsNotes,
   onDepthTopicChange,
   onDepthScoreChange,
-  onInterestsPassionsNotesChange,
 }: TShapeDepthSectionProps) => {
   return (
     <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
@@ -32,29 +28,15 @@ const TShapeDepthSection = ({
 
       <div className="space-y-2">
         <Label htmlFor="depth-topic" className="text-xs text-muted-foreground">
-          What's the one thing they can't stop talking about outside of work? A single deep rabbit hole.
+          What's the one thing they can't stop talking about outside of work? Plus any broader interests — books, films, podcasts, hobbies, side projects, cultural diet.
         </Label>
         <HintTextarea
           id="depth-topic"
-          hint="Capture the ONE obsession — 18th Century Pottery, Carnatic Music, Retro Gaming, Bird Watching..."
-          placeholder="e.g., 18th Century Pottery, Carnatic Music, Retro Gaming, Bird Watching — describe what they said about it..."
+          hint="Deep rabbit holes, cultural diet — pottery, Carnatic music, architecture docs, Murakami, retro gaming..."
+          placeholder="e.g., 18th Century Pottery, Carnatic Music, architecture documentaries, reads Murakami, runs a pottery Instagram..."
           value={depthTopic}
           onChange={(e) => onDepthTopicChange(e.target.value)}
-          className="sketch-border-light bg-background min-h-[100px] resize-none"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="interests-passions-notes" className="text-xs text-muted-foreground">
-          Beyond the one obsession — what else do they consume or dabble in? Books, films, podcasts, hobbies, side projects, cultural interests.
-        </Label>
-        <HintTextarea
-          id="interests-passions-notes"
-          hint="Their broader cultural diet — architecture docs, Murakami, pottery Instagram, podcasts, hobbies..."
-          placeholder="e.g. Obsessed with architecture documentaries, reads Murakami, runs a pottery Instagram..."
-          value={interestsPassionsNotes}
-          onChange={(e) => onInterestsPassionsNotesChange(e.target.value)}
-          className="sketch-border-light bg-background min-h-[100px] resize-none"
+          className="sketch-border-light bg-background min-h-[120px] resize-none"
         />
       </div>
       
