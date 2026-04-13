@@ -671,10 +671,8 @@ const SidewaysInterviewCanvas = () => {
             <TShapeDepthSection
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
-              interestsPassionsNotes={formState.interestsPassionsNotes}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
-              onInterestsPassionsNotesChange={(value) => updateField("interestsPassionsNotes", value)}
             />
             <ReadingBreadthSection
               readsWidely={formState.readsWidely}
