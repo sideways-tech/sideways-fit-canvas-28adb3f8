@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface HintTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   hint: string;
-  hintPosition?: "right" | "top";
+  hintPosition?: "left" | "right" | "top";
 }
 
 const HintTextarea = ({ hint, hintPosition = "left", className, ...props }: HintTextareaProps) => {
