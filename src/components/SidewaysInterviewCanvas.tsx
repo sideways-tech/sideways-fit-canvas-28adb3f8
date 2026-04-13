@@ -200,6 +200,13 @@ const SidewaysInterviewCanvas = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const markTouched = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
 
+  // Auto-fill interviewer email from session
+  useEffect(() => {
+    if (loggedInEmail) {
+      setFormState((prev) => ({ ...prev, interviewerEmail: loggedInEmail }));
+    }
+  }, [loggedInEmail]);
+
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
 
