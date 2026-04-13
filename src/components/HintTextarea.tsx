@@ -15,7 +15,7 @@ const HintTextarea = ({ hint, hintPosition = "left", className, ...props }: Hint
   const showHint = isFocused && hasContent;
 
   return (
-    <div className="relative">
+    <div className="relative overflow-visible">
       <Textarea
         {...props}
         className={cn(className)}
