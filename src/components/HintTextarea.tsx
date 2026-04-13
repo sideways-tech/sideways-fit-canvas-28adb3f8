@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 
 interface HintTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   hint: string;
-  hintPosition?: "right" | "top";
+  hintPosition?: "left" | "right" | "top";
 }
 
-const HintTextarea = ({ hint, hintPosition = "top", className, ...props }: HintTextareaProps) => {
+const HintTextarea = ({ hint, hintPosition = "left", className, ...props }: HintTextareaProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasContent, setHasContent] = useState(!!props.value);
 
