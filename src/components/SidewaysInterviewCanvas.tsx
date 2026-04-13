@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import BackgroundSection from "./BackgroundSection";
@@ -153,13 +154,15 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
 };
 
 const SidewaysInterviewCanvas = () => {
-  const { signOut } = useAuth();
+  const { signOut, session } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
+  const loggedInEmail = session?.user?.email || "";
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
     candidateEmail: "",
     candidateRole: "",
     interviewerName: "",
-    interviewerEmail: "",
+    interviewerEmail: loggedInEmail,
     interviewRound: "",
     department: "",
     hiringLevel: "",
@@ -196,6 +199,13 @@ const SidewaysInterviewCanvas = () => {
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const markTouched = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
+
+  // Auto-fill interviewer email from session
+  useEffect(() => {
+    if (loggedInEmail) {
+      setFormState((prev) => ({ ...prev, interviewerEmail: loggedInEmail }));
+    }
+  }, [loggedInEmail]);
 
   const { verdict, scores: categoryScores } = useMemo(() => calculateVerdict(formState), [formState]);
   const breadthScore = formState.professionalBreadth;
@@ -266,7 +276,6 @@ const SidewaysInterviewCanvas = () => {
     { field: "department", label: "Department" },
     { field: "hiringLevel", label: "Hiring Level" },
     { field: "interviewerName", label: "Interviewer Name" },
-    { field: "interviewerEmail", label: "Interviewer Email" },
     { field: "interviewRound", label: "Round" },
   ];
 
@@ -598,18 +607,10 @@ const SidewaysInterviewCanvas = () => {
                   type="email"
                   placeholder="interviewer@sideways.com"
                   value={formState.interviewerEmail}
-                  onChange={(e) => updateField("interviewerEmail", e.target.value)}
-                  onBlur={() => markTouched("interviewerEmail")}
-                  className={`sketch-border-light bg-background ${touched.interviewerEmail && (isFieldEmpty("interviewerEmail") || !isValidEmail(formState.interviewerEmail.trim())) ? "border-destructive focus:ring-destructive" : ""}`}
+                  disabled
+                  className="sketch-border-light bg-muted/50 cursor-not-allowed"
                 />
-                <div className="h-5">
-                  {touched.interviewerEmail && isFieldEmpty("interviewerEmail") && (
-                    <p className="text-xs text-destructive">Required</p>
-                  )}
-                  {touched.interviewerEmail && !isFieldEmpty("interviewerEmail") && !isValidEmail(formState.interviewerEmail.trim()) && (
-                    <p className="text-xs text-destructive">Enter a valid email address</p>
-                  )}
-                </div>
+                <p className="text-xs text-muted-foreground">Auto-filled from your login</p>
               </div>
               <div className="space-y-1.5 shrink-0">
                 <Label>Round <span className="text-destructive">*</span></Label>
@@ -836,6 +837,15 @@ const SidewaysInterviewCanvas = () => {
               <LayoutDashboard className="w-4 h-4" />
               <span>Dashboard</span>
             </Link>
+            {isSuperAdmin && (
+              <>
+                <span className="text-border">|</span>
+                <Link to="/kra-admin" className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>KRA Admin</span>
+                </Link>
+              </>
+            )}
             <span className="text-border">|</span>
             <button onClick={signOut} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors">
               <LogOut className="w-3.5 h-3.5" />
