@@ -47,7 +47,7 @@ const sliders = [
   {
     key: "professionalBreadth" as const,
     label: "Breadth of Professional Interests",
-    description: "Beyond their core role, how curious are they about adjacent disciplines? A client servicing person interested in copy, art direction, typography. A designer who understands strategy, production, media.",
+    descriptionKey: "professionalBreadth" as const,
     icon: Compass,
     low: "Stays in their lane",
     high: "Cross-disciplinary curiosity",
