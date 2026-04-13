@@ -17,6 +17,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import sidewaysLogo from "@/assets/sideways-logo.png";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 
 interface Assessment {
   id: string;
@@ -59,9 +61,12 @@ const Dashboard = () => {
   const [expandedCandidates, setExpandedCandidates] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const queryClient = useQueryClient();
+  const { session } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
+  const userEmail = session?.user?.email?.toLowerCase() || "";
 
   const { data: candidates, isLoading } = useQuery({
-    queryKey: ["candidates-dashboard"],
+    queryKey: ["candidates-dashboard", isSuperAdmin, userEmail],
     queryFn: async () => {
       const { data: candidatesData, error: cErr } = await supabase
         .from("candidates")
@@ -70,17 +75,30 @@ const Dashboard = () => {
 
       if (cErr) throw cErr;
 
-      const { data: assessmentsData, error: aErr } = await supabase
+      let assessmentsQuery = supabase
         .from("assessments")
         .select("*")
         .order("round_number", { ascending: true });
 
+      // Non-admins only see their own assessments
+      if (!isSuperAdmin) {
+        assessmentsQuery = assessmentsQuery.eq("interviewer_email", userEmail);
+      }
+
+      const { data: assessmentsData, error: aErr } = await assessmentsQuery;
       if (aErr) throw aErr;
 
-      const grouped: CandidateWithAssessments[] = (candidatesData || []).map((c) => ({
+      const assessmentCandidateIds = new Set((assessmentsData || []).map((a) => a.candidate_id));
+
+      let grouped: CandidateWithAssessments[] = (candidatesData || []).map((c) => ({
         ...c,
         assessments: (assessmentsData || []).filter((a) => a.candidate_id === c.id),
       }));
+
+      // Non-admins only see candidates they have assessments for
+      if (!isSuperAdmin) {
+        grouped = grouped.filter((c) => assessmentCandidateIds.has(c.id));
+      }
 
       return grouped;
     },
