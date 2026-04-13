@@ -22,12 +22,11 @@ import {
 } from "@/lib/kraLocalStore";
 
 const DISCIPLINES = [
+  { value: "creative-copy-art", label: "Creative (Copy & Art)" },
+  { value: "creative-design", label: "Creative Design" },
+  { value: "account-management", label: "Account Management" },
   { value: "strategy", label: "Strategy" },
-  { value: "creative", label: "Creative" },
-  { value: "copy", label: "Copy" },
   { value: "tech-ux", label: "Tech / UX" },
-  { value: "product-design", label: "Product Design" },
-  { value: "servicing", label: "Servicing" },
 ];
 
 const KraAdmin = () => {
