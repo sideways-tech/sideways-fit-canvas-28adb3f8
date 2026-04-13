@@ -2,13 +2,13 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, Sparkles } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import HandwrittenLabel from "./HandwrittenLabel";
 import SketchCard from "./SketchCard";
 import BackgroundSection from "./BackgroundSection";
@@ -671,8 +671,10 @@ const SidewaysInterviewCanvas = () => {
             <TShapeDepthSection
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
+              interestsPassionsNotes={formState.interestsPassionsNotes}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
+              onInterestsPassionsNotesChange={(value) => updateField("interestsPassionsNotes", value)}
             />
             <ReadingBreadthSection
               readsWidely={formState.readsWidely}
@@ -691,23 +693,6 @@ const SidewaysInterviewCanvas = () => {
               onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
             />
 
-            {/* Interests & Passions — freeform capture */}
-            <div className="space-y-2 p-4 bg-muted/20 rounded-lg sketch-border-light">
-              <Label htmlFor="interests-passions-notes" className="text-sm font-medium flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-highlighter" />
-                Broader Interests & Cultural Diet
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Beyond the one obsession above — what else do they consume or dabble in? Books, films, podcasts, hobbies, side projects, cultural interests.
-              </p>
-              <Textarea
-                id="interests-passions-notes"
-                placeholder="e.g. Obsessed with architecture documentaries, reads Murakami, runs a pottery Instagram..."
-                value={formState.interestsPassionsNotes}
-                onChange={(e) => updateField("interestsPassionsNotes", e.target.value)}
-                className="min-h-[100px] bg-background"
-              />
-            </div>
           </div>
         </SketchCard>
 

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
+import HintTextarea from "./HintTextarea";
 import { Palette, Sparkles } from "lucide-react";
 
 interface AestheticsSectionProps {
@@ -86,11 +86,9 @@ const AestheticsSection = ({
           <Sparkles className="w-4 h-4 text-highlighter" />
           Process of Design / Creation.
         </Label>
-        <p className="text-xs text-muted-foreground">
-          Did they show curiosity about how things are designed or cerated? Note any examples shared.
-        </p>
-        <Textarea
+        <HintTextarea
           id="process-note"
+          hint="Did they show curiosity about how things are designed or created? Note any examples shared."
           placeholder="E.g., Asked about our design process, mentioned enjoying craftsmanship, shared a creative hobby..."
           value={processNote}
           onChange={(e) => onProcessNoteChange(e.target.value)}

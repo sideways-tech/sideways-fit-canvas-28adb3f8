@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import HandwrittenLabel from "./HandwrittenLabel";
+import HintTextarea from "./HintTextarea";
 import { Target, TrendingUp, Heart, Compass } from "lucide-react";
 
 type MotivationLevel = "unclear" | "practical" | "passionate";
@@ -54,8 +54,9 @@ const IndustryMotivationBlock = ({
         Capture their specific reason for choosing this industry/role
       </p>
 
-      <Textarea
+      <HintTextarea
         id="motivation-reason"
+        hint="What drew them here — passion for creativity, problem-solving, or just career momentum?"
         placeholder="What did they say about why they want to work in this industry or role?"
         value={reason}
         onChange={(e) => onReasonChange(e.target.value)}
