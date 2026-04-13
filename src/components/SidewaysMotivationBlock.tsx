@@ -16,10 +16,8 @@ interface SidewaysMotivationBlockProps {
   onSidewaysReasonChange: (reason: string) => void;
   honestyLevel: HonestyLevel | "";
   onHonestyChange: (value: HonestyLevel) => void;
-  indianExamples: string;
-  onIndianExamplesChange: (value: string) => void;
-  internationalExamples: string;
-  onInternationalExamplesChange: (value: string) => void;
+  campaignExamples: string;
+  onCampaignExamplesChange: (value: string) => void;
 }
 
 const sidewaysOptions = [
