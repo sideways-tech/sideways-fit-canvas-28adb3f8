@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import { Wrench, Mic, Briefcase, Compass } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 interface ProfessionalDeepDiveSectionProps {
   depthOfCraft: number;
@@ -10,6 +11,7 @@ interface ProfessionalDeepDiveSectionProps {
   portfolioQuality: number;
   professionalBreadth: number;
   professionalDiveNotes: string;
+  department?: string;
   onDepthOfCraftChange: (value: number) => void;
   onArticulationSkillChange: (value: number) => void;
   onPortfolioQualityChange: (value: number) => void;
@@ -58,12 +60,14 @@ const ProfessionalDeepDiveSection = ({
   portfolioQuality,
   professionalBreadth,
   professionalDiveNotes,
+  department,
   onDepthOfCraftChange,
   onArticulationSkillChange,
   onPortfolioQualityChange,
   onProfessionalBreadthChange,
   onNotesChange,
 }: ProfessionalDeepDiveSectionProps) => {
+  const config = getDisciplineConfig(department);
   const values: Record<string, number> = {
     depthOfCraft,
     articulationSkill,
