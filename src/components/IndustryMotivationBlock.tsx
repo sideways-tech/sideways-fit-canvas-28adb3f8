@@ -4,12 +4,14 @@ import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import { Target, TrendingUp, Heart, Compass } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 type MotivationLevel = "unclear" | "practical" | "passionate";
 
 interface IndustryMotivationBlockProps {
   level: MotivationLevel | "";
   reason: string;
+  department?: string;
   onLevelChange: (level: MotivationLevel) => void;
   onReasonChange: (reason: string) => void;
 }
@@ -41,9 +43,11 @@ const industryOptions = [
 const IndustryMotivationBlock = ({
   level,
   reason,
+  department,
   onLevelChange,
   onReasonChange,
 }: IndustryMotivationBlockProps) => {
+  const config = getDisciplineConfig(department);
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -56,7 +60,7 @@ const IndustryMotivationBlock = ({
 
       <HintTextarea
         id="motivation-reason"
-        hint="What drew them here — passion for creativity, problem-solving, or just career momentum?"
+        hint={config.industryMotivation.hint}
         placeholder="What did they say about why they want to work in this industry or role?"
         value={reason}
         onChange={(e) => onReasonChange(e.target.value)}

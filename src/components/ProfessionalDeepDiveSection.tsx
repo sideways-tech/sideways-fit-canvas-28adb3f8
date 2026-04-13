@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import { Wrench, Mic, Briefcase, Compass } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 interface ProfessionalDeepDiveSectionProps {
   depthOfCraft: number;
@@ -10,6 +11,7 @@ interface ProfessionalDeepDiveSectionProps {
   portfolioQuality: number;
   professionalBreadth: number;
   professionalDiveNotes: string;
+  department?: string;
   onDepthOfCraftChange: (value: number) => void;
   onArticulationSkillChange: (value: number) => void;
   onPortfolioQualityChange: (value: number) => void;
@@ -45,7 +47,7 @@ const sliders = [
   {
     key: "professionalBreadth" as const,
     label: "Breadth of Professional Interests",
-    description: "Beyond their core role, how curious are they about adjacent disciplines? A client servicing person interested in copy, art direction, typography. A designer who understands strategy, production, media.",
+    descriptionKey: "professionalBreadth" as const,
     icon: Compass,
     low: "Stays in their lane",
     high: "Cross-disciplinary curiosity",
@@ -58,12 +60,14 @@ const ProfessionalDeepDiveSection = ({
   portfolioQuality,
   professionalBreadth,
   professionalDiveNotes,
+  department,
   onDepthOfCraftChange,
   onArticulationSkillChange,
   onPortfolioQualityChange,
   onProfessionalBreadthChange,
   onNotesChange,
 }: ProfessionalDeepDiveSectionProps) => {
+  const config = getDisciplineConfig(department);
   const values: Record<string, number> = {
     depthOfCraft,
     articulationSkill,
@@ -93,7 +97,7 @@ const ProfessionalDeepDiveSection = ({
               <Icon className="w-5 h-5 text-highlighter" />
               <Label className="text-sm font-medium">{slider.label}</Label>
             </div>
-            <p className="text-xs text-muted-foreground">{slider.description}</p>
+            <p className="text-xs text-muted-foreground">{'descriptionKey' in slider ? config.professionalBreadth.description : slider.description}</p>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <HandwrittenLabel className="text-xl text-muted-foreground">

@@ -4,10 +4,12 @@ import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import { Palette, Sparkles } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 interface AestheticsSectionProps {
   interest: number;
   processNote: string;
+  department?: string;
   onInterestChange: (value: number) => void;
   onProcessNoteChange: (note: string) => void;
 }
@@ -15,9 +17,12 @@ interface AestheticsSectionProps {
 const AestheticsSection = ({
   interest,
   processNote,
+  department,
   onInterestChange,
   onProcessNoteChange,
 }: AestheticsSectionProps) => {
+  const config = getDisciplineConfig(department);
+
   return (
     <div className="space-y-6 p-4 bg-muted/20 rounded-lg sketch-border-light">
       <div className="flex items-center gap-2">
@@ -31,7 +36,7 @@ const AestheticsSection = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <HandwrittenLabel className="text-2xl text-muted-foreground">
-            Aesthetic sensibility
+            {config.aestheticsSensibility.sliderLabel}
           </HandwrittenLabel>
           <span className="text-sm font-medium tabular-nums">{interest}%</span>
         </div>
@@ -45,8 +50,8 @@ const AestheticsSection = ({
         />
         
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>"I don't really think about design"</span>
-          <span>"Beauty matters deeply to me"</span>
+          <span>{config.aestheticsSensibility.low}</span>
+          <span>{config.aestheticsSensibility.high}</span>
         </div>
       </div>
 
@@ -73,10 +78,10 @@ const AestheticsSection = ({
         </div>
         <span className="text-sm text-muted-foreground">
           {interest >= 80
-            ? "Design sensibility detected!"
+            ? config.aestheticsSensibility.tiers.high
             : interest >= 50
-            ? "Appreciates good design"
-            : "Functional mindset"}
+            ? config.aestheticsSensibility.tiers.mid
+            : config.aestheticsSensibility.tiers.low}
         </span>
       </div>
 
@@ -84,12 +89,12 @@ const AestheticsSection = ({
       <div className="space-y-3">
         <Label htmlFor="process-note" className="text-sm font-medium flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-highlighter" />
-          Process of Design / Creation.
+          {config.aestheticsProcess.title}
         </Label>
         <HintTextarea
           id="process-note"
-          hint="Did they show curiosity about how things are designed or created? Note any examples shared."
-          placeholder="E.g., Asked about our design process, mentioned enjoying craftsmanship, shared a creative hobby..."
+          hint={config.aestheticsProcess.hint}
+          placeholder={config.aestheticsProcess.placeholder}
           value={processNote}
           onChange={(e) => onProcessNoteChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[80px] resize-none"

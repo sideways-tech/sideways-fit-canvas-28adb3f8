@@ -671,6 +671,7 @@ const SidewaysInterviewCanvas = () => {
             <TShapeDepthSection
               depthTopic={formState.depthTopic}
               depthScore={formState.depthScore}
+              department={formState.department}
               onDepthTopicChange={(value) => updateField("depthTopic", value)}
               onDepthScoreChange={(value) => updateField("depthScore", value)}
             />
@@ -687,6 +688,7 @@ const SidewaysInterviewCanvas = () => {
             <AestheticsSection
               interest={formState.aestheticsInterest}
               processNote={formState.aestheticsProcessNote}
+              department={formState.department}
               onInterestChange={(value) => updateField("aestheticsInterest", value)}
               onProcessNoteChange={(value) => updateField("aestheticsProcessNote", value)}
             />
@@ -709,6 +711,7 @@ const SidewaysInterviewCanvas = () => {
               portfolioQuality={formState.portfolioQuality}
               professionalBreadth={formState.professionalBreadth}
               professionalDiveNotes={formState.professionalDiveNotes}
+              department={formState.department}
               onDepthOfCraftChange={(value) => updateField("depthOfCraft", value)}
               onArticulationSkillChange={(value) => updateField("articulationSkill", value)}
               onPortfolioQualityChange={(value) => updateField("portfolioQuality", value)}
@@ -738,6 +741,7 @@ const SidewaysInterviewCanvas = () => {
             <IndustryMotivationBlock
               level={formState.motivationLevel}
               reason={formState.motivationReason}
+              department={formState.department}
               onLevelChange={(value) => updateField("motivationLevel", value)}
               onReasonChange={(value) => updateField("motivationReason", value)}
             />
@@ -760,6 +764,7 @@ const SidewaysInterviewCanvas = () => {
               onHonestyChange={(value) => updateField("honestyLevel", value)}
               campaignExamples={formState.indianExamples}
               onCampaignExamplesChange={(value) => updateField("indianExamples", value)}
+              department={formState.department}
             />
           </div>
         </SketchCard>
