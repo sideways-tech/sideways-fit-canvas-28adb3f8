@@ -91,7 +91,6 @@ const SidewaysMotivationBlock = ({
           onChange={(e) => onCampaignExamplesChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[100px] resize-none"
         />
-        />
       </div>
 
       {/* Grade: Honesty Meter */}
