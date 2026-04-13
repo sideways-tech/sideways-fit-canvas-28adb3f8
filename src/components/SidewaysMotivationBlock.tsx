@@ -5,6 +5,7 @@ import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import HonestyMeter from "./HonestyMeter";
 import { Building2, Sparkles, Shuffle } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
 type HonestyLevel = "flattery" | "diplomatic" | "honest";
@@ -18,6 +19,7 @@ interface SidewaysMotivationBlockProps {
   onHonestyChange: (value: HonestyLevel) => void;
   campaignExamples: string;
   onCampaignExamplesChange: (value: string) => void;
+  department?: string;
 }
 
 const sidewaysOptions = [
@@ -53,7 +55,9 @@ const SidewaysMotivationBlock = ({
   onHonestyChange,
   campaignExamples,
   onCampaignExamplesChange,
+  department,
 }: SidewaysMotivationBlockProps) => {
+  const config = getDisciplineConfig(department);
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -81,12 +85,12 @@ const SidewaysMotivationBlock = ({
 
       <div className="space-y-2">
         <Label htmlFor="campaign-examples" className="text-xs text-muted-foreground">
-          Campaigns or creative work (Indian or international) they find inspirational
+          {config.campaignExamples.label}
         </Label>
         <HintTextarea
           id="campaign-examples"
-          hint="Campaigns they admire — Amul, Fevicol, Apple, Nike, Spotify Wrapped, etc."
-          placeholder="E.g., 'Amul topicals', 'Swiggy's voice of hunger', 'Apple's Shot on iPhone', 'Spotify Wrapped'..."
+          hint={config.campaignExamples.hint}
+          placeholder={config.campaignExamples.placeholder}
           value={campaignExamples}
           onChange={(e) => onCampaignExamplesChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[100px] resize-none"

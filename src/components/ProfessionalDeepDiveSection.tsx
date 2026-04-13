@@ -97,7 +97,7 @@ const ProfessionalDeepDiveSection = ({
               <Icon className="w-5 h-5 text-highlighter" />
               <Label className="text-sm font-medium">{slider.label}</Label>
             </div>
-            <p className="text-xs text-muted-foreground">{slider.description}</p>
+            <p className="text-xs text-muted-foreground">{'descriptionKey' in slider ? config.professionalBreadth.description : slider.description}</p>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <HandwrittenLabel className="text-xl text-muted-foreground">

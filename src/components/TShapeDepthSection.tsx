@@ -3,10 +3,12 @@ import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
 import { Flame } from "lucide-react";
+import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
 interface TShapeDepthSectionProps {
   depthTopic: string;
   depthScore: number;
+  department?: string;
   onDepthTopicChange: (topic: string) => void;
   onDepthScoreChange: (score: number) => void;
 }
@@ -14,9 +16,12 @@ interface TShapeDepthSectionProps {
 const TShapeDepthSection = ({
   depthTopic,
   depthScore,
+  department,
   onDepthTopicChange,
   onDepthScoreChange,
 }: TShapeDepthSectionProps) => {
+  const config = getDisciplineConfig(department);
+
   return (
     <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
       <div className="flex items-center gap-2">
@@ -32,8 +37,8 @@ const TShapeDepthSection = ({
         </Label>
         <HintTextarea
           id="depth-topic"
-          hint="Deep rabbit holes, cultural diet — pottery, Carnatic music, architecture docs, Murakami, retro gaming..."
-          placeholder="e.g., 18th Century Pottery, Carnatic Music, architecture documentaries, reads Murakami, runs a pottery Instagram..."
+          hint={config.nonWorkObsessions.hint}
+          placeholder={config.nonWorkObsessions.placeholder}
           value={depthTopic}
           onChange={(e) => onDepthTopicChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[120px] resize-none"
