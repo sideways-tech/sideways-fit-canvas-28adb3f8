@@ -24,7 +24,7 @@ import {
 const DISCIPLINES = [
   { value: "creative-copy-art", label: "Creative (Copy & Art)" },
   { value: "creative-design", label: "Creative Design" },
-  { value: "account-management", label: "Account Management" },
+  { value: "account-management", label: "Account Management\n" },
   { value: "strategy", label: "Strategy" },
   { value: "tech-ux", label: "Tech / UX" },
 ];
