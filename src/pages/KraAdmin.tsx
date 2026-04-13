@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, Trash2, FileSpreadsheet, Plus } from "lucide-react";
+import { ArrowLeft, Upload, Trash2, FileSpreadsheet, Plus, UserPlus, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
 import SketchCard from "@/components/SketchCard";
@@ -24,12 +25,122 @@ import {
 const DISCIPLINES = [
   { value: "creative-copy-art", label: "Creative (Copy & Art)" },
   { value: "creative-design", label: "Creative Design" },
-  { value: "account-management", label: "Account Management\n" },
+  { value: "account-management", label: "Account Management" },
   { value: "strategy", label: "Strategy" },
   { value: "tech-ux", label: "Tech / UX" },
 ];
 
-const KraAdmin = () => {
+/* ───────────────────── Super Admins Tab ───────────────────── */
+
+const SuperAdminsTab = () => {
+  const [newEmail, setNewEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: admins, isLoading } = useQuery({
+    queryKey: ["super-admins-list"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("super_admins")
+        .select("id, email, created_at")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data as { id: string; email: string; created_at: string }[];
+    },
+  });
+
+  const handleAdd = async () => {
+    const email = newEmail.trim().toLowerCase();
+    if (!email) return;
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-super-admins", {
+        body: { action: "add", email },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Added", description: `${email} is now a super admin.` });
+      setNewEmail("");
+      queryClient.invalidateQueries({ queryKey: ["super-admins-list"] });
+      queryClient.invalidateQueries({ queryKey: ["super-admin-check"] });
+    } catch (err: any) {
+      toast({ title: "Failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRemove = async (email: string) => {
+    if (!confirm(`Remove "${email}" from super admins?`)) return;
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-super-admins", {
+        body: { action: "remove", email },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Removed", description: `${email} is no longer a super admin.` });
+      queryClient.invalidateQueries({ queryKey: ["super-admins-list"] });
+      queryClient.invalidateQueries({ queryKey: ["super-admin-check"] });
+    } catch (err: any) {
+      toast({ title: "Failed", description: err.message, variant: "destructive" });
+    }
+  };
+
+  return (
+    <SketchCard delay={0.1}>
+      <div className="space-y-4">
+        <HandwrittenLabel as="h3" className="text-3xl">Super Admins</HandwrittenLabel>
+        <p className="text-xs text-muted-foreground">
+          Super admins can access this page and see all interviews on the dashboard.
+        </p>
+
+        <div className="flex gap-2">
+          <Input
+            type="email"
+            placeholder="email@example.com"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            className="sketch-border-light bg-background"
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          />
+          <Button variant="circus" onClick={handleAdd} disabled={submitting || !newEmail.trim()} className="gap-2 shrink-0">
+            <UserPlus className="h-4 w-4" />
+            Add
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : !admins?.length ? (
+          <p className="text-sm text-muted-foreground">No super admins configured.</p>
+        ) : (
+          <div className="space-y-2">
+            {admins.map((a) => (
+              <div key={a.id} className="flex items-center justify-between rounded-sm bg-muted/30 p-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{a.email}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemove(a.email)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </SketchCard>
+  );
+};
+
+/* ───────────────────── KRA Tab ───────────────────── */
+
+const KraTab = () => {
   const [selectedDiscipline, setSelectedDiscipline] = useState("");
   const [customDiscipline, setCustomDiscipline] = useState("");
   const [showCustom, setShowCustom] = useState(false);
@@ -45,21 +156,15 @@ const KraAdmin = () => {
     queryFn: async () => {
       try {
         const { data, error } = (await withTimeout(
-          (supabase as any)
-            .from("kra_definitions")
-            .select("discipline")
-            .order("discipline"),
-          4000,
-          "Backend unavailable"
+          (supabase as any).from("kra_definitions").select("discipline").order("discipline"),
+          4000, "Backend unavailable"
         )) as { data: { discipline: string }[] | null; error: any };
-
         if (error) throw error;
         setBackendDown(false);
         return [...new Set((data || []).map((d: { discipline: string }) => d.discipline))] as string[];
       } catch {
         setBackendDown(true);
-        const local = getStoredDisciplines();
-        return local;
+        return getStoredDisciplines();
       }
     },
   });
@@ -69,30 +174,17 @@ const KraAdmin = () => {
     queryFn: async () => {
       try {
         const { data, error } = (await withTimeout(
-          (supabase as any)
-            .from("kra_definitions")
-            .select("kra_name, level")
-            .eq("discipline", discipline),
-          4000,
-          "Backend unavailable"
+          (supabase as any).from("kra_definitions").select("kra_name, level").eq("discipline", discipline),
+          4000, "Backend unavailable"
         )) as { data: { kra_name: string; level: string }[] | null; error: any };
-
         if (error) throw error;
-
         const kraMap = new Map<string, Set<string>>();
         for (const row of data || []) {
-          if (!kraMap.has(row.kra_name)) {
-            kraMap.set(row.kra_name, new Set());
-          }
+          if (!kraMap.has(row.kra_name)) kraMap.set(row.kra_name, new Set());
           kraMap.get(row.kra_name)!.add(row.level);
         }
-
         return Array.from(kraMap.entries())
-          .map(([name, levels]) => ({
-            name,
-            order: 0,
-            levels: Array.from(levels).sort(),
-          }))
+          .map(([name, levels]) => ({ name, order: 0, levels: Array.from(levels).sort() }))
           .sort((a, b) => a.name.localeCompare(b.name));
       } catch {
         return getStoredKraSummary(discipline);
@@ -106,33 +198,18 @@ const KraAdmin = () => {
       toast({ title: "Missing info", description: "Select a discipline and upload a file.", variant: "destructive" });
       return;
     }
-
     setUploading(true);
     try {
       const records = await parseKraWorkbook(file, discipline);
       saveStoredKraDefinitions(records, discipline);
-
-      toast({
-        title: "✅ KRA Data Imported",
-        description: `${records.length} records saved for "${discipline}".`,
-      });
+      toast({ title: "✅ KRA Data Imported", description: `${records.length} records saved for "${discipline}".` });
 
       const formData = new FormData();
       formData.append("file", file);
       formData.append("discipline", discipline);
-
-      supabase.functions
-        .invoke("parse-kra-excel", { body: formData })
-        .then(({ error }) => {
-          if (error) throw error;
-          toast({ title: "Backend synced", description: `"${discipline}" is now synced to the backend.` });
-        })
-        .catch(() => {
-          toast({
-            title: "Saved locally",
-            description: "Backend sync is unavailable right now, but the KRA data will still work in this browser.",
-          });
-        });
+      supabase.functions.invoke("parse-kra-excel", { body: formData })
+        .then(({ error }) => { if (error) throw error; toast({ title: "Backend synced", description: `"${discipline}" is now synced to the backend.` }); })
+        .catch(() => { toast({ title: "Saved locally", description: "Backend sync is unavailable right now, but the KRA data will still work in this browser." }); });
 
       setFile(null);
       queryClient.invalidateQueries({ queryKey: ["kra-disciplines"] });
@@ -147,26 +224,122 @@ const KraAdmin = () => {
 
   const handleDelete = async (disc: string) => {
     if (!confirm(`Delete all KRA data for "${disc}"?`)) return;
-
     deleteStoredKraDefinitions(disc);
-
     try {
       const { error } = (await withTimeout(
         (supabase as any).from("kra_definitions").delete().eq("discipline", disc),
-        4000,
-        "Backend unavailable"
+        4000, "Backend unavailable"
       )) as { error: any };
       if (error) throw error;
-    } catch {
-      // local delete already completed
-    }
-
+    } catch { /* local delete already completed */ }
     toast({ title: "Deleted", description: `KRA data for "${disc}" removed.` });
     queryClient.invalidateQueries({ queryKey: ["kra-disciplines"] });
     queryClient.invalidateQueries({ queryKey: ["kra-summary"] });
     queryClient.invalidateQueries({ queryKey: ["kra-definitions"] });
   };
 
+  return (
+    <div className="space-y-8">
+      <SketchCard delay={0.1}>
+        <div className="space-y-4">
+          <HandwrittenLabel as="h3" className="text-3xl">Upload KRA Excel</HandwrittenLabel>
+          <p className="text-xs text-muted-foreground">
+            Excel must have columns: KRA, Sub-KRA, L1, L2, L3, L4, L5, L6 (and optionally L7) in the first sheet.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Discipline</Label>
+              {showCustom ? (
+                <div className="flex gap-2">
+                  <Input placeholder="e.g. media-buying" value={customDiscipline} onChange={(e) => setCustomDiscipline(e.target.value)} className="sketch-border-light bg-background" />
+                  <Button variant="ghost" size="sm" onClick={() => setShowCustom(false)}>Cancel</Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Select value={selectedDiscipline} onValueChange={setSelectedDiscipline}>
+                    <SelectTrigger className="sketch-border-light bg-background"><SelectValue placeholder="Select discipline…" /></SelectTrigger>
+                    <SelectContent>
+                      {DISCIPLINES.map((d) => (<SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                  <Button variant="ghost" size="icon" onClick={() => setShowCustom(true)} title="Add custom"><Plus className="h-4 w-4" /></Button>
+                </div>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Excel File</Label>
+              <Input type="file" accept=".xlsx,.xls" onChange={(e) => setFile(e.target.files?.[0] || null)} className="sketch-border-light bg-background" />
+            </div>
+          </div>
+          <Button variant="circus" onClick={handleUpload} disabled={uploading || !discipline || !file} className="gap-2">
+            <Upload className="h-4 w-4" />
+            {uploading ? "Importing…" : "Import & Replace"}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            If the backend is flaky, this page now saves the KRA data locally first so the tool keeps working.
+          </p>
+        </div>
+      </SketchCard>
+
+      <SketchCard delay={0.15}>
+        <div className="space-y-4">
+          <HandwrittenLabel as="h3" className="text-3xl">Uploaded Disciplines</HandwrittenLabel>
+          {backendDown && (
+            <div className="rounded-sm border border-dashed border-destructive/40 bg-destructive/5 px-4 py-3">
+              <p className="text-sm text-destructive">⚠️ The backend is currently unreachable. Your previously uploaded data is safe — it will reappear once the connection recovers.</p>
+            </div>
+          )}
+          {loadingDisciplines ? (
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            </div>
+          ) : !existingDisciplines?.length ? (
+            <p className="text-sm text-muted-foreground">{backendDown ? "No locally cached KRA data found." : "No KRA data uploaded yet."}</p>
+          ) : (
+            <div className="space-y-2">
+              {existingDisciplines.map((disc) => (
+                <div key={disc} className="flex items-center justify-between rounded-sm bg-muted/30 p-3">
+                  <div className="flex items-center gap-2">
+                    <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium capitalize">{disc.replace(/-/g, " / ")}</span>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(disc)} className="text-destructive hover:text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </SketchCard>
+
+      {discipline && kraSummary && kraSummary.length > 0 && (
+        <SketchCard delay={0.2}>
+          <div className="space-y-3">
+            <HandwrittenLabel as="h3" className="text-3xl">KRAs for "{discipline.replace(/-/g, " / ")}"</HandwrittenLabel>
+            <div className="space-y-1">
+              {kraSummary.map((kra, i) => (
+                <div key={i} className="flex items-center gap-3 rounded-sm bg-muted/20 p-2 text-sm">
+                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/10 text-xs font-bold">{i + 1}</span>
+                  <span className="flex-1 font-medium">{kra.name}</span>
+                  <span className="text-xs text-muted-foreground">{kra.levels.join(", ")}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SketchCard>
+      )}
+    </div>
+  );
+};
+
+/* ───────────────────── Admin Page ───────────────────── */
+
+const KraAdmin = () => {
   return (
     <div className="min-h-screen bg-background paper-texture">
       <div className="container max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
@@ -180,7 +353,7 @@ const KraAdmin = () => {
               <img src={sidewaysLogo} alt="Sideways" className="h-12" />
               <div>
                 <HandwrittenLabel as="h1" className="text-5xl">Admin</HandwrittenLabel>
-                <p className="text-sm text-muted-foreground">Upload & manage KRA definitions per discipline</p>
+                <p className="text-sm text-muted-foreground">Manage KRA definitions & super admins</p>
               </div>
             </div>
             <Link to="/">
@@ -192,137 +365,26 @@ const KraAdmin = () => {
           </div>
         </motion.header>
 
-        <SketchCard className="mb-8" delay={0.1}>
-          <div className="space-y-4">
-            <HandwrittenLabel as="h3" className="text-3xl">Upload KRA Excel</HandwrittenLabel>
-            <p className="text-xs text-muted-foreground">
-              Excel must have columns: KRA, Sub-KRA, L1, L2, L3, L4, L5, L6 (and optionally L7) in the first sheet.
-            </p>
+        <Tabs defaultValue="kra" className="space-y-6">
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="kra" className="gap-2">
+              <FileSpreadsheet className="h-4 w-4" />
+              KRA Definitions
+            </TabsTrigger>
+            <TabsTrigger value="admins" className="gap-2">
+              <Shield className="h-4 w-4" />
+              Super Admins
+            </TabsTrigger>
+          </TabsList>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label>Discipline</Label>
-                {showCustom ? (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="e.g. media-buying"
-                      value={customDiscipline}
-                      onChange={(e) => setCustomDiscipline(e.target.value)}
-                      className="sketch-border-light bg-background"
-                    />
-                    <Button variant="ghost" size="sm" onClick={() => setShowCustom(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Select value={selectedDiscipline} onValueChange={setSelectedDiscipline}>
-                      <SelectTrigger className="sketch-border-light bg-background">
-                        <SelectValue placeholder="Select discipline…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DISCIPLINES.map((d) => (
-                          <SelectItem key={d.value} value={d.value}>
-                            {d.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button variant="ghost" size="icon" onClick={() => setShowCustom(true)} title="Add custom">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
+          <TabsContent value="kra">
+            <KraTab />
+          </TabsContent>
 
-              <div className="space-y-1.5">
-                <Label>Excel File</Label>
-                <Input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="sketch-border-light bg-background"
-                />
-              </div>
-            </div>
-
-            <Button variant="circus" onClick={handleUpload} disabled={uploading || !discipline || !file} className="gap-2">
-              <Upload className="h-4 w-4" />
-              {uploading ? "Importing…" : "Import & Replace"}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              If the backend is flaky, this page now saves the KRA data locally first so the tool keeps working.
-            </p>
-          </div>
-        </SketchCard>
-
-        <SketchCard className="mb-8" delay={0.15}>
-          <div className="space-y-4">
-            <HandwrittenLabel as="h3" className="text-3xl">Uploaded Disciplines</HandwrittenLabel>
-
-            {backendDown && (
-              <div className="rounded-sm border border-dashed border-destructive/40 bg-destructive/5 px-4 py-3">
-                <p className="text-sm text-destructive">
-                  ⚠️ The backend is currently unreachable. Your previously uploaded data is safe — it will reappear once the connection recovers. Any new uploads will be saved locally in this browser in the meantime.
-                </p>
-              </div>
-            )}
-
-            {loadingDisciplines ? (
-              <div className="flex items-center gap-3">
-                <svg className="h-5 w-5 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <p className="text-sm text-muted-foreground">Loading…</p>
-              </div>
-            ) : !existingDisciplines?.length ? (
-              <p className="text-sm text-muted-foreground">
-                {backendDown ? "No locally cached KRA data found." : "No KRA data uploaded yet."}
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {existingDisciplines.map((disc) => (
-                  <div key={disc} className="flex items-center justify-between rounded-sm bg-muted/30 p-3">
-                    <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium capitalize">{disc.replace(/-/g, " / ")}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(disc)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </SketchCard>
-
-        {discipline && kraSummary && kraSummary.length > 0 && (
-          <SketchCard className="mb-8" delay={0.2}>
-            <div className="space-y-3">
-              <HandwrittenLabel as="h3" className="text-3xl">
-                KRAs for "{discipline.replace(/-/g, " / ")}"
-              </HandwrittenLabel>
-              <div className="space-y-1">
-                {kraSummary.map((kra, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-sm bg-muted/20 p-2 text-sm">
-                    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/10 text-xs font-bold">
-                      {i + 1}
-                    </span>
-                    <span className="flex-1 font-medium">{kra.name}</span>
-                    <span className="text-xs text-muted-foreground">{kra.levels.join(", ")}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </SketchCard>
-        )}
+          <TabsContent value="admins">
+            <SuperAdminsTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
