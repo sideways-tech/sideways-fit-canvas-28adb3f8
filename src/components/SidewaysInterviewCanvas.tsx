@@ -153,6 +153,7 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
 };
 
 const SidewaysInterviewCanvas = () => {
+  const { signOut } = useAuth();
   const [formState, setFormState] = useState<FormState>({
     candidateName: "",
     candidateEmail: "",
