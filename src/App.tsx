@@ -25,7 +25,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/report/:id" element={<ProtectedRoute><AssessmentReport /></ProtectedRoute>} />
-            <Route path="/kra-admin" element={<ProtectedRoute><SuperAdminRoute><KraAdmin /></SuperAdminRoute></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><SuperAdminRoute><KraAdmin /></SuperAdminRoute></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
