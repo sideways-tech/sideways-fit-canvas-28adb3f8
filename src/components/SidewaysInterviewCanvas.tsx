@@ -758,10 +758,8 @@ const SidewaysInterviewCanvas = () => {
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
               honestyLevel={formState.honestyLevel}
               onHonestyChange={(value) => updateField("honestyLevel", value)}
-              indianExamples={formState.indianExamples}
-              onIndianExamplesChange={(value) => updateField("indianExamples", value)}
-              internationalExamples={formState.internationalExamples}
-              onInternationalExamplesChange={(value) => updateField("internationalExamples", value)}
+              campaignExamples={formState.indianExamples}
+              onCampaignExamplesChange={(value) => updateField("indianExamples", value)}
             />
           </div>
         </SketchCard>
