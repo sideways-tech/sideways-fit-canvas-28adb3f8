@@ -1,0 +1,1 @@
+DELETE FROM kra_definitions WHERE discipline = 'creative-copy-art';
