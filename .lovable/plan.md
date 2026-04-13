@@ -1,43 +1,16 @@
 
 
-## Split Section D into Two Big Blocks + Reorder "Why Sideways"
+## Updated Plan — Single Change
 
-### What we're doing
-Taking the single "D. Why This Industry & Why Sideways" card and splitting it into two separate `SketchCard` blocks, while also reordering the "Why Sideways" content to follow the capture-then-grade pattern.
+The approved plan stays exactly the same, with one tweak to **Field 4 (Aesthetics — Process)** for **Tech / UX**:
 
-### Structure after the change
+**Before:**
+- Title: "Engineering & Product Process"
+- Hint: "Did they geek out about architecture, AI/ML workflows, CI/CD, testing philosophy, or how they evaluate new tools?"
 
-**Card D: Why This Industry?**
-- Textarea — capture their reason
-- MCQ — rate motivation level
-- Celebration banner if "passionate"
+**After:**
+- Title: "Design & Product Craft Process"
+- Hint: "Did they geek out about design systems, prototyping workflows, interaction patterns, AI-assisted design, or how they bridge design and engineering?"
 
-**Card E: Why Sideways?**
-- Textarea — General (explored sideways.co.in? appeals? critique?)
-- Textarea — Indian campaign examples
-- Textarea — International campaign examples
-- Honesty Meter — how honest were they?
-- MCQ — how Sideways-specific was their motivation?
-- Celebration banner if "sideways-specific"
-
-Current E (Diagnostic Mindset) becomes **F**, and subsequent sections shift accordingly.
-
-### Files to change
-
-1. **`src/components/IndustryMotivationSection.tsx`**
-   - Split into two exported components: `IndustryMotivationBlock` and `SidewaysMotivationBlock`
-   - Each gets only its relevant props
-   - Remove the internal bounding-box wrappers (the cards themselves provide the visual container)
-   - Reorder "Why Sideways" elements: all textareas first, then honesty meter, then MCQ
-
-2. **`src/components/SidewaysInterviewCanvas.tsx`**
-   - Replace single SketchCard D with two SketchCards (D + E)
-   - Import both new components
-   - Re-letter E → F for Diagnostic Mindset
-   - Update `requiredSelections` section labels if they reference lettering
-
-3. **`src/pages/AssessmentReport.tsx`**
-   - Update any section headers that reference the old lettering (D, E → D, E, F)
-
-No state, props, or data changes — same fields, same save logic, purely visual reorganization.
+Everything else in the approved plan remains unchanged. Ready to implement the full config map with this revision.
 
