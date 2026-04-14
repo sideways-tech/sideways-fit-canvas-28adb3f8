@@ -110,7 +110,7 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
           )}
         </AnimatePresence>
 
-        {/* Vertically stacked: mic → small button → label, all center-aligned */}
+        {/* Mic button + status label */}
         <div className="flex flex-col items-center gap-2">
           {/* Main mic button */}
           <Tooltip>
@@ -147,25 +147,6 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
             </TooltipTrigger>
             <TooltipContent side="left">{config.label}</TooltipContent>
           </Tooltip>
-
-          {/* Small transcript toggle — always reserve the space so mic doesn't jump */}
-          <div className="h-8 flex items-center justify-center">
-            {hasTranscript ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <motion.button
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    onClick={() => setExpanded(!expanded)}
-                    className="w-8 h-8 rounded-full bg-card sketch-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-md"
-                  >
-                    {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
-                  </motion.button>
-                </TooltipTrigger>
-                <TooltipContent side="left">{expanded ? "Hide transcript" : "Show transcript"}</TooltipContent>
-              </Tooltip>
-            ) : null}
-          </div>
 
           {/* Status label */}
           <div className="h-4 flex items-center justify-center">
