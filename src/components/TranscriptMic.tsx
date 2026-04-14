@@ -58,7 +58,7 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="fixed bottom-3 right-3 z-50 flex flex-col items-center">
+      <div className="fixed bottom-3 right-3 z-50">
         {/* Error message */}
         <AnimatePresence>
           {error && (
@@ -73,14 +73,13 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
           )}
         </AnimatePresence>
 
-        {/* Mic button - fixed size container to prevent layout shift */}
-        <div className="relative w-14 h-14">
+        <div className="relative w-14 h-[76px]">
           <Tooltip>
             <TooltipTrigger asChild>
               <motion.button
                 onClick={handleMainAction}
                 disabled={status === "connecting"}
-                className={`absolute inset-0 rounded-full flex items-center justify-center shadow-lg transition-colors ${config.color} ${
+                className={`absolute top-0 left-0 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-colors ${config.color} ${
                   status === "connecting" ? "opacity-70 cursor-wait" : "cursor-pointer"
                 }`}
               >
@@ -109,19 +108,18 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
             </TooltipTrigger>
             <TooltipContent side="left">{config.label}</TooltipContent>
           </Tooltip>
-        </div>
 
-        {/* Status label */}
-        <div className="h-5 mt-1 flex items-center justify-center">
-          {isActive && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-muted-foreground whitespace-nowrap"
-            >
-              {config.label}
-            </motion.span>
-          )}
+          <div className="absolute top-[60px] left-1/2 flex h-4 -translate-x-1/2 items-center justify-center">
+            {isActive && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="whitespace-nowrap text-xs text-muted-foreground"
+              >
+                {config.label}
+              </motion.span>
+            )}
+          </div>
         </div>
       </div>
     </TooltipProvider>
