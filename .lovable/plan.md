@@ -1,51 +1,41 @@
 
 
-## Problem
+## Add Floating Hints to Slider Sections
 
-The current verdict algorithm only checks aggregate category scores against thresholds. A candidate with near-zero **Depth of Craft** (the vertical bar of the T) can still receive a "Lean Yes" because the other professional dimensions compensate for it in the weighted average.
+### What changes
 
-This undermines the T-shape philosophy — a person without meaningful depth shouldn't clear the bar.
+Add contextual floating hints to two slider sections to guide interviewers on what to look for or ask:
 
-## Proposed Solution: T-Shape Floor Checks
+1. **Interested in Other People's Lives** (`InterestedInOthersSection.tsx`)
+   - Hint text (example): *"Look for: Do they ask about your life unprompted? Do they remember details about colleagues? Do they show genuine curiosity about the interviewer's background, not just polite small talk?"*
 
-Add explicit minimum thresholds for the T-shape dimensions before a positive verdict can be issued:
+2. **Interest in Art, Aesthetics & Design** (`AestheticsSection.tsx` — the interest slider specifically)
+   - Hint text will come from `disciplineConfig` (already discipline-aware), added as a new config field `aestheticsSensibility.hint`
 
-**New rules added to `calculateVerdict`:**
+### How it works
 
-1. **Depth of Craft floor** — If `depthOfCraft < 30`, force at minimum a "Lean No" (regardless of aggregate scores). If `depthOfCraft < 15`, force "Strong No".
-
-2. **Professional Breadth floor** (optional but recommended) — If `professionalBreadth < 20`, force at minimum "Lean No". This ensures the horizontal bar of the T also has substance.
-
-These checks would be inserted **before** the existing "Lean Yes" / "Strong Yes" logic, so they act as hard gates.
-
-### Concrete code change
-
-In `src/components/SidewaysInterviewCanvas.tsx`, inside `calculateVerdict`, after the existing "Lean No" check and before the "Strong Yes" check:
-
-```typescript
-// T-Shape floor: Depth of Craft must meet minimum for positive verdicts
-if (state.depthOfCraft < 15) {
-  return { verdict: "strong-no", scores };
-}
-if (state.depthOfCraft < 30) {
-  return { verdict: "lean-no", scores };
-}
-
-// T-Shape floor: Professional Breadth minimum
-if (state.professionalBreadth < 20) {
-  return { verdict: "lean-no", scores };
-}
-```
-
-### Suggested thresholds (adjustable)
-
-| Dimension | Strong No if below | Lean No if below |
-|---|---|---|
-| Depth of Craft | 15 | 30 |
-| Professional Breadth | — | 20 |
-
-These are on a 0–100 scale. Happy to adjust the exact numbers based on your judgment.
+- Wrap each slider in a `relative overflow-visible` container
+- Add `FloatingHint` component triggered on **hover** over the slider area (using `onMouseEnter`/`onMouseLeave`), so interviewers see guidance as they're about to adjust the slider
+- Position hints to the **right** or **top** to avoid clipping against left margins
+- Reuses the existing `FloatingHint` component — no new UI components needed
 
 ### Files changed
-- `src/components/SidewaysInterviewCanvas.tsx` — add T-shape floor checks in `calculateVerdict`
+
+- `src/components/InterestedInOthersSection.tsx` — add hover state + FloatingHint to the slider area
+- `src/components/AestheticsSection.tsx` — add hover state + FloatingHint to the interest slider area
+- `src/lib/disciplineConfig.ts` — add `aestheticsSensibility.hint` field per department with discipline-specific guidance text
+
+### Hint content (editable — happy to adjust wording)
+
+**Interested in Others:**
+> "Look for: Do they ask about your life unprompted? Remember details about others? Show curiosity about the interviewer's background — not just polite small talk?"
+
+**Aesthetics (creative departments):**
+> "Look for: Do they notice the office design? Reference visual references naturally? Have opinions on fonts, colors, or layouts without being prompted?"
+
+**Aesthetics (strategy):**
+> "Look for: Do they reference visual culture, design trends, or brand aesthetics in conversation? Do they notice details in campaign craft?"
+
+**Aesthetics (tech-ux):**
+> "Look for: Do they have opinions on UI details, micro-interactions, or design systems? Do they reference apps or products for their design quality?"
 
