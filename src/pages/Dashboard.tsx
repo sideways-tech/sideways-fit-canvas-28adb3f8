@@ -171,7 +171,7 @@ const Dashboard = () => {
               <div className="flex items-center gap-4">
                 <img src={sidewaysLogo} alt="Sideways" className="h-12" />
                 <div>
-                  <HandwrittenLabel as="h1" className="text-5xl">Interviews' Archive</HandwrittenLabel>
+                  <HandwrittenLabel as="h1" className="text-5xl">Interview Archive</HandwrittenLabel>
                   <p className="text-sm text-muted-foreground">All assessments at a glance</p>
                 </div>
               </div>
