@@ -67,8 +67,19 @@ const Confetti = () => (
 );
 
 const DiagnosticSection = ({ value, onChange }: DiagnosticSectionProps) => {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className="space-y-4 relative">
+    <div
+      className="space-y-4 relative overflow-visible"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <FloatingHint
+        hint="Think back to the full conversation: Did they accept the brief at face value, or did they push back and ask 'Why are we doing this?' before jumping to 'How'? A true diagnostician reframes the problem before solving it."
+        isActive={hovered}
+        position="left"
+      />
       <RadioGroup
         value={value}
         onValueChange={(val) => onChange(val as DiagnosticLevel)}
