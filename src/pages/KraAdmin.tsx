@@ -352,7 +352,7 @@ const KraAdmin = () => {
             <div className="flex items-center gap-4">
               <img src={sidewaysLogo} alt="Sideways" className="h-12" />
               <div>
-                <HandwrittenLabel as="h1" className="text-5xl">Admin</HandwrittenLabel>
+                <HandwrittenLabel as="h1" className="text-5xl">Admin Panel</HandwrittenLabel>
                 <p className="text-sm text-muted-foreground">Manage KRA definitions & super admins</p>
               </div>
             </div>
