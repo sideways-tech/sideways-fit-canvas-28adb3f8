@@ -54,7 +54,8 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
               <MessageCircle className="w-3.5 h-3.5 text-highlighter shrink-0 mt-0.5" />
               <p className="text-xs text-foreground/90 leading-relaxed">{hint}</p>
             </div>
-            <div className={tailStyles[position]} />
+            <div className={tailBorderStyles[position]} />
+            <div className={tailCoverStyles[position]} />
           </div>
         </motion.div>
       )}
