@@ -21,6 +21,7 @@ const statusConfig: Record<TranscriptionStatus, { color: string; label: string }
 const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
   const { status, transcript, interimText, start, pause, resume, stop, error } = useTranscription();
   const [expanded, setExpanded] = useState(false);
+  const isMobile = useIsMobile();
 
   // Sync transcript to parent whenever it changes
   useEffect(() => {
