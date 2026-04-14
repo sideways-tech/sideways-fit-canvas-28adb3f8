@@ -2,7 +2,6 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import HandwrittenLabel from "./HandwrittenLabel";
-import { getDisciplineConfig } from "@/lib/disciplineConfig";
 import { Flame } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
