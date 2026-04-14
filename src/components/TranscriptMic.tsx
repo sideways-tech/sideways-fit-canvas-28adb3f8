@@ -51,11 +51,8 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="fixed bottom-3 right-3 z-50 flex flex-col items-center gap-2" style={{ width: "3.5rem" }}>
-        {/* Spacer to keep mic button position stable — reserves space for the small button + status label below */}
-        <div className="flex-1" />
-
-        {/* Expandable transcript panel — positioned above the mic */}
+      <div className="fixed bottom-3 right-3 z-50">
+        {/* Transcript panel — anchored above the button column */}
         <AnimatePresence>
           {expanded && hasTranscript && (
             <motion.div
@@ -63,7 +60,8 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-80 max-h-[40vh] bg-card sketch-border rounded-lg shadow-lg overflow-hidden"
+              className="w-80 max-h-[40vh] bg-card sketch-border rounded-lg shadow-lg overflow-hidden mb-3"
+              style={{ position: "absolute", bottom: "100%", right: 0 }}
             >
               <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                 <span className="text-xs font-medium text-muted-foreground">Live Transcript</span>
@@ -93,77 +91,83 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-destructive/10 text-destructive text-xs px-3 py-2 rounded-lg max-w-[240px]"
+              className="bg-destructive/10 text-destructive text-xs px-3 py-2 rounded-lg max-w-[240px] mb-2"
             >
               {error}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Main mic button */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleMainAction}
-              disabled={status === "connecting"}
-              className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-colors ${config.color} ${
-                status === "connecting" ? "opacity-70 cursor-wait" : "cursor-pointer"
-              }`}
-            >
-              {/* Pulse rings when recording */}
-              {status === "recording" && (
-                <>
-                  <motion.span
-                    className="absolute inset-0 rounded-full bg-hire/30"
-                    animate={{ scale: [1, 1.6], opacity: [0.4, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                  />
-                  <motion.span
-                    className="absolute inset-0 rounded-full bg-hire/20"
-                    animate={{ scale: [1, 2], opacity: [0.3, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                  />
-                </>
-              )}
-              <MainIcon className={`w-6 h-6 relative z-10 ${
-                status === "recording" ? "text-background" : 
-                status === "paused" ? "text-background" : 
-                "text-foreground"
-              }`} />
-            </motion.button>
-          </TooltipTrigger>
-          <TooltipContent side="left">{config.label}</TooltipContent>
-        </Tooltip>
-
-        {/* Transcript toggle below the mic */}
-        {hasTranscript && (
+        {/* Vertically stacked: mic → small button → label, all center-aligned */}
+        <div className="flex flex-col items-center gap-2">
+          {/* Main mic button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                onClick={() => setExpanded(!expanded)}
-                className="w-8 h-8 rounded-full bg-card sketch-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-md"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleMainAction}
+                disabled={status === "connecting"}
+                className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-colors ${config.color} ${
+                  status === "connecting" ? "opacity-70 cursor-wait" : "cursor-pointer"
+                }`}
               >
-                {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+                {status === "recording" && (
+                  <>
+                    <motion.span
+                      className="absolute inset-0 rounded-full bg-hire/30"
+                      animate={{ scale: [1, 1.6], opacity: [0.4, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                    />
+                    <motion.span
+                      className="absolute inset-0 rounded-full bg-hire/20"
+                      animate={{ scale: [1, 2], opacity: [0.3, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
+                    />
+                  </>
+                )}
+                <MainIcon className={`w-6 h-6 relative z-10 ${
+                  status === "recording" ? "text-background" : 
+                  status === "paused" ? "text-background" : 
+                  "text-foreground"
+                }`} />
               </motion.button>
             </TooltipTrigger>
-            <TooltipContent side="left">{expanded ? "Hide transcript" : "Show transcript"}</TooltipContent>
+            <TooltipContent side="left">{config.label}</TooltipContent>
           </Tooltip>
-        )}
 
-        {/* Status label */}
-        {isActive && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xs text-muted-foreground"
-          >
-            {config.label}
-          </motion.span>
-        )}
+          {/* Small transcript toggle — always reserve the space so mic doesn't jump */}
+          <div className="h-8 flex items-center justify-center">
+            {hasTranscript ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.button
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    onClick={() => setExpanded(!expanded)}
+                    className="w-8 h-8 rounded-full bg-card sketch-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-md"
+                  >
+                    {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+                  </motion.button>
+                </TooltipTrigger>
+                <TooltipContent side="left">{expanded ? "Hide transcript" : "Show transcript"}</TooltipContent>
+              </Tooltip>
+            ) : null}
+          </div>
+
+          {/* Status label */}
+          <div className="h-4 flex items-center justify-center">
+            {isActive && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xs text-muted-foreground whitespace-nowrap"
+              >
+                {config.label}
+              </motion.span>
+            )}
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   );
