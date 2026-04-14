@@ -35,9 +35,8 @@ const TShapeDepthSection = ({
         <Label htmlFor="depth-topic" className="text-xs text-muted-foreground">
           What's the one thing they can't stop talking about outside of work? Plus any broader interests — books, films, podcasts, hobbies, side projects, cultural diet.
         </Label>
-        <HintTextarea
+        <Textarea
           id="depth-topic"
-          hint={config.nonWorkObsessions.hint}
           placeholder={config.nonWorkObsessions.placeholder}
           value={depthTopic}
           onChange={(e) => onDepthTopicChange(e.target.value)}
