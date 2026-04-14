@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranscription, TranscriptionStatus } from "@/hooks/useTranscription";
@@ -10,6 +10,11 @@ interface TranscriptMicProps {
   onTranscriptChange: (transcript: string) => void;
 }
 
+export interface TranscriptMicHandle {
+  stopRecording: () => void;
+  isRecording: () => boolean;
+}
+
 const statusConfig: Record<TranscriptionStatus, { color: string; label: string }> = {
   idle: { color: "bg-muted", label: "Start Recording" },
   connecting: { color: "bg-[hsl(48,60%,80%)]/70", label: "Connecting..." },
@@ -18,10 +23,15 @@ const statusConfig: Record<TranscriptionStatus, { color: string; label: string }
   error: { color: "bg-destructive", label: "Error" },
 };
 
-const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
+const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onTranscriptChange }, ref) => {
   const { status, transcript, interimText, start, pause, resume, stop, error } = useTranscription();
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
+
+  useImperativeHandle(ref, () => ({
+    stopRecording: () => stop(),
+    isRecording: () => status === "recording" || status === "paused" || status === "connecting",
+  }), [stop, status]);
 
   // Sync transcript to parent whenever it changes
   useEffect(() => {
@@ -173,6 +183,8 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
       </div>
     </TooltipProvider>
   );
-};
+});
+
+TranscriptMic.displayName = "TranscriptMic";
 
 export default TranscriptMic;
