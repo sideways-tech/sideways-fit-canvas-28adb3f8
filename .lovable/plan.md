@@ -1,41 +1,69 @@
 
 
-## Add Floating Hints to Slider Sections
+# Plan: Fix Build Errors + Live Interview Transcript (Updated)
 
-### What changes
+## Part 1: Fix Build Errors in IndustryMotivationSection.tsx
 
-Add contextual floating hints to two slider sections to guide interviewers on what to look for or ask:
+The file still has stale references from the merge. Changes:
 
-1. **Interested in Other People's Lives** (`InterestedInOthersSection.tsx`)
-   - Hint text (example): *"Look for: Do they ask about your life unprompted? Do they remember details about colleagues? Do they show genuine curiosity about the interviewer's background, not just polite small talk?"*
+- **Lines 90-91**: Remove `honestyLevel` and `onHonestyChange` from destructured props (not in the interface)
+- **Lines 229-235**: Remove the entire HonestyMeter block (component no longer exists/used)
+- **Lines 237-295**: Replace old `sidewaysOptions` / `SidewaysMotivationLevel` references with the new `engagementOptions` / `SidewaysEngagement` that are already defined at the top of the file (lines ~53-75). Fix the celebration condition from `"sideways-specific"` to `"opinionated-engaged"`
 
-2. **Interest in Art, Aesthetics & Design** (`AestheticsSection.tsx` — the interest slider specifically)
-   - Hint text will come from `disciplineConfig` (already discipline-aware), added as a new config field `aestheticsSensibility.hint`
+## Part 2: Speech-to-Text Transcript Feature
 
-### How it works
+### Architecture
 
-- Wrap each slider in a `relative overflow-visible` container
-- Add `FloatingHint` component triggered on **hover** over the slider area (using `onMouseEnter`/`onMouseLeave`), so interviewers see guidance as they're about to adjust the slider
-- Position hints to the **right** or **top** to avoid clipping against left margins
-- Reuses the existing `FloatingHint` component — no new UI components needed
+```text
+Browser Mic → MediaRecorder (WebSocket)
+       ↓
+Edge Function (deepgram-proxy) — holds API key securely
+       ↓
+Deepgram Live API (nova-2, diarize=true, language=en-IN)
+       ↓
+Transcript chunks → Browser (live display)
+       ↓
+On submit → saved to assessments.transcript column
+```
 
-### Files changed
+### Updated based on your feedback
 
-- `src/components/InterestedInOthersSection.tsx` — add hover state + FloatingHint to the slider area
-- `src/components/AestheticsSection.tsx` — add hover state + FloatingHint to the interest slider area
-- `src/lib/disciplineConfig.ts` — add `aestheticsSensibility.hint` field per department with discipline-specific guidance text
+- **Language**: `en-IN` (Indian English) as primary, with Hindi code-switching handled by Deepgram's multilingual support
+- **Mic position**: Fixed to **bottom-right corner** (not top-right), sticky, inspired by Granola's minimal floating action button
+- **Design & animation**: Circular button with subtle pulse when recording, smooth state transitions using Framer Motion. Three states visualized with icon morphing (mic → pause → mic)
 
-### Hint content (editable — happy to adjust wording)
+### Database change
+- Add `transcript` column (type `text`, nullable) to the `assessments` table
 
-**Interested in Others:**
-> "Look for: Do they ask about your life unprompted? Remember details about others? Show curiosity about the interviewer's background — not just polite small talk?"
+### Secret required
+- `DEEPGRAM_API_KEY` — will be requested via the secrets tool
 
-**Aesthetics (creative departments):**
-> "Look for: Do they notice the office design? Reference visual references naturally? Have opinions on fonts, colors, or layouts without being prompted?"
+### New files
 
-**Aesthetics (strategy):**
-> "Look for: Do they reference visual culture, design trends, or brand aesthetics in conversation? Do they notice details in campaign craft?"
+1. **`supabase/functions/deepgram-proxy/index.ts`**
+   - WebSocket proxy: browser streams audio in, Deepgram results come back out
+   - Keeps `DEEPGRAM_API_KEY` server-side
+   - Configures: `model=nova-2`, `diarize=true`, `language=en-IN`, `smart_format=true`
 
-**Aesthetics (tech-ux):**
-> "Look for: Do they have opinions on UI details, micro-interactions, or design systems? Do they reference apps or products for their design quality?"
+2. **`src/hooks/useTranscription.ts`**
+   - Manages `getUserMedia`, `MediaRecorder`, WebSocket connection
+   - Exposes: `start()`, `pause()`, `resume()`, `stop()`, `transcript`, `status`
+   - Accumulates diarized transcript with speaker labels
+
+3. **`src/components/TranscriptMic.tsx`**
+   - Fixed bottom-right floating button (Granola-inspired)
+   - Three states: idle (mic icon), recording (animated pulse + pause icon), paused (resume icon)
+   - Expandable transcript panel that slides up from the button
+   - Framer Motion animations: scale-in on mount, pulse ring while recording, smooth icon transitions
+
+### Integration points
+- **SidewaysInterviewCanvas**: Mount `TranscriptMic`, pass transcript into form state, save on submission
+- **Dashboard**: Show transcript indicator on assessments; click opens modal with formatted transcript
+- **AssessmentReport**: Include transcript section
+
+### UX details
+- Bottom-right position with `z-50`, offset from edge (~4rem)
+- Recording state: subtle concentric pulse rings (like Granola's breathing animation)
+- Collapsible live transcript panel: max-height ~40vh, auto-scrolls to bottom
+- Speaker labels shown as "Speaker 1", "Speaker 2" with distinct styling
 
