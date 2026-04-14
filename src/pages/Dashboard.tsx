@@ -444,6 +444,26 @@ const Dashboard = () => {
                                     <TooltipContent>Download CV</TooltipContent>
                                   </Tooltip>
                                 )}
+                                {a.transcript && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Open transcript in a simple modal/alert
+                                          const win = window.open("", "_blank", "width=600,height=500");
+                                          if (win) {
+                                            win.document.write(`<html><head><title>Interview Transcript</title><style>body{font-family:monospace;white-space:pre-wrap;padding:24px;line-height:1.6;color:#333;}</style></head><body>${a.transcript.replace(/</g, "&lt;")}</body></html>`);
+                                            win.document.close();
+                                          }
+                                        }}
+                                      >
+                                        <Mic className="w-4 h-4 text-hire hover:text-foreground transition-colors cursor-pointer" />
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>View transcript</TooltipContent>
+                                  </Tooltip>
+                                )}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <span className="text-muted-foreground text-xs">
