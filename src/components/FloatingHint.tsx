@@ -27,10 +27,16 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
     top: { x: 0, y: 8 },
   };
 
-  const tailStyles = {
+  const tailBorderStyles = {
     left: "absolute top-4 -right-1.5 w-3 h-3 bg-highlighter/25 border-r border-t border-highlighter/40 rotate-45",
     right: "absolute top-4 -left-1.5 w-3 h-3 bg-highlighter/25 border-l border-b border-highlighter/40 rotate-45",
     top: "absolute -bottom-1.5 left-6 w-3 h-3 bg-highlighter/25 border-r border-b border-highlighter/40 rotate-45",
+  };
+
+  const tailCoverStyles = {
+    left: "absolute top-[15px] -right-px w-3 h-3 bg-highlighter/25 rotate-45 z-10",
+    right: "absolute top-[15px] -left-px w-3 h-3 bg-highlighter/25 rotate-45 z-10",
+    top: "absolute -bottom-px left-[23px] w-3 h-3 bg-highlighter/25 rotate-45 z-10",
   };
 
   return (
