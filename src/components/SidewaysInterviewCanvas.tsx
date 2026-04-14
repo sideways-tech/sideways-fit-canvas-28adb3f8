@@ -30,7 +30,7 @@ import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
 import KraReferenceBlock from "./KraReferenceBlock";
 import ThankYouPage from "./ThankYouPage";
-import TranscriptMic from "./TranscriptMic";
+import TranscriptMic, { TranscriptMicHandle } from "./TranscriptMic";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -297,7 +297,14 @@ const SidewaysInterviewCanvas = () => {
 
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
 
+  const transcriptMicRef = useRef<TranscriptMicHandle>(null);
+
   const handleSubmitAssessment = async () => {
+    // Stop recording if active before saving
+    if (transcriptMicRef.current?.isRecording()) {
+      transcriptMicRef.current.stopRecording();
+    }
+
     // Mark all required fields as touched
     const allTouched: Record<string, boolean> = { ...touched };
     requiredFields.forEach(({ field }) => { allTouched[field] = true; });
@@ -862,7 +869,7 @@ const SidewaysInterviewCanvas = () => {
         </motion.footer>
 
         {/* Sticky Transcript Mic */}
-        <TranscriptMic onTranscriptChange={(t) => updateField("transcript", t)} />
+        <TranscriptMic ref={transcriptMicRef} onTranscriptChange={(t) => updateField("transcript", t)} />
       </div>
     </div>
   );

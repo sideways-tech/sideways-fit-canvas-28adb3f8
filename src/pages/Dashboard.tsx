@@ -458,7 +458,7 @@ const Dashboard = () => {
                                           }
                                         }}
                                       >
-                                        <Mic className="w-4 h-4 text-hire hover:text-foreground transition-colors cursor-pointer" />
+                                        <Mic className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
                                       </button>
                                     </TooltipTrigger>
                                     <TooltipContent>View transcript</TooltipContent>
