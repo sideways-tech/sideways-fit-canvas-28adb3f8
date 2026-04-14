@@ -18,6 +18,7 @@ export interface DisciplineConfig {
     sliderLabel: string;
     low: string;
     high: string;
+    hint: string;
     tiers: { high: string; mid: string; low: string };
   };
   aestheticsProcess: {
