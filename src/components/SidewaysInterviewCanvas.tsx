@@ -97,7 +97,7 @@ const calculateCategoryScores = (state: FormState): CategoryScores => {
   );
 
   // ACT 2: The Professional (5 dimensions, weighted)
-  const resilienceNormalized = ((state.resilienceScore - 1) / 4) * 100; // 1-5 → 0-100
+  const resilienceNormalized = state.resilienceScore > 0 ? ((state.resilienceScore - 1) / 4) * 100 : 0; // 1-5 → 0-100, 0 = not rated
   const professional = Math.round(
     state.depthOfCraft * 0.27 +
     state.articulationSkill * 0.22 +
