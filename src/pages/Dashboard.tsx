@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip, Trash2, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip, Trash2, ChevronLeftIcon, ChevronRightIcon, Mic } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ interface Assessment {
   verdict: string | null;
   cv_file_path: string | null;
   created_at: string;
+  transcript?: string | null;
 }
 
 interface CandidateWithAssessments {
