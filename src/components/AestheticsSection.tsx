@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
+import FloatingHint from "./FloatingHint";
 import { Palette, Sparkles } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
@@ -22,6 +24,7 @@ const AestheticsSection = ({
   onProcessNoteChange,
 }: AestheticsSectionProps) => {
   const config = getDisciplineConfig(department);
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div className="space-y-6 p-4 bg-muted/20 rounded-lg sketch-border-light">
@@ -41,13 +44,24 @@ const AestheticsSection = ({
           <span className="text-sm font-medium tabular-nums">{interest}%</span>
         </div>
         
-        <Slider
-          value={[interest]}
-          onValueChange={([value]) => onInterestChange(value)}
-          max={100}
-          step={5}
-          className="w-full"
-        />
+        <div
+          className="relative overflow-visible"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <Slider
+            value={[interest]}
+            onValueChange={([value]) => onInterestChange(value)}
+            max={100}
+            step={5}
+            className="w-full"
+          />
+          <FloatingHint
+            hint={config.aestheticsSensibility.hint}
+            isActive={hovered}
+            position="top"
+          />
+        </div>
         
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>{config.aestheticsSensibility.low}</span>
