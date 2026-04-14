@@ -59,7 +59,7 @@ const AestheticsSection = ({
           <FloatingHint
             hint={config.aestheticsSensibility.hint}
             isActive={hovered}
-            position="top"
+            position="left"
           />
         </div>
         
