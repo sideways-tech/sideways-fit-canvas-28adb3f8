@@ -555,9 +555,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    console.error('send-assessment-report error:', msg)
-    return new Response(JSON.stringify({ error: msg }), {
+    console.error('send-assessment-report error:', error instanceof Error ? error.message : String(error))
+    return new Response(JSON.stringify({ error: 'An internal error occurred' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
