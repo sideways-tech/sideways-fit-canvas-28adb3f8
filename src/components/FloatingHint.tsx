@@ -41,7 +41,7 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
           animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, ...animateFrom[position] }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className={`absolute z-10 max-w-[320px] min-w-[280px] ${positionClasses[position]}`}
+          className={`absolute z-50 max-w-[320px] min-w-[280px] ${positionClasses[position]}`}
         >
           <div className="relative bg-highlighter/25 border border-highlighter/40 rounded-xl px-3 py-2 shadow-md">
             <div className="flex items-start gap-1.5">
