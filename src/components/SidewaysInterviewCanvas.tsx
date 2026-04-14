@@ -844,7 +844,7 @@ const SidewaysInterviewCanvas = () => {
             )}
             <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors">
               <LayoutDashboard className="w-4 h-4" />
-              <span>Dashboard</span>
+              <span>Archive</span>
             </Link>
             <span className="text-border">|</span>
             <button onClick={signOut} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors">
