@@ -135,7 +135,7 @@ const ThankYouPage = ({
             <Link to="/dashboard" className="flex-1">
               <Button className="w-full gap-2 h-12 bg-ink text-background hover:bg-ink/90">
                 <LayoutDashboard className="w-4 h-4" />
-                View Dashboard
+                View Archive
               </Button>
             </Link>
           </motion.div>
