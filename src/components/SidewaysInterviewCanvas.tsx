@@ -144,6 +144,19 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
     return { verdict: "lean-no", scores };
   }
 
+  // T-Shape floor: Depth of Craft must meet minimum for positive verdicts
+  if (state.depthOfCraft < 15) {
+    return { verdict: "strong-no", scores };
+  }
+  if (state.depthOfCraft < 30) {
+    return { verdict: "lean-no", scores };
+  }
+
+  // T-Shape floor: Professional Breadth minimum
+  if (state.professionalBreadth < 20) {
+    return { verdict: "lean-no", scores };
+  }
+
   // Strong Yes: all categories strong AND high overall
   if (minCategory >= 60 && overall >= 65) {
     return { verdict: "strong-yes", scores };
