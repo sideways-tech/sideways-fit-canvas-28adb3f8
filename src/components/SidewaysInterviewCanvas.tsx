@@ -860,6 +860,9 @@ const SidewaysInterviewCanvas = () => {
             </button>
           </div>
         </motion.footer>
+
+        {/* Sticky Transcript Mic */}
+        <TranscriptMic onTranscriptChange={(t) => updateField("transcript", t)} />
       </div>
     </div>
   );
