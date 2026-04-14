@@ -32,8 +32,8 @@ const Login = () => {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-4">
           <img src={sidewaysLogo} alt="Sideways" className="h-20 mx-auto" />
-          <h1 className="text-xl font-semibold">Internal Access</h1>
-          <p className="text-sm text-muted-foreground">Sign in to access the assessment tool</p>
+          <h1 className="text-xl font-semibold">Hiring Assessment App</h1>
+          <p className="text-sm text-muted-foreground">Sign in to access the internal assessment App</p>
         </div>
 
         {/* Email login disabled – Google sign-in only
