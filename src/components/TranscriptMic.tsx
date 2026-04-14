@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Pause, Play, ChevronDown, ChevronUp } from "lucide-react";
+import { Mic, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranscription, TranscriptionStatus } from "@/hooks/useTranscription";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -47,7 +47,7 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
   const isActive = status === "recording" || status === "paused" || status === "connecting";
   const hasTranscript = transcript.trim().length > 0 || interimText.trim().length > 0;
 
-  const MainIcon = status === "recording" ? Pause : status === "paused" ? Play : Mic;
+  const MainIcon = status === "recording" ? Pause : Mic;
 
   return (
     <TooltipProvider delayDuration={300}>
