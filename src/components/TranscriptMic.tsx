@@ -89,13 +89,15 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
                 {status === "recording" && !isMobile && (
                   <>
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-[hsl(142,40%,75%)]/40"
-                      animate={{ scale: [1, 1.6], opacity: [0.5, 0] }}
+                      className="absolute inset-0 rounded-full bg-[hsl(142,40%,75%)]/40 pointer-events-none"
+                      initial={{ scale: 1, opacity: 0.5 }}
+                      animate={{ scale: 1.6, opacity: 0 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                     />
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-[hsl(142,40%,75%)]/30"
-                      animate={{ scale: [1, 2], opacity: [0.4, 0] }}
+                      className="absolute inset-0 rounded-full bg-[hsl(142,40%,75%)]/30 pointer-events-none"
+                      initial={{ scale: 1, opacity: 0.4 }}
+                      animate={{ scale: 2, opacity: 0 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
                     />
                   </>
