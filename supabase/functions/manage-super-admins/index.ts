@@ -66,9 +66,9 @@ Deno.serve(async (req) => {
         .from("super_admins")
         .insert({ email: normalizedEmail });
       if (error) {
-        if (error.code === "23505") {
+      if (error.code === "23505") {
           return new Response(JSON.stringify({ error: "Email already exists" }), {
-            status: 409,
+            status: 200,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
