@@ -18,6 +18,7 @@ export interface DisciplineConfig {
     sliderLabel: string;
     low: string;
     high: string;
+    hint: string;
     tiers: { high: string; mid: string; low: string };
   };
   aestheticsProcess: {
@@ -50,6 +51,7 @@ const configs: Record<Department, DisciplineConfig> = {
       sliderLabel: "Aesthetic sensibility",
       low: '"I don\'t really think about design"',
       high: '"Beauty matters deeply to me"',
+      hint: "Look for: Do they notice the office design? Reference visual references naturally? Have opinions on fonts, colors, or layouts without being prompted?",
       tiers: {
         high: "Design sensibility detected!",
         mid: "Appreciates good design",
@@ -87,6 +89,7 @@ const configs: Record<Department, DisciplineConfig> = {
       sliderLabel: "Aesthetic sensibility",
       low: '"I don\'t really think about design"',
       high: '"Beauty matters deeply to me"',
+      hint: "Look for: Do they notice the office design? Reference visual references naturally? Have opinions on fonts, colors, or layouts without being prompted?",
       tiers: {
         high: "Design sensibility detected!",
         mid: "Appreciates good design",
@@ -124,6 +127,7 @@ const configs: Record<Department, DisciplineConfig> = {
       sliderLabel: "Eye for Craft",
       low: "Doesn't notice design choices",
       high: "Spots craft in everything",
+      hint: "Look for: Do they notice the office design? Reference visual references naturally? Have opinions on fonts, colors, or layouts without being prompted?",
       tiers: {
         high: "Sharp eye for craft!",
         mid: "Notices good work",
@@ -161,6 +165,7 @@ const configs: Record<Department, DisciplineConfig> = {
       sliderLabel: "Cultural & Visual Antenna",
       low: "Rarely notices design or aesthetics",
       high: "Attuned to visual culture and trends",
+      hint: "Look for: Do they reference visual culture, design trends, or brand aesthetics in conversation? Do they notice details in campaign craft?",
       tiers: {
         high: "Culturally attuned!",
         mid: "Picks up on trends",
@@ -199,6 +204,7 @@ const configs: Record<Department, DisciplineConfig> = {
       sliderLabel: "UI/UX & Interaction Sensibility",
       low: "Ships it if it works",
       high: "Obsesses over every pixel and micro-interaction",
+      hint: "Look for: Do they have opinions on UI details, micro-interactions, or design systems? Do they reference apps or products for their design quality?",
       tiers: {
         high: "Design-obsessed builder!",
         mid: "Cares about polish",
