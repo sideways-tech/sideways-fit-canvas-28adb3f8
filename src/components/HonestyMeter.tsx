@@ -50,21 +50,6 @@ const HonestyMeter = ({ value, onChange }: HonestyMeterProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Visual Meter */}
-      <div className="relative h-8 bg-gradient-to-r from-reject/30 via-highlighter/30 to-hire/30 rounded-full overflow-hidden sketch-border-light">
-        <motion.div
-          className="absolute top-0 h-full w-6 bg-ink rounded-full shadow-lg"
-          initial={{ left: "50%", x: "-50%" }}
-          animate={{ left: meterPosition, x: "-50%" }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}
-        />
-        <div className="absolute inset-0 flex justify-between items-center px-4 text-xs font-handwritten text-2xl">
-          <span className="text-reject">✗</span>
-          <span className="text-muted-foreground">~</span>
-          <span className="text-hire">✓</span>
-        </div>
-      </div>
-
       {/* Options */}
       <RadioGroup
         value={value}
