@@ -14,20 +14,20 @@ const diagnosticOptions: Record<string, { label: string; description: string }> 
   "clarifier": { label: "Clarifier", description: "Asked superficial process questions" },
   "diagnostician": { label: "Diagnostician", description: "Challenged the premise / Asked 'Why'" },
 };
-const honestyOptions: Record<string, { label: string; description: string }> = {
-  "flattery": { label: "Flattery", description: "Only positive things, avoided critique" },
-  "diplomatic": { label: "Diplomatic", description: "Balanced but guarded feedback" },
-  "honest": { label: "Constructive Critique", description: "The Birbal Standard — Truth to power" },
-};
 const motivationOptions: Record<string, { label: string; description: string }> = {
   "unclear": { label: "Unclear / Generic", description: "Couldn't articulate why" },
   "practical": { label: "Practical Reasons", description: "Career growth, industry reputation, learning opportunity" },
   "passionate": { label: "Deep Connection", description: "Clear passion for problem-solving, creativity, or impact" },
 };
-const sidewaysMotivationOptions: Record<string, { label: string; description: string }> = {
+const sidewaysEngagementOptions: Record<string, { label: string; description: string }> = {
+  "surface-generic": { label: "Surface-Level / Generic", description: "Vague praise, could be any agency" },
+  "informed-safe": { label: "Informed but Safe", description: "Knows the work but offers no real opinion" },
+  "genuine-fan": { label: "Genuine Admiration", description: "Specific, detailed, authentic praise" },
+  "opinionated-engaged": { label: "Opinionated & Engaged", description: "Clear POV, offers critique or strong takes" },
+  // Legacy values for old assessments
   "generic": { label: "Generic — Could Be Any Agency", description: "No specific reason" },
   "culture-fit": { label: "Culture Fit", description: "Resonates with values, work style, or team vibe" },
-  "sideways-specific": { label: "Specific to Sideways", description: "Knows our work, references projects, articulates unique draw" },
+  "sideways-specific": { label: "Specific to Sideways", description: "Knows our work, references projects" },
 };
 const resilienceDescriptions: Record<number, string> = {
   1: "Got defensive — struggled to separate self from work",
@@ -286,9 +286,8 @@ const AssessmentReport = () => {
         <Card>
           <SectionTitle icon="🧠" title="Act 3 · Mindset & Alignment" />
           <McqRow label="Diagnostic Mindset" value={a.diagnostic_level} options={diagnosticOptions} />
-          <McqRow label="Honesty Level" value={a.honesty_level} options={honestyOptions} />
           <McqRow label="Industry Motivation" value={a.motivation_level} options={motivationOptions} />
-          <McqRow label="Sideways Motivation" value={a.sideways_motivation_level} options={sidewaysMotivationOptions} />
+          <McqRow label="Sideways Engagement" value={a.sideways_motivation_level} options={sidewaysEngagementOptions} />
         </Card>
 
         <NoteBlock title="Why This Industry — Reason" text={a.motivation_reason} icon="🔥" />

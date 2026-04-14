@@ -33,9 +33,8 @@ import ThankYouPage from "./ThankYouPage";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
-type HonestyLevel = "flattery" | "diplomatic" | "honest";
 type MotivationLevel = "unclear" | "practical" | "passionate";
-type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
+type SidewaysEngagement = "surface-generic" | "informed-safe" | "genuine-fan" | "opinionated-engaged";
 type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
 interface FormState {
@@ -56,7 +55,6 @@ interface FormState {
   recentReadExample: string;
   interestsPassionsNotes: string;
   sidewaysWebsiteFeedback: string;
-  honestyLevel: HonestyLevel | "";
   depthOfCraft: number;
   articulationSkill: number;
   portfolioQuality: number;
@@ -70,7 +68,7 @@ interface FormState {
   aestheticsProcessNote: string;
   motivationLevel: MotivationLevel | "";
   motivationReason: string;
-  sidewaysMotivationLevel: SidewaysMotivationLevel | "";
+  sidewaysMotivationLevel: SidewaysEngagement | "";
   sidewaysMotivationReason: string;
   indianExamples: string;
   internationalExamples: string;
@@ -110,17 +108,14 @@ const calculateCategoryScores = (state: FormState): CategoryScores => {
   const diagnosticScore = normalizeCategorical(state.diagnosticLevel, {
     "order-taker": 15, "clarifier": 50, "diagnostician": 100,
   });
-  const honestyScore = normalizeCategorical(state.honestyLevel, {
-    "flattery": 10, "diplomatic": 50, "honest": 100,
-  });
   const motivationScore = normalizeCategorical(state.motivationLevel, {
     "unclear": 10, "practical": 50, "passionate": 100,
   });
-  const sidewaysMotivationScore = normalizeCategorical(state.sidewaysMotivationLevel, {
-    "generic": 15, "culture-fit": 50, "sideways-specific": 100,
+  const sidewaysEngagementScore = normalizeCategorical(state.sidewaysMotivationLevel, {
+    "surface-generic": 10, "informed-safe": 40, "genuine-fan": 85, "opinionated-engaged": 100,
   });
   const mindset = Math.round(
-    (diagnosticScore + honestyScore + motivationScore + sidewaysMotivationScore) / 4
+    (diagnosticScore + motivationScore + sidewaysEngagementScore) / 3
   );
 
   // Overall: weighted combination (Professional matters most)
@@ -188,7 +183,6 @@ const SidewaysInterviewCanvas = () => {
     recentReadExample: "",
     interestsPassionsNotes: "",
     sidewaysWebsiteFeedback: "",
-    honestyLevel: "",
     depthOfCraft: 0,
     articulationSkill: 0,
     portfolioQuality: 0,
@@ -294,9 +288,8 @@ const SidewaysInterviewCanvas = () => {
 
   const requiredSelections: { field: keyof FormState; label: string; section: string }[] = [
     { field: "diagnosticLevel", label: "Diagnostic Mindset", section: "Section F" },
-    { field: "honestyLevel", label: "Honesty Meter", section: "Section E" },
     { field: "motivationLevel", label: "Industry Motivation", section: "Section D" },
-    { field: "sidewaysMotivationLevel", label: "Sideways Motivation", section: "Section E" },
+    { field: "sidewaysMotivationLevel", label: "Sideways Engagement", section: "Section E" },
   ];
 
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
@@ -397,7 +390,7 @@ const SidewaysInterviewCanvas = () => {
         professional_dive_notes: formState.professionalDiveNotes || null,
         resilience_score: formState.resilienceScore,
         diagnostic_level: formState.diagnosticLevel || null,
-        honesty_level: formState.honestyLevel || null,
+        honesty_level: null,
         sideways_website_feedback: formState.sidewaysWebsiteFeedback || null,
         motivation_level: formState.motivationLevel || null,
         motivation_reason: formState.motivationReason || null,
@@ -776,8 +769,6 @@ const SidewaysInterviewCanvas = () => {
               sidewaysReason={formState.sidewaysMotivationReason}
               onSidewaysLevelChange={(value) => updateField("sidewaysMotivationLevel", value)}
               onSidewaysReasonChange={(value) => updateField("sidewaysMotivationReason", value)}
-              honestyLevel={formState.honestyLevel}
-              onHonestyChange={(value) => updateField("honestyLevel", value)}
               campaignExamples={formState.indianExamples}
               onCampaignExamplesChange={(value) => updateField("indianExamples", value)}
               department={formState.department}
@@ -812,7 +803,6 @@ const SidewaysInterviewCanvas = () => {
               readsWidely={formState.readsWidely}
               depthScore={formState.depthScore}
               depthTopic={formState.depthTopic}
-              honestyLevel={formState.honestyLevel}
               resilienceScore={formState.resilienceScore}
               aestheticsInterest={formState.aestheticsInterest}
               motivationLevel={formState.motivationLevel}
