@@ -30,6 +30,7 @@ import VerdictFooter from "./VerdictFooter";
 import CvUpload from "./CvUpload";
 import KraReferenceBlock from "./KraReferenceBlock";
 import ThankYouPage from "./ThankYouPage";
+import TranscriptMic from "./TranscriptMic";
 import sidewaysLogo from "@/assets/sideways-logo.png";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -72,6 +73,7 @@ interface FormState {
   sidewaysMotivationReason: string;
   indianExamples: string;
   internationalExamples: string;
+  transcript: string;
 }
 
 interface CategoryScores {
@@ -200,6 +202,7 @@ const SidewaysInterviewCanvas = () => {
     sidewaysMotivationReason: "",
     indianExamples: "",
     internationalExamples: "",
+    transcript: "",
   });
 
   const [cvFilePath, setCvFilePath] = useState<string>("");
@@ -405,6 +408,7 @@ const SidewaysInterviewCanvas = () => {
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
         verdict,
+        transcript: formState.transcript || null,
       }).select("*").single();
 
       if (aErr) throw aErr;
@@ -856,6 +860,9 @@ const SidewaysInterviewCanvas = () => {
             </button>
           </div>
         </motion.footer>
+
+        {/* Sticky Transcript Mic */}
+        <TranscriptMic onTranscriptChange={(t) => updateField("transcript", t)} />
       </div>
     </div>
   );

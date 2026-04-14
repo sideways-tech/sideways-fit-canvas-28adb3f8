@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip, Trash2, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, ChevronRight, FileText, Paperclip, Trash2, ChevronLeftIcon, ChevronRightIcon, Mic } from "lucide-react";
 import { Link } from "react-router-dom";
 import HandwrittenLabel from "@/components/HandwrittenLabel";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ interface Assessment {
   verdict: string | null;
   cv_file_path: string | null;
   created_at: string;
+  transcript?: string | null;
 }
 
 interface CandidateWithAssessments {
@@ -441,6 +442,26 @@ const Dashboard = () => {
                                       </a>
                                     </TooltipTrigger>
                                     <TooltipContent>Download CV</TooltipContent>
+                                  </Tooltip>
+                                )}
+                                {a.transcript && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Open transcript in a simple modal/alert
+                                          const win = window.open("", "_blank", "width=600,height=500");
+                                          if (win) {
+                                            win.document.write(`<html><head><title>Interview Transcript</title><style>body{font-family:monospace;white-space:pre-wrap;padding:24px;line-height:1.6;color:#333;}</style></head><body>${a.transcript.replace(/</g, "&lt;")}</body></html>`);
+                                            win.document.close();
+                                          }
+                                        }}
+                                      >
+                                        <Mic className="w-4 h-4 text-hire hover:text-foreground transition-colors cursor-pointer" />
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>View transcript</TooltipContent>
                                   </Tooltip>
                                 )}
                                 <Tooltip>

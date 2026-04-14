@@ -50,6 +50,7 @@ export type Database = {
           sideways_motivation_level: string | null
           sideways_motivation_reason: string | null
           sideways_website_feedback: string | null
+          transcript: string | null
           updated_at: string
           verdict: string | null
         }
@@ -88,6 +89,7 @@ export type Database = {
           sideways_motivation_level?: string | null
           sideways_motivation_reason?: string | null
           sideways_website_feedback?: string | null
+          transcript?: string | null
           updated_at?: string
           verdict?: string | null
         }
@@ -126,6 +128,7 @@ export type Database = {
           sideways_motivation_level?: string | null
           sideways_motivation_reason?: string | null
           sideways_website_feedback?: string | null
+          transcript?: string | null
           updated_at?: string
           verdict?: string | null
         }
