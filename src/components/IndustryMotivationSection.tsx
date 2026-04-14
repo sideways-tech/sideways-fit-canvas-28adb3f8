@@ -232,7 +232,7 @@ const IndustryMotivationSection = ({
         </div>
 
         {/* Sideways Motivation MCQ */}
-        <Label className="text-xs text-muted-foreground">
+        <Label className="text-sm font-medium mt-2 block">
           Based on their answer, how Sideways-specific was their motivation?
         </Label>
         <RadioGroup
