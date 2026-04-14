@@ -115,13 +115,13 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
                 {status === "recording" && (
                   <>
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-hire/30"
-                      animate={{ scale: [1, 1.6], opacity: [0.4, 0] }}
+                      className="absolute inset-0 rounded-full bg-hire/50"
+                      animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                     />
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-hire/20"
-                      animate={{ scale: [1, 2], opacity: [0.3, 0] }}
+                      className="absolute inset-0 rounded-full bg-hire/40"
+                      animate={{ scale: [1, 2], opacity: [0.5, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
                     />
                   </>
