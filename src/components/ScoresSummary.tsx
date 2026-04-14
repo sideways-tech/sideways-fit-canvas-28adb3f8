@@ -184,7 +184,7 @@ const ScoresSummary = ({
   return (
     <div className="space-y-6">
       {/* T-Shape Visual */}
-      <TShapeVisualizer depth={depthOfCraft} breadth={professionalBreadth} />
+      <TShapeVisualizer depthScore={depthOfCraft} breadthScore={professionalBreadth} />
 
       {/* Section Groups */}
       {sections.map((section) => (

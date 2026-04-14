@@ -3,24 +3,20 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import HandwrittenLabel from "./HandwrittenLabel";
-import HonestyMeter from "./HonestyMeter";
-import { Target, TrendingUp, Heart, Compass, Building2, Sparkles, Shuffle } from "lucide-react";
+import { Target, TrendingUp, Heart, Compass, Building2, Sparkles, Shuffle, Eye } from "lucide-react";
 
 type MotivationLevel = "unclear" | "practical" | "passionate";
-type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
-type HonestyLevel = "flattery" | "diplomatic" | "honest";
+type SidewaysEngagement = "surface-generic" | "informed-safe" | "genuine-fan" | "opinionated-engaged";
 
 interface IndustryMotivationSectionProps {
   level: MotivationLevel | "";
   reason: string;
   onLevelChange: (level: MotivationLevel) => void;
   onReasonChange: (reason: string) => void;
-  sidewaysLevel: SidewaysMotivationLevel | "";
+  sidewaysLevel: SidewaysEngagement | "";
   sidewaysReason: string;
-  onSidewaysLevelChange: (level: SidewaysMotivationLevel) => void;
+  onSidewaysLevelChange: (level: SidewaysEngagement) => void;
   onSidewaysReasonChange: (reason: string) => void;
-  honestyLevel: HonestyLevel | "";
-  onHonestyChange: (value: HonestyLevel) => void;
   indianExamples: string;
   onIndianExamplesChange: (value: string) => void;
   internationalExamples: string;
@@ -51,25 +47,32 @@ const industryOptions = [
   },
 ];
 
-const sidewaysOptions = [
+const engagementOptions = [
   {
-    value: "generic" as SidewaysMotivationLevel,
-    label: "Generic — Could Be Any Agency",
-    description: '"It seemed like a cool place" or no specific reason',
+    value: "surface-generic" as SidewaysEngagement,
+    label: "Surface-Level / Generic",
+    description: "Vague praise or no specific take — could be about any agency",
     icon: Shuffle,
     color: "text-reject",
   },
   {
-    value: "culture-fit" as SidewaysMotivationLevel,
-    label: "Culture Fit",
-    description: "Resonates with values, work style, or team vibe",
-    icon: Building2,
+    value: "informed-safe" as SidewaysEngagement,
+    label: "Informed but Safe",
+    description: "Knows our work, can name projects, but offers no real opinion or POV",
+    icon: Eye,
     color: "text-highlighter",
   },
   {
-    value: "sideways-specific" as SidewaysMotivationLevel,
-    label: "Specific to Sideways",
-    description: "Knows our work, references projects, articulates unique draw",
+    value: "genuine-fan" as SidewaysEngagement,
+    label: "Genuine Admiration",
+    description: "Specific, detailed, authentic praise — clearly did their homework and means it",
+    icon: Heart,
+    color: "text-hire",
+  },
+  {
+    value: "opinionated-engaged" as SidewaysEngagement,
+    label: "Opinionated & Engaged",
+    description: "Has a clear POV on our work — offers critique, suggestions, or strong takes",
     icon: Sparkles,
     color: "text-hire",
   },
