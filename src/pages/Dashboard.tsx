@@ -63,7 +63,7 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const queryClient = useQueryClient();
   const { session } = useAuth();
-  const { isSuperAdmin } = useSuperAdmin();
+  const { isSuperAdmin, isLoading: isAdminLoading } = useSuperAdmin();
   const userEmail = session?.user?.email?.toLowerCase() || "";
 
   const { data: candidates, isLoading } = useQuery({
