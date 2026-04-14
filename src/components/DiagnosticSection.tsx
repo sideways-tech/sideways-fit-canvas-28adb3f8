@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
+import FloatingHint from "./FloatingHint";
 import { CheckCircle2, Coffee, HelpCircle, Lightbulb } from "lucide-react";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
@@ -65,8 +67,19 @@ const Confetti = () => (
 );
 
 const DiagnosticSection = ({ value, onChange }: DiagnosticSectionProps) => {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className="space-y-4 relative">
+    <div
+      className="space-y-4 relative overflow-visible"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <FloatingHint
+        hint="Think back to the full conversation: Did they accept the brief at face value, or did they push back and ask 'Why are we doing this?' before jumping to 'How'? A true diagnostician reframes the problem before solving it."
+        isActive={hovered}
+        position="left"
+      />
       <RadioGroup
         value={value}
         onValueChange={(val) => onChange(val as DiagnosticLevel)}
