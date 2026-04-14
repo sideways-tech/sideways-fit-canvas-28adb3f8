@@ -408,6 +408,7 @@ const SidewaysInterviewCanvas = () => {
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
         verdict,
+        transcript: formState.transcript || null,
       }).select("*").single();
 
       if (aErr) throw aErr;
