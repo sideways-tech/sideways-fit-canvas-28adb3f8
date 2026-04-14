@@ -3,44 +3,47 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
 import HintTextarea from "./HintTextarea";
-import HonestyMeter from "./HonestyMeter";
-import { Building2, Sparkles, Shuffle } from "lucide-react";
+import { Building2, Sparkles, Shuffle, Eye, Heart } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
-type SidewaysMotivationLevel = "generic" | "culture-fit" | "sideways-specific";
-type HonestyLevel = "flattery" | "diplomatic" | "honest";
+type SidewaysEngagement = "surface-generic" | "informed-safe" | "genuine-fan" | "opinionated-engaged";
 
 interface SidewaysMotivationBlockProps {
-  sidewaysLevel: SidewaysMotivationLevel | "";
+  sidewaysLevel: SidewaysEngagement | "";
   sidewaysReason: string;
-  onSidewaysLevelChange: (level: SidewaysMotivationLevel) => void;
+  onSidewaysLevelChange: (level: SidewaysEngagement) => void;
   onSidewaysReasonChange: (reason: string) => void;
-  honestyLevel: HonestyLevel | "";
-  onHonestyChange: (value: HonestyLevel) => void;
   campaignExamples: string;
   onCampaignExamplesChange: (value: string) => void;
   department?: string;
 }
 
-const sidewaysOptions = [
+const engagementOptions = [
   {
-    value: "generic" as SidewaysMotivationLevel,
-    label: "Generic — Could Be Any Agency",
-    description: '"It seemed like a cool place" or no specific reason',
+    value: "surface-generic" as SidewaysEngagement,
+    label: "Surface-Level / Generic",
+    description: "Vague praise or no specific take — could be about any agency",
     icon: Shuffle,
     color: "text-reject",
   },
   {
-    value: "culture-fit" as SidewaysMotivationLevel,
-    label: "Culture Fit",
-    description: "Resonates with values, work style, or team vibe",
-    icon: Building2,
+    value: "informed-safe" as SidewaysEngagement,
+    label: "Informed but Safe",
+    description: "Knows our work, can name projects, but offers no real opinion or POV",
+    icon: Eye,
     color: "text-highlighter",
   },
   {
-    value: "sideways-specific" as SidewaysMotivationLevel,
-    label: "Specific to Sideways",
-    description: "Knows our work, references projects, articulates unique draw",
+    value: "genuine-fan" as SidewaysEngagement,
+    label: "Genuine Admiration",
+    description: "Specific, detailed, authentic praise — clearly did their homework and means it",
+    icon: Heart,
+    color: "text-hire",
+  },
+  {
+    value: "opinionated-engaged" as SidewaysEngagement,
+    label: "Opinionated & Engaged",
+    description: "Has a clear POV on our work — offers critique, suggestions, or strong takes",
     icon: Sparkles,
     color: "text-hire",
   },
@@ -51,8 +54,6 @@ const SidewaysMotivationBlock = ({
   sidewaysReason,
   onSidewaysLevelChange,
   onSidewaysReasonChange,
-  honestyLevel,
-  onHonestyChange,
   campaignExamples,
   onCampaignExamplesChange,
   department,
@@ -97,24 +98,22 @@ const SidewaysMotivationBlock = ({
         />
       </div>
 
-      {/* Grade: Honesty Meter */}
+      {/* Merged Grade: Quality of Sideways Engagement */}
       <div className="space-y-3 pt-2">
         <Label className="text-sm font-medium">
-          Their take on Sideways work — how honest were they?
+          How would you rate the quality of their engagement with Sideways?
         </Label>
-        <HonestyMeter value={honestyLevel} onChange={onHonestyChange} />
+        <p className="text-xs text-muted-foreground">
+          This isn't about whether they praised or critiqued — it's about how deeply they engaged with who we are and what we do.
+        </p>
       </div>
 
-      {/* Grade: Sideways Motivation MCQ */}
-      <Label className="text-sm font-medium mt-2 block">
-        Based on their answer, how Sideways-specific was their motivation?
-      </Label>
       <RadioGroup
         value={sidewaysLevel}
-        onValueChange={(val) => onSidewaysLevelChange(val as SidewaysMotivationLevel)}
+        onValueChange={(val) => onSidewaysLevelChange(val as SidewaysEngagement)}
         className="space-y-3"
       >
-        {sidewaysOptions.map((option) => {
+        {engagementOptions.map((option) => {
           const Icon = option.icon;
           const isSelected = sidewaysLevel === option.value;
 
@@ -152,7 +151,7 @@ const SidewaysMotivationBlock = ({
         })}
       </RadioGroup>
 
-      {sidewaysLevel === "sideways-specific" && (
+      {(sidewaysLevel === "genuine-fan" || sidewaysLevel === "opinionated-engaged") && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,7 +159,7 @@ const SidewaysMotivationBlock = ({
         >
           <Sparkles className="w-5 h-5 text-hire" />
           <HandwrittenLabel className="text-3xl text-hire">
-            They did their homework!
+            {sidewaysLevel === "opinionated-engaged" ? "They brought receipts!" : "They did their homework!"}
           </HandwrittenLabel>
         </motion.div>
       )}
