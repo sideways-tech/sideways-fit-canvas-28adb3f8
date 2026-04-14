@@ -36,6 +36,7 @@ const Login = () => {
           <p className="text-sm text-muted-foreground">Sign in to access the assessment tool</p>
         </div>
 
+        {/* Email login disabled – Google sign-in only
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="login-email">Email</Label>
@@ -72,6 +73,7 @@ const Login = () => {
             <span className="bg-background px-2 text-muted-foreground">or</span>
           </div>
         </div>
+        */}
 
         <Button
           type="button"
