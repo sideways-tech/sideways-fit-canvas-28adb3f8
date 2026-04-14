@@ -80,13 +80,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "remove") {
-      // Prevent removing yourself
-      if (normalizedEmail === user.email.toLowerCase()) {
-        return new Response(JSON.stringify({ error: "Cannot remove yourself" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const { error } = await adminClient
         .from("super_admins")
         .delete()
