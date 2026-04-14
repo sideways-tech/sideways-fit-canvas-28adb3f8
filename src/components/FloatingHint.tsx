@@ -16,8 +16,8 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
   }, [isActive]);
 
   const positionClasses = {
-    left: "right-full mr-3 top-2",
-    right: "left-full ml-3 top-2",
+    left: "right-full mr-3 top-1/2 -translate-y-1/2",
+    right: "left-full ml-3 top-1/2 -translate-y-1/2",
     top: "bottom-full mb-3 left-4",
   };
 
@@ -25,18 +25,6 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
     left: { x: 8, y: 0 },
     right: { x: -8, y: 0 },
     top: { x: 0, y: 8 },
-  };
-
-  const tailBorderStyles = {
-    left: "absolute top-4 -right-1.5 w-3 h-3 bg-highlighter/25 border-r border-t border-highlighter/40 rotate-45",
-    right: "absolute top-4 -left-1.5 w-3 h-3 bg-highlighter/25 border-l border-b border-highlighter/40 rotate-45",
-    top: "absolute -bottom-1.5 left-6 w-3 h-3 bg-highlighter/25 border-r border-b border-highlighter/40 rotate-45",
-  };
-
-  const tailCoverStyles = {
-    left: "absolute top-[15px] -right-px w-3 h-3 bg-highlighter/25 rotate-45 z-10",
-    right: "absolute top-[15px] -left-px w-3 h-3 bg-highlighter/25 rotate-45 z-10",
-    top: "absolute -bottom-px left-[23px] w-3 h-3 bg-highlighter/25 rotate-45 z-10",
   };
 
   return (
@@ -54,8 +42,22 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
               <MessageCircle className="w-3.5 h-3.5 text-highlighter shrink-0 mt-0.5" />
               <p className="text-xs text-foreground/90 leading-relaxed">{hint}</p>
             </div>
-            <div className={tailBorderStyles[position]} />
-            <div className={tailCoverStyles[position]} />
+            {/* Single clean tail arrow */}
+            {position === "left" && (
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -right-[6px] w-2.5 h-2.5 bg-highlighter/25 border-r border-t border-highlighter/40 rotate-45"
+              />
+            )}
+            {position === "right" && (
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -left-[6px] w-2.5 h-2.5 bg-highlighter/25 border-l border-b border-highlighter/40 rotate-45"
+              />
+            )}
+            {position === "top" && (
+              <div
+                className="absolute left-6 -bottom-[6px] w-2.5 h-2.5 bg-highlighter/25 border-r border-b border-highlighter/40 rotate-45"
+              />
+            )}
           </div>
         </motion.div>
       )}
