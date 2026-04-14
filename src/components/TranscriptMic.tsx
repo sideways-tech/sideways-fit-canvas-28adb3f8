@@ -4,6 +4,7 @@ import { Mic, Pause, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranscription, TranscriptionStatus } from "@/hooks/useTranscription";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TranscriptMicProps {
   onTranscriptChange: (transcript: string) => void;
@@ -11,9 +12,9 @@ interface TranscriptMicProps {
 
 const statusConfig: Record<TranscriptionStatus, { color: string; label: string }> = {
   idle: { color: "bg-muted", label: "Start Recording" },
-  connecting: { color: "bg-highlighter/50", label: "Connecting..." },
-  recording: { color: "bg-hire", label: "Recording" },
-  paused: { color: "bg-highlighter", label: "Paused" },
+  connecting: { color: "bg-[hsl(48,60%,80%)]/70", label: "Connecting..." },
+  recording: { color: "bg-[hsl(142,40%,75%)]", label: "Recording" },
+  paused: { color: "bg-[hsl(48,60%,80%)]", label: "Paused" },
   error: { color: "bg-destructive", label: "Error" },
 };
 
