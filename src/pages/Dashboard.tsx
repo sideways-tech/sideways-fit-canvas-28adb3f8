@@ -103,6 +103,7 @@ const Dashboard = () => {
 
       return grouped;
     },
+    enabled: !isAdminLoading,
   });
 
   const filtered = candidates?.filter((c) => {
