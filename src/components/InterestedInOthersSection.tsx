@@ -47,7 +47,7 @@ const InterestedInOthersSection = ({ value, onChange }: InterestedInOthersSectio
           <FloatingHint
             hint="Look for: Do they ask about your life unprompted? Remember details about others? Show curiosity about the interviewer's background — not just polite small talk?"
             isActive={hovered}
-            position="top"
+            position="left"
           />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
