@@ -851,7 +851,7 @@ const SidewaysInterviewCanvas = () => {
               <>
                 <Link to="/admin" className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Admin</span>
+                  <span>Admin Panel</span>
                 </Link>
                 <span className="text-border">|</span>
               </>
