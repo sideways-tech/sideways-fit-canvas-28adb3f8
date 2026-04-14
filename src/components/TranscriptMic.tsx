@@ -51,8 +51,11 @@ const TranscriptMic = ({ onTranscriptChange }: TranscriptMicProps) => {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end gap-2">
-        {/* Expandable transcript panel */}
+      <div className="fixed bottom-3 right-3 z-50 flex flex-col items-center gap-2" style={{ width: "3.5rem" }}>
+        {/* Spacer to keep mic button position stable — reserves space for the small button + status label below */}
+        <div className="flex-1" />
+
+        {/* Expandable transcript panel — positioned above the mic */}
         <AnimatePresence>
           {expanded && hasTranscript && (
             <motion.div
