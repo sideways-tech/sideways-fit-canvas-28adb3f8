@@ -15,10 +15,10 @@ const HintTextarea = ({ hint, hintPosition = "left", className, ...props }: Hint
   const showHint = isFocused && hasContent;
 
   return (
-    <div className="relative overflow-visible">
+    <div className="relative overflow-visible flex items-center">
       <Textarea
         {...props}
-        className={cn(className)}
+        className={cn("w-full", className)}
         onFocus={(e) => {
           setIsFocused(true);
           props.onFocus?.(e);

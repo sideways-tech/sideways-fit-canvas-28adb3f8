@@ -16,9 +16,9 @@ const FloatingHint = ({ hint, isActive, position = "left" }: FloatingHintProps) 
   }, [isActive]);
 
   const positionClasses = {
-    left: "right-full mr-3 top-1/2 -translate-y-1/2",
-    right: "left-full ml-3 top-1/2 -translate-y-1/2",
-    top: "bottom-full mb-3 left-4",
+    left: "absolute right-full mr-3 top-1/2 -translate-y-1/2",
+    right: "absolute left-full ml-3 top-1/2 -translate-y-1/2",
+    top: "absolute bottom-full mb-3 left-4",
   };
 
   const animateFrom = {
