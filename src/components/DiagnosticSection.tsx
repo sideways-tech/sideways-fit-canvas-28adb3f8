@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
+import FloatingHint from "./FloatingHint";
 import { CheckCircle2, Coffee, HelpCircle, Lightbulb } from "lucide-react";
 
 type DiagnosticLevel = "order-taker" | "clarifier" | "diagnostician";
