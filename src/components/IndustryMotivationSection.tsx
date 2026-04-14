@@ -87,8 +87,6 @@ const IndustryMotivationSection = ({
   sidewaysReason,
   onSidewaysLevelChange,
   onSidewaysReasonChange,
-  honestyLevel,
-  onHonestyChange,
   indianExamples,
   onIndianExamplesChange,
   internationalExamples,
@@ -174,7 +172,7 @@ const IndustryMotivationSection = ({
         )}
       </div>
 
-      {/* Why Sideways? sub-block — consolidated with website feedback */}
+      {/* Why Sideways? sub-block */}
       <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
         <div className="flex items-center gap-2">
           <Building2 className="w-5 h-5 text-highlighter" />
@@ -184,7 +182,6 @@ const IndustryMotivationSection = ({
           Do they know who we are and why they want to be here specifically?
         </p>
 
-        {/* Main textarea — motivation + website critique */}
         <div className="space-y-2">
           <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
             Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
@@ -198,7 +195,6 @@ const IndustryMotivationSection = ({
           />
         </div>
 
-        {/* Indian inspirational examples */}
         <div className="space-y-2">
           <Label htmlFor="indian-examples" className="text-xs text-muted-foreground">
             🇮🇳 Indian campaigns or work they found inspirational
@@ -212,7 +208,6 @@ const IndustryMotivationSection = ({
           />
         </div>
 
-        {/* International inspirational examples */}
         <div className="space-y-2">
           <Label htmlFor="international-examples" className="text-xs text-muted-foreground">
             🌍 International campaigns or work they found inspirational
@@ -226,24 +221,15 @@ const IndustryMotivationSection = ({
           />
         </div>
 
-        {/* Honesty Meter — how honest were they about our work? */}
-        <div className="space-y-3 pt-2">
-          <Label className="text-sm font-medium">
-            Their take on Sideways work — how honest were they?
-          </Label>
-          <HonestyMeter value={honestyLevel} onChange={onHonestyChange} />
-        </div>
-
-        {/* Sideways Motivation MCQ */}
         <Label className="text-sm font-medium mt-2 block">
-          Based on their answer, how Sideways-specific was their motivation?
+          Based on their answer, how Sideways-specific was their engagement?
         </Label>
         <RadioGroup
           value={sidewaysLevel}
-          onValueChange={(val) => onSidewaysLevelChange(val as SidewaysMotivationLevel)}
+          onValueChange={(val) => onSidewaysLevelChange(val as SidewaysEngagement)}
           className="space-y-3"
         >
-          {sidewaysOptions.map((option) => {
+          {engagementOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = sidewaysLevel === option.value;
 
@@ -281,7 +267,7 @@ const IndustryMotivationSection = ({
           })}
         </RadioGroup>
 
-        {sidewaysLevel === "sideways-specific" && (
+        {sidewaysLevel === "opinionated-engaged" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
