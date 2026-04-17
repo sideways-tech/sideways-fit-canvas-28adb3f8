@@ -1,12 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 export type TranscriptionStatus = "idle" | "connecting" | "recording" | "paused" | "error";
-
-interface TranscriptEntry {
-  speaker: number;
-  text: string;
-  isFinal: boolean;
-}
 
 export interface UseTranscriptionReturn {
   status: TranscriptionStatus;
@@ -19,6 +13,8 @@ export interface UseTranscriptionReturn {
   error: string | null;
 }
 
+const TARGET_SAMPLE_RATE = 16000;
+
 export function useTranscription(): UseTranscriptionReturn {
   const [status, setStatus] = useState<TranscriptionStatus>("idle");
   const [transcript, setTranscript] = useState("");
@@ -27,188 +23,286 @@ export function useTranscription(): UseTranscriptionReturn {
 
   const wsRef = useRef<WebSocket | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
   const lastSpeakerRef = useRef<number>(-1);
+  const pausedRef = useRef<boolean>(false);
+  const statusRef = useRef<TranscriptionStatus>("idle");
+  const stoppingRef = useRef<boolean>(false);
+
+  const updateStatus = useCallback((next: TranscriptionStatus) => {
+    statusRef.current = next;
+    setStatus(next);
+  }, []);
 
   const getWsUrl = () => {
     const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    // Use wss for the edge function
-    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy`;
+    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy?sample_rate=${TARGET_SAMPLE_RATE}`;
   };
 
-  const start = useCallback(async () => {
-    setError(null);
-    setStatus("connecting");
-
+  const teardownAudio = useCallback(() => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          channelCount: 1,
-          sampleRate: 16000,
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-      });
-      mediaStreamRef.current = stream;
-
-      const ws = new WebSocket(getWsUrl());
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        // Wait for "connected" message from proxy
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-
-          if (data.type === "connected") {
-            // Deepgram is ready, start streaming audio
-            startAudioStream(stream);
-            setStatus("recording");
-            return;
-          }
-
-          if (data.type === "error") {
-            setError(data.message);
-            setStatus("error");
-            return;
-          }
-
-          if (data.type === "dgClosed") {
-            return;
-          }
-
-          // Deepgram transcript result
-          if (data.channel?.alternatives?.[0]) {
-            const alt = data.channel.alternatives[0];
-            const words = alt.words || [];
-            const text = alt.transcript || "";
-
-            if (!text.trim()) return;
-
-            if (data.is_final) {
-              // Build text with speaker labels
-              let formatted = "";
-              let currentSpeaker = lastSpeakerRef.current;
-
-              for (const word of words) {
-                const speaker = word.speaker ?? 0;
-                if (speaker !== currentSpeaker) {
-                  currentSpeaker = speaker;
-                  formatted += `\n[Speaker ${speaker + 1}]: `;
-                }
-                formatted += word.punctuated_word + " ";
-              }
-
-              if (words.length > 0) {
-                lastSpeakerRef.current = words[words.length - 1].speaker ?? 0;
-              }
-
-              setTranscript((prev) => prev + formatted);
-              setInterimText("");
-            } else {
-              setInterimText(text);
-            }
-          }
-        } catch {
-          // Non-JSON message, ignore
-        }
-      };
-
-      ws.onerror = () => {
-        setError("WebSocket connection failed");
-        setStatus("error");
-      };
-
-      ws.onclose = () => {
-        if (status === "recording") {
-          setStatus("idle");
-        }
-      };
-    } catch (err: any) {
-      setError(err.message || "Failed to access microphone");
-      setStatus("error");
+      if (workletNodeRef.current) {
+        workletNodeRef.current.port.onmessage = null;
+        workletNodeRef.current.disconnect();
+        workletNodeRef.current = null;
+      }
+      if (processorRef.current) {
+        processorRef.current.onaudioprocess = null;
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
+      if (sourceRef.current) {
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+      }
+      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+        audioContextRef.current.close().catch(() => { /* ignore */ });
+      }
+      audioContextRef.current = null;
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+        mediaStreamRef.current = null;
+      }
+    } catch (e) {
+      console.error("teardownAudio error", e);
     }
   }, []);
 
-  const startAudioStream = (stream: MediaStream) => {
-    const audioContext = new AudioContext({ sampleRate: 16000 });
+  const sendAudio = useCallback((buffer: ArrayBuffer) => {
+    if (pausedRef.current) return;
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try { ws.send(buffer); } catch (e) { console.error("ws send failed", e); }
+    }
+  }, []);
+
+  const startAudioPipeline = useCallback(async (stream: MediaStream) => {
+    // Use the device's native sample rate to maximize compatibility; the worklet
+    // downsamples to TARGET_SAMPLE_RATE for Deepgram.
+    const audioContext = new AudioContext();
     audioContextRef.current = audioContext;
 
     const source = audioContext.createMediaStreamSource(stream);
-    // Use ScriptProcessor for broad compatibility (AudioWorklet needs more setup)
-    const processor = audioContext.createScriptProcessor(4096, 1, 1);
-    processorRef.current = processor;
+    sourceRef.current = source;
 
-    processor.onaudioprocess = (e) => {
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
-        const inputData = e.inputBuffer.getChannelData(0);
-        // Convert float32 to int16
-        const int16 = new Int16Array(inputData.length);
-        for (let i = 0; i < inputData.length; i++) {
-          const s = Math.max(-1, Math.min(1, inputData[i]));
-          int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    let usingWorklet = false;
+    try {
+      await audioContext.audioWorklet.addModule("/pcm-worklet.js");
+      const node = new AudioWorkletNode(audioContext, "pcm-worklet", {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCount: 1,
+        processorOptions: { targetSampleRate: TARGET_SAMPLE_RATE },
+      });
+      node.port.onmessage = (e) => {
+        if (e.data instanceof ArrayBuffer) sendAudio(e.data);
+      };
+      source.connect(node);
+      // Connect to destination with a muted gain so the graph runs without playback.
+      const silent = audioContext.createGain();
+      silent.gain.value = 0;
+      node.connect(silent).connect(audioContext.destination);
+      workletNodeRef.current = node;
+      usingWorklet = true;
+    } catch (e) {
+      console.warn("AudioWorklet unavailable, falling back to ScriptProcessor", e);
+    }
+
+    if (!usingWorklet) {
+      const processor = audioContext.createScriptProcessor(4096, 1, 1);
+      processorRef.current = processor;
+      const inRate = audioContext.sampleRate;
+      const ratio = inRate / TARGET_SAMPLE_RATE;
+      processor.onaudioprocess = (e) => {
+        if (pausedRef.current) return;
+        const input = e.inputBuffer.getChannelData(0);
+        const outLen = Math.floor(input.length / ratio);
+        const out = new Int16Array(outLen);
+        for (let i = 0; i < outLen; i++) {
+          const start = Math.floor(i * ratio);
+          const end = Math.floor((i + 1) * ratio);
+          let sum = 0;
+          let count = 0;
+          for (let j = start; j < end && j < input.length; j++) {
+            sum += input[j];
+            count++;
+          }
+          const sample = count > 0 ? sum / count : 0;
+          const s = Math.max(-1, Math.min(1, sample));
+          out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
-        wsRef.current.send(int16.buffer);
+        sendAudio(out.buffer);
+      };
+      source.connect(processor);
+      processor.connect(audioContext.destination);
+    }
+  }, [sendAudio]);
+
+  const start = useCallback(async () => {
+    setError(null);
+    stoppingRef.current = false;
+    pausedRef.current = false;
+    updateStatus("connecting");
+
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+    } catch (err: any) {
+      setError(err?.message || "Microphone access denied");
+      updateStatus("error");
+      return;
+    }
+    mediaStreamRef.current = stream;
+
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(getWsUrl());
+    } catch (err: any) {
+      setError(err?.message || "Failed to open WebSocket");
+      updateStatus("error");
+      teardownAudio();
+      return;
+    }
+    ws.binaryType = "arraybuffer";
+    wsRef.current = ws;
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "connected") {
+          startAudioPipeline(stream).catch((e) => {
+            console.error("audio pipeline failed", e);
+            setError(e?.message || "Audio pipeline failed");
+            updateStatus("error");
+          });
+          updateStatus("recording");
+          return;
+        }
+
+        if (data.type === "error") {
+          setError(data.message || "Transcription error");
+          updateStatus("error");
+          return;
+        }
+
+        if (data.type === "dgClosed") {
+          // Deepgram closed unexpectedly — surface for visibility
+          if (!stoppingRef.current && statusRef.current !== "idle") {
+            const reason = data.reason ? ` (${data.code}: ${data.reason})` : data.code ? ` (${data.code})` : "";
+            setError(`Transcription stopped${reason}`);
+          }
+          return;
+        }
+
+        // Deepgram transcript payload
+        if (data.channel?.alternatives?.[0]) {
+          const alt = data.channel.alternatives[0];
+          const words = alt.words || [];
+          const text = alt.transcript || "";
+
+          if (!text.trim()) return;
+
+          if (data.is_final) {
+            let formatted = "";
+            let currentSpeaker = lastSpeakerRef.current;
+
+            for (const word of words) {
+              const speaker = word.speaker ?? 0;
+              if (speaker !== currentSpeaker) {
+                currentSpeaker = speaker;
+                formatted += `\n[Speaker ${speaker + 1}]: `;
+              }
+              formatted += (word.punctuated_word ?? word.word) + " ";
+            }
+
+            if (words.length > 0) {
+              lastSpeakerRef.current = words[words.length - 1].speaker ?? 0;
+            }
+
+            setTranscript((prev) => prev + formatted);
+            setInterimText("");
+          } else {
+            setInterimText(text);
+          }
+        }
+      } catch {
+        /* non-JSON message, ignore */
       }
     };
 
-    source.connect(processor);
-    processor.connect(audioContext.destination);
-  };
+    ws.onerror = () => {
+      if (stoppingRef.current) return;
+      setError("Connection error");
+      updateStatus("error");
+    };
+
+    ws.onclose = () => {
+      // Tear down audio so we don't keep capturing into a dead socket
+      teardownAudio();
+      if (stoppingRef.current) {
+        updateStatus("idle");
+      } else if (statusRef.current === "recording" || statusRef.current === "paused" || statusRef.current === "connecting") {
+        updateStatus("error");
+        setError((prev) => prev ?? "Transcription connection closed");
+      }
+    };
+  }, [startAudioPipeline, teardownAudio, updateStatus]);
 
   const pause = useCallback(() => {
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-    }
-    setStatus("paused");
-  }, []);
+    pausedRef.current = true;
+    updateStatus("paused");
+  }, [updateStatus]);
 
   const resume = useCallback(() => {
-    if (
-      audioContextRef.current &&
-      mediaStreamRef.current &&
-      processorRef.current
-    ) {
-      const source = audioContextRef.current.createMediaStreamSource(
-        mediaStreamRef.current
-      );
-      source.connect(processorRef.current);
-      processorRef.current.connect(audioContextRef.current.destination);
-    }
-    setStatus("recording");
-  }, []);
+    pausedRef.current = false;
+    updateStatus("recording");
+  }, [updateStatus]);
 
   const stop = useCallback(() => {
-    // Close WebSocket
-    if (wsRef.current) {
+    stoppingRef.current = true;
+    pausedRef.current = false;
+
+    const ws = wsRef.current;
+    if (ws) {
       try {
-        wsRef.current.send(JSON.stringify({ type: "close" }));
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "Finalize" }));
+          ws.send(JSON.stringify({ type: "close" }));
+        }
       } catch { /* ignore */ }
-      wsRef.current.close();
+      try { ws.close(); } catch { /* ignore */ }
       wsRef.current = null;
     }
 
-    // Stop audio
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((t) => t.stop());
-      mediaStreamRef.current = null;
-    }
-
+    teardownAudio();
     lastSpeakerRef.current = -1;
-    setStatus("idle");
     setInterimText("");
-  }, []);
+    updateStatus("idle");
+  }, [teardownAudio, updateStatus]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stoppingRef.current = true;
+      const ws = wsRef.current;
+      if (ws) {
+        try { ws.close(); } catch { /* ignore */ }
+        wsRef.current = null;
+      }
+      teardownAudio();
+    };
+  }, [teardownAudio]);
 
   return {
     status,
