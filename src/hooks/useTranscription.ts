@@ -271,23 +271,42 @@ export function useTranscription(): UseTranscriptionReturn {
 
   const stop = useCallback(() => {
     stoppingRef.current = true;
-    pausedRef.current = false;
+    pausedRef.current = true; // stop sending audio immediately
+
+    // Flush any pending interim text into the transcript so we don't lose it
+    setInterimText((interim) => {
+      if (interim && interim.trim()) {
+        setTranscript((prev) => prev + (prev.endsWith(" ") || prev === "" ? "" : " ") + interim);
+      }
+      return "";
+    });
+
+    // Stop capturing audio right away
+    teardownAudio();
 
     const ws = wsRef.current;
     if (ws) {
       try {
         if (ws.readyState === WebSocket.OPEN) {
+          // Ask Deepgram to flush remaining audio. Give it a brief grace
+          // period so the final transcript can arrive before we close.
           ws.send(JSON.stringify({ type: "Finalize" }));
-          ws.send(JSON.stringify({ type: "close" }));
+          setTimeout(() => {
+            try {
+              if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: "close" }));
+              }
+            } catch { /* ignore */ }
+            try { ws.close(); } catch { /* ignore */ }
+          }, 800);
+        } else {
+          try { ws.close(); } catch { /* ignore */ }
         }
       } catch { /* ignore */ }
-      try { ws.close(); } catch { /* ignore */ }
       wsRef.current = null;
     }
 
-    teardownAudio();
     lastSpeakerRef.current = -1;
-    setInterimText("");
     updateStatus("idle");
   }, [teardownAudio, updateStatus]);
 

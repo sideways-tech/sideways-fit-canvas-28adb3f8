@@ -298,11 +298,14 @@ const SidewaysInterviewCanvas = () => {
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
 
   const transcriptMicRef = useRef<TranscriptMicHandle>(null);
+  const transcriptRef = useRef<string>("");
 
   const handleSubmitAssessment = async () => {
-    // Stop recording if active before saving
+    // Stop recording if active before saving, and wait for Deepgram to
+    // flush any final words into the transcript before we read formState.
     if (transcriptMicRef.current?.isRecording()) {
       transcriptMicRef.current.stopRecording();
+      await new Promise((resolve) => setTimeout(resolve, 1200));
     }
 
     // Mark all required fields as touched
@@ -415,7 +418,7 @@ const SidewaysInterviewCanvas = () => {
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
         verdict,
-        transcript: formState.transcript || null,
+        transcript: (transcriptRef.current || formState.transcript || null),
       }).select("*").single();
 
       if (aErr) throw aErr;
@@ -869,7 +872,13 @@ const SidewaysInterviewCanvas = () => {
         </motion.footer>
 
         {/* Sticky Transcript Mic */}
-        <TranscriptMic ref={transcriptMicRef} onTranscriptChange={(t) => updateField("transcript", t)} />
+        <TranscriptMic
+          ref={transcriptMicRef}
+          onTranscriptChange={(t) => {
+            transcriptRef.current = t;
+            updateField("transcript", t);
+          }}
+        />
       </div>
     </div>
   );
