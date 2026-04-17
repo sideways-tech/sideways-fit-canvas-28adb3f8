@@ -300,9 +300,11 @@ const SidewaysInterviewCanvas = () => {
   const transcriptMicRef = useRef<TranscriptMicHandle>(null);
 
   const handleSubmitAssessment = async () => {
-    // Stop recording if active before saving
+    // Stop recording if active before saving, and wait for Deepgram to
+    // flush any final words into the transcript before we read formState.
     if (transcriptMicRef.current?.isRecording()) {
       transcriptMicRef.current.stopRecording();
+      await new Promise((resolve) => setTimeout(resolve, 1200));
     }
 
     // Mark all required fields as touched
