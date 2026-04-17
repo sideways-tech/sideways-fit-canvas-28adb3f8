@@ -298,6 +298,7 @@ const SidewaysInterviewCanvas = () => {
   const isFieldEmpty = (field: keyof FormState) => !String(formState[field]).trim();
 
   const transcriptMicRef = useRef<TranscriptMicHandle>(null);
+  const transcriptRef = useRef<string>("");
 
   const handleSubmitAssessment = async () => {
     // Stop recording if active before saving, and wait for Deepgram to
