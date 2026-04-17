@@ -59,6 +59,23 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
   return (
     <TooltipProvider delayDuration={300}>
       <div className="fixed bottom-3 right-3 z-50">
+        {/* Live transcript preview (debug) */}
+        <AnimatePresence>
+          {(status === "recording" || status === "paused") && (transcript || interimText) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mb-2 w-[280px] max-h-[40vh] overflow-y-auto rounded-lg border border-border bg-background/95 backdrop-blur p-3 shadow-lg text-xs text-foreground whitespace-pre-wrap"
+            >
+              {transcript}
+              {interimText && (
+                <span className="text-muted-foreground italic">{transcript ? " " : ""}{interimText}</span>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Error message */}
         <AnimatePresence>
           {error && (
