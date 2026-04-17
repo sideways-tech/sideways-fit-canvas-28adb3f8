@@ -23,7 +23,7 @@ const statusConfig: Record<TranscriptionStatus, { color: string; label: string }
 };
 
 const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onTranscriptChange }, ref) => {
-  const { status, transcript, start, pause, resume, stop, error } = useTranscription();
+  const { status, transcript, interimText, start, pause, resume, stop, error } = useTranscription();
   const isMobile = useIsMobile();
 
   useImperativeHandle(ref, () => ({
