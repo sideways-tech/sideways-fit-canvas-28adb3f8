@@ -1,7 +1,7 @@
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import HintTextarea from "./HintTextarea";
+import { Textarea } from "@/components/ui/textarea";
 import { Wrench, Mic, Briefcase, Compass } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
@@ -124,8 +124,7 @@ const ProfessionalDeepDiveSection = ({
       {/* Notes */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">Interviewer notes on this section including demo / portfolio</Label>
-        <HintTextarea
-          hint="Key observations, standout moments, red flags from their portfolio walkthrough"
+        <Textarea
           placeholder="Key observations, standout moments, red flags..."
           value={professionalDiveNotes}
           onChange={(e) => onNotesChange(e.target.value)}
