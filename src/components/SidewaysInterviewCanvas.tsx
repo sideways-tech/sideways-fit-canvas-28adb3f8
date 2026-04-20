@@ -301,11 +301,12 @@ const SidewaysInterviewCanvas = () => {
   const transcriptRef = useRef<string>("");
 
   const handleSubmitAssessment = async () => {
-    // Stop recording if active before saving, and wait for Deepgram to
-    // flush any final words into the transcript before we read formState.
+    let finalizedTranscript = (transcriptRef.current || formState.transcript || "").trim();
+
     if (transcriptMicRef.current?.isRecording()) {
-      transcriptMicRef.current.stopRecording();
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      finalizedTranscript = (await transcriptMicRef.current.stopRecording()).trim();
+      transcriptRef.current = finalizedTranscript;
+      setFormState((prev) => ({ ...prev, transcript: finalizedTranscript }));
     }
 
     // Mark all required fields as touched
@@ -380,6 +381,8 @@ const SidewaysInterviewCanvas = () => {
       }
 
       // Insert assessment
+      const transcriptToSave = finalizedTranscript || null;
+
       const { data: savedAssessment, error: aErr } = await supabase.from("assessments").insert({
         candidate_id: candidateId,
         round_number: parseInt(formState.interviewRound),
@@ -418,7 +421,7 @@ const SidewaysInterviewCanvas = () => {
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
         verdict,
-        transcript: (transcriptRef.current || formState.transcript || null),
+        transcript: transcriptToSave,
       }).select("*").single();
 
       if (aErr) throw aErr;

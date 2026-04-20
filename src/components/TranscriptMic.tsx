@@ -10,7 +10,7 @@ interface TranscriptMicProps {
 }
 
 export interface TranscriptMicHandle {
-  stopRecording: () => void;
+  stopRecording: () => Promise<string>;
   isRecording: () => boolean;
 }
 
@@ -32,9 +32,7 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
   }), [stop, status]);
 
   useEffect(() => {
-    if (transcript) {
-      onTranscriptChange(transcript);
-    }
+    onTranscriptChange(transcript);
   }, [transcript, onTranscriptChange]);
 
   const handleMainAction = async () => {
