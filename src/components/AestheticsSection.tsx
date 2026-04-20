@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import HintTextarea from "./HintTextarea";
-import FloatingHint from "./FloatingHint";
+import { Textarea } from "@/components/ui/textarea";
 import { Palette, Sparkles } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
@@ -24,7 +23,6 @@ const AestheticsSection = ({
   onProcessNoteChange,
 }: AestheticsSectionProps) => {
   const config = getDisciplineConfig(department);
-  const [hovered, setHovered] = useState(false);
 
   return (
     <div className="space-y-6 p-4 bg-muted/20 rounded-lg sketch-border-light">
@@ -44,22 +42,13 @@ const AestheticsSection = ({
           <span className="text-sm font-medium tabular-nums">{interest}%</span>
         </div>
         
-        <div
-          className="relative overflow-visible"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
+        <div className="relative overflow-visible">
           <Slider
             value={[interest]}
             onValueChange={([value]) => onInterestChange(value)}
             max={100}
             step={5}
             className="w-full"
-          />
-          <FloatingHint
-            hint={config.aestheticsSensibility.hint}
-            isActive={hovered}
-            position="left"
           />
         </div>
         
@@ -105,9 +94,8 @@ const AestheticsSection = ({
           <Sparkles className="w-4 h-4 text-highlighter" />
           {config.aestheticsProcess.title}
         </Label>
-        <HintTextarea
+        <Textarea
           id="process-note"
-          hint={config.aestheticsProcess.hint}
           placeholder={config.aestheticsProcess.placeholder}
           value={processNote}
           onChange={(e) => onProcessNoteChange(e.target.value)}

@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import HintTextarea from "./HintTextarea";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BackgroundSectionProps {
   backgroundNotes: string;
@@ -13,8 +13,7 @@ const BackgroundSection = ({
   return (
     <div className="space-y-2">
       <Label>The human behind the résumé — their roots, education, family, city and what their Sundays look like.</Label>
-      <HintTextarea
-        hint="Their story — background, upbringing, education, family, where they live, weekend routines"
+      <Textarea
         placeholder="Capture their story — background, upbringing, education, family, where they live, weekend routines etc."
         value={backgroundNotes}
         onChange={(e) => onBackgroundNotesChange(e.target.value)}
