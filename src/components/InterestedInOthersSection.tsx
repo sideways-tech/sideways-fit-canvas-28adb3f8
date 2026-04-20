@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import FloatingHint from "./FloatingHint";
 import { Users } from "lucide-react";
 
 interface InterestedInOthersSectionProps {
@@ -11,8 +10,6 @@ interface InterestedInOthersSectionProps {
 }
 
 const InterestedInOthersSection = ({ value, onChange }: InterestedInOthersSectionProps) => {
-  const [hovered, setHovered] = useState(false);
-
   return (
     <div className="space-y-4 p-4 bg-muted/20 rounded-lg sketch-border-light">
       <div className="flex items-center gap-2">
@@ -32,22 +29,13 @@ const InterestedInOthersSection = ({ value, onChange }: InterestedInOthersSectio
           </HandwrittenLabel>
           <span className="text-sm font-medium tabular-nums">{value}%</span>
         </div>
-        <div
-          className="relative overflow-visible"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
+        <div className="relative overflow-visible">
           <Slider
             value={[value]}
             onValueChange={([v]) => onChange(v)}
             max={100}
             step={5}
             className="w-full"
-          />
-          <FloatingHint
-            hint="Look for: Do they ask about your life unprompted? Remember details about others? Show curiosity about the interviewer's background — not just polite small talk?"
-            isActive={hovered}
-            position="left"
           />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">

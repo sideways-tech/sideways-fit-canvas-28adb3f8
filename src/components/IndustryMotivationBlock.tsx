@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import HintTextarea from "./HintTextarea";
+import { Textarea } from "@/components/ui/textarea";
 import { Target, TrendingUp, Heart, Compass } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
@@ -58,9 +58,8 @@ const IndustryMotivationBlock = ({
         Capture their specific reason for choosing this industry/role
       </p>
 
-      <HintTextarea
+      <Textarea
         id="motivation-reason"
-        hint={config.industryMotivation.hint}
         placeholder="What did they say about why they want to work in this industry or role?"
         value={reason}
         onChange={(e) => onReasonChange(e.target.value)}

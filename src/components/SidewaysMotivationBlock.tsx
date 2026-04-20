@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import HandwrittenLabel from "./HandwrittenLabel";
-import HintTextarea from "./HintTextarea";
+import { Textarea } from "@/components/ui/textarea";
 import { Building2, Sparkles, Shuffle, Eye, Heart } from "lucide-react";
 import { getDisciplineConfig } from "@/lib/disciplineConfig";
 
@@ -74,9 +74,8 @@ const SidewaysMotivationBlock = ({
         <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
           Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
         </Label>
-        <HintTextarea
+        <Textarea
           id="sideways-reason"
-          hint="Did they explore sideways.co.in? What appeals? What would they critique?"
           placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section'..."
           value={sidewaysReason}
           onChange={(e) => onSidewaysReasonChange(e.target.value)}
@@ -88,9 +87,8 @@ const SidewaysMotivationBlock = ({
         <Label htmlFor="campaign-examples" className="text-xs text-muted-foreground">
           {config.campaignExamples.label}
         </Label>
-        <HintTextarea
+        <Textarea
           id="campaign-examples"
-          hint={config.campaignExamples.hint}
           placeholder={config.campaignExamples.placeholder}
           value={campaignExamples}
           onChange={(e) => onCampaignExamplesChange(e.target.value)}
