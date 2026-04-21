@@ -291,7 +291,7 @@ const AssessmentReport = () => {
         </Card>
 
         <NoteBlock title="Why This Industry — Reason" text={a.motivation_reason} icon="🔥" />
-        <NoteBlock title="Why Sideways / Work Critique" text={a.sideways_motivation_reason || a.sideways_website_feedback} icon="🎯" />
+        <NoteBlock title="POV on Sideways" text={a.sideways_motivation_reason || a.sideways_website_feedback} icon="🎯" />
         {a.sideways_motivation_reason && a.sideways_website_feedback && a.sideways_website_feedback !== a.sideways_motivation_reason && (
           <NoteBlock title="Additional Sideways Work Feedback" text={a.sideways_website_feedback} icon="🧭" />
         )}
