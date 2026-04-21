@@ -394,6 +394,7 @@ export function useTranscription(): UseTranscriptionReturn {
 
     stoppingRef.current = true;
     pausedRef.current = true;
+    clearReconnectTimer();
     teardownAudio();
 
     return new Promise<string>((resolve) => {
