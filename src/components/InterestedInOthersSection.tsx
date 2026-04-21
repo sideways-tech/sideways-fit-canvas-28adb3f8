@@ -19,7 +19,7 @@ const InterestedInOthersSection = ({ value, onChange }: InterestedInOthersSectio
         </Label>
       </div>
       <p className="text-xs text-muted-foreground">
-        Not living in a bubble — genuinely curious about others
+        Not living in a bubble. Genuinely curious about the world beyond their screen and their work. Ask them what they noticed on their way to this interview — a strong candidate will mention people, moments, or details that reveal they're actually paying attention.
       </p>
 
       <div className="space-y-3">
