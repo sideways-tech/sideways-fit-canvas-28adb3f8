@@ -34,7 +34,7 @@ const AestheticsSection = ({
           </Label>
         </div>
         <p className="text-xs text-muted-foreground">
-          Does the candidate genuinely engages with beauty, taste, and form? Ask what they notice, admire, or question in design, music, architecture, or visual culture — strong candidates have specific opinions, not vague appreciation.
+          Does the candidate genuinely engage with beauty, taste, and form? Ask what they notice, admire, or question in design, music, architecture, or visual culture — strong candidates have specific opinions, not vague appreciation.
         </p>
       </div>
 
