@@ -781,7 +781,7 @@ const SidewaysInterviewCanvas = () => {
           <div className="space-y-4">
             <div className="space-y-1">
               <HandwrittenLabel as="h3" className="text-4xl">E. Why Sideways</HandwrittenLabel>
-              <p className="text-sm text-muted-foreground">Do they know who we are — and can they be honest about it?</p>
+              <p className="text-sm text-muted-foreground">What's their point of view on us — and on the work we do?</p>
             </div>
             <SidewaysMotivationBlock
               sidewaysLevel={formState.sidewaysMotivationLevel}
