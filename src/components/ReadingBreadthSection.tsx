@@ -22,7 +22,7 @@ const ReadingBreadthSection = ({
       <div className="flex items-center gap-2">
         <BookOpen className="w-5 h-5 text-highlighter" />
         <Label className="text-sm font-medium">
-          Reads Widely (Beyond Their Domain)
+          Reads Widely (within domain + outside of domain)
         </Label>
       </div>
       <p className="text-xs text-muted-foreground">
