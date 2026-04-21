@@ -26,11 +26,16 @@ const AestheticsSection = ({
 
   return (
     <div className="space-y-6 p-4 bg-muted/20 rounded-lg sketch-border-light">
-      <div className="flex items-center gap-2">
-        <Palette className="w-5 h-5 text-highlighter" />
-        <Label className="text-sm font-medium">
-          Interest in Art, Aesthetics & Design
-        </Label>
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <Palette className="w-5 h-5 text-highlighter" />
+          <Label className="text-sm font-medium">
+            Interest in Art, Aesthetics & Design
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Genuinely engages with beauty, taste, and form. Ask what they notice, admire, or question in design, music, architecture, or visual culture — strong candidates have specific opinions, not vague appreciation.
+        </p>
       </div>
 
       {/* Interest Level */}
