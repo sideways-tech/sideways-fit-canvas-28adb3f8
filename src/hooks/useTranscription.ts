@@ -15,6 +15,17 @@ export interface UseTranscriptionReturn {
 
 const TARGET_SAMPLE_RATE = 16000;
 const FINALIZE_TIMEOUT_MS = 1800;
+const MAX_RECONNECT_ATTEMPTS = 3;
+const RECONNECT_DELAY_MS = 800;
+
+const friendlyCloseReason = (code?: number, reason?: string): string => {
+  if (code === 1011) return "the transcription server hit an error";
+  if (code === 1006) return "the network dropped the connection";
+  if (code === 1008 || code === 4001 || code === 4003) return "authentication failed";
+  if (code === 1013 || code === 429) return "the service is busy — please try again";
+  if (reason && reason.trim()) return reason;
+  return "the connection was closed";
+};
 
 export function useTranscription(): UseTranscriptionReturn {
   const [status, setStatus] = useState<TranscriptionStatus>("idle");
