@@ -68,7 +68,7 @@ const SidewaysMotivationBlock = ({
       {/* All capture textareas first */}
       <div className="space-y-2">
         <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-          Have they explored sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
+          Have they explored our website sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
         </Label>
         <Textarea
           id="sideways-reason"
