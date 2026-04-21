@@ -77,8 +77,9 @@ Deno.serve((req) => {
 
   clientSocket.onopen = () => {
     const dgUrl = new URL("wss://api.deepgram.com/v1/listen");
-    dgUrl.searchParams.set("model", "nova-2");
-    dgUrl.searchParams.set("language", "en-IN");
+    dgUrl.searchParams.set("model", "nova-3");
+    // Nova-3 supports code-switching across languages (English + Hindi)
+    dgUrl.searchParams.set("language", "multi");
     dgUrl.searchParams.set("diarize", "true");
     dgUrl.searchParams.set("smart_format", "true");
     dgUrl.searchParams.set("punctuate", "true");

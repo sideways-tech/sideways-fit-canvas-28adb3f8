@@ -15,6 +15,17 @@ export interface UseTranscriptionReturn {
 
 const TARGET_SAMPLE_RATE = 16000;
 const FINALIZE_TIMEOUT_MS = 1800;
+const MAX_RECONNECT_ATTEMPTS = 3;
+const RECONNECT_DELAY_MS = 800;
+
+const friendlyCloseReason = (code?: number, reason?: string): string => {
+  if (code === 1011) return "the transcription server hit an error";
+  if (code === 1006) return "the network dropped the connection";
+  if (code === 1008 || code === 4001 || code === 4003) return "authentication failed";
+  if (code === 1013 || code === 429) return "the service is busy — please try again";
+  if (reason && reason.trim()) return reason;
+  return "the connection was closed";
+};
 
 export function useTranscription(): UseTranscriptionReturn {
   const [status, setStatus] = useState<TranscriptionStatus>("idle");
@@ -36,6 +47,8 @@ export function useTranscription(): UseTranscriptionReturn {
   const interimTextRef = useRef("");
   const stopResolverRef = useRef<((value: string) => void) | null>(null);
   const finalizeTimerRef = useRef<number | null>(null);
+  const reconnectAttemptsRef = useRef<number>(0);
+  const reconnectTimerRef = useRef<number | null>(null);
 
   const updateStatus = useCallback((next: TranscriptionStatus) => {
     statusRef.current = next;
@@ -220,37 +233,19 @@ export function useTranscription(): UseTranscriptionReturn {
     return formatted;
   }, []);
 
-  const start = useCallback(async () => {
-    setError(null);
-    clearFinalizeTimer();
-    stopResolverRef.current = null;
-    stoppingRef.current = false;
-    pausedRef.current = false;
-    resetTranscriptState();
-    updateStatus("connecting");
-
-    let stream: MediaStream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-    } catch (err: any) {
-      setError(err?.message || "Microphone access denied");
-      updateStatus("error");
-      return;
+  const clearReconnectTimer = useCallback(() => {
+    if (reconnectTimerRef.current !== null) {
+      window.clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
     }
-    mediaStreamRef.current = stream;
+  }, []);
 
+  const connectWebSocket = useCallback((stream: MediaStream, isReconnect: boolean) => {
     let ws: WebSocket;
     try {
       ws = new WebSocket(getWsUrl());
     } catch (err: any) {
-      setError(err?.message || "Failed to open WebSocket");
+      setError(err?.message || "Failed to open transcription connection");
       updateStatus("error");
       teardownAudio();
       return;
@@ -264,11 +259,15 @@ export function useTranscription(): UseTranscriptionReturn {
         const data = JSON.parse(event.data);
 
         if (data.type === "connected") {
-          startAudioPipeline(stream).catch((e) => {
-            console.error("audio pipeline failed", e);
-            setError(e?.message || "Audio pipeline failed");
-            updateStatus("error");
-          });
+          // Reset reconnect counter on a successful connection
+          reconnectAttemptsRef.current = 0;
+          if (!isReconnect) {
+            startAudioPipeline(stream).catch((e) => {
+              console.error("audio pipeline failed", e);
+              setError(e?.message || "Audio pipeline failed");
+              updateStatus("error");
+            });
+          }
           updateStatus("recording");
           return;
         }
@@ -280,9 +279,10 @@ export function useTranscription(): UseTranscriptionReturn {
         }
 
         if (data.type === "dgClosed") {
-          if (!stoppingRef.current && statusRef.current !== "idle") {
-            const reason = data.reason ? ` (${data.code}: ${data.reason})` : data.code ? ` (${data.code})` : "";
-            setError(`Transcription stopped${reason}`);
+          // Don't surface a toast here — the ws.onclose handler will decide
+          // whether to silently reconnect or show a final error message.
+          if (data.code) {
+            console.warn("Deepgram closed", data.code, data.reason || "");
           }
           return;
         }
@@ -306,21 +306,76 @@ export function useTranscription(): UseTranscriptionReturn {
     };
 
     ws.onerror = () => {
-      if (stoppingRef.current) return;
-      setError("Connection error");
-      updateStatus("error");
+      // Defer to onclose for reconnect/error handling so we don't double-toast.
+      console.warn("Transcription WebSocket error");
     };
 
-    ws.onclose = () => {
-      teardownAudio();
+    ws.onclose = (event) => {
+      // Intentional stop by user — resolve the stop promise.
       if (stoppingRef.current) {
+        teardownAudio();
         resolveStop();
-      } else if (["recording", "paused", "connecting"].includes(statusRef.current)) {
-        updateStatus("error");
-        setError((prev) => prev ?? "Transcription connection closed");
+        return;
       }
+
+      // If we were actively transcribing, attempt silent auto-reconnect.
+      const wasActive = ["recording", "paused", "connecting"].includes(statusRef.current);
+      if (!wasActive) return;
+
+      if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS && mediaStreamRef.current) {
+        reconnectAttemptsRef.current += 1;
+        const attempt = reconnectAttemptsRef.current;
+        console.warn(`Transcription dropped — reconnecting (attempt ${attempt}/${MAX_RECONNECT_ATTEMPTS})`);
+        updateStatus("connecting");
+        clearReconnectTimer();
+        reconnectTimerRef.current = window.setTimeout(() => {
+          if (stoppingRef.current || !mediaStreamRef.current) return;
+          connectWebSocket(mediaStreamRef.current, true);
+        }, RECONNECT_DELAY_MS * attempt);
+        return;
+      }
+
+      // Out of retries — tear down and surface a friendly error.
+      teardownAudio();
+      updateStatus("error");
+      const reason = friendlyCloseReason(event.code, event.reason);
+      setError(`Transcription stopped — ${reason}. Tap the mic to retry.`);
     };
-  }, [appendTranscript, clearFinalizeTimer, formatFinalTranscriptChunk, resetTranscriptState, resolveStop, setInterimValue, startAudioPipeline, teardownAudio, updateStatus]);
+  }, [appendTranscript, clearReconnectTimer, formatFinalTranscriptChunk, resolveStop, setInterimValue, startAudioPipeline, teardownAudio, updateStatus]);
+
+  const start = useCallback(async () => {
+    setError(null);
+    clearFinalizeTimer();
+    clearReconnectTimer();
+    stopResolverRef.current = null;
+    stoppingRef.current = false;
+    pausedRef.current = false;
+    reconnectAttemptsRef.current = 0;
+    resetTranscriptState();
+    updateStatus("connecting");
+
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+    } catch (err: any) {
+      const msg = err?.name === "NotAllowedError"
+        ? "Microphone access denied. Please allow mic access in your browser."
+        : err?.message || "Could not access microphone";
+      setError(msg);
+      updateStatus("error");
+      return;
+    }
+    mediaStreamRef.current = stream;
+
+    connectWebSocket(stream, false);
+  }, [clearFinalizeTimer, clearReconnectTimer, connectWebSocket, resetTranscriptState, updateStatus]);
 
   const pause = useCallback(() => {
     pausedRef.current = true;
@@ -339,6 +394,7 @@ export function useTranscription(): UseTranscriptionReturn {
 
     stoppingRef.current = true;
     pausedRef.current = true;
+    clearReconnectTimer();
     teardownAudio();
 
     return new Promise<string>((resolve) => {
@@ -380,6 +436,7 @@ export function useTranscription(): UseTranscriptionReturn {
     return () => {
       stoppingRef.current = true;
       clearFinalizeTimer();
+      clearReconnectTimer();
       const ws = wsRef.current;
       if (ws) {
         try {
@@ -390,7 +447,7 @@ export function useTranscription(): UseTranscriptionReturn {
       }
       teardownAudio();
     };
-  }, [clearFinalizeTimer, teardownAudio]);
+  }, [clearFinalizeTimer, clearReconnectTimer, teardownAudio]);
 
   return {
     status,
