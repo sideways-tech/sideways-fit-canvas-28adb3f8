@@ -14,6 +14,8 @@ interface IndustryMotivationBlockProps {
   department?: string;
   onLevelChange: (level: MotivationLevel) => void;
   onReasonChange: (reason: string) => void;
+  campaignExamples: string;
+  onCampaignExamplesChange: (value: string) => void;
 }
 
 const industryOptions = [
@@ -46,6 +48,8 @@ const IndustryMotivationBlock = ({
   department,
   onLevelChange,
   onReasonChange,
+  campaignExamples,
+  onCampaignExamplesChange,
 }: IndustryMotivationBlockProps) => {
   const config = getDisciplineConfig(department);
   return (
@@ -124,6 +128,19 @@ const IndustryMotivationBlock = ({
           </HandwrittenLabel>
         </motion.div>
       )}
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="campaign-examples" className="text-xs text-muted-foreground">
+          {config.campaignExamples.label}
+        </Label>
+        <Textarea
+          id="campaign-examples"
+          placeholder={config.campaignExamples.placeholder}
+          value={campaignExamples}
+          onChange={(e) => onCampaignExamplesChange(e.target.value)}
+          className="sketch-border-light bg-background min-h-[100px] resize-none"
+        />
+      </div>
     </div>
   );
 };
