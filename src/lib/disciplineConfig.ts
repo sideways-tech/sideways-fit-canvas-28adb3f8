@@ -59,7 +59,7 @@ const configs: Record<Department, DisciplineConfig> = {
       },
     },
     aestheticsProcess: {
-      title: "Process of Design / Creation",
+      title: "Running Notes for this Section:",
       hint: "Did they show curiosity about how things are designed or created? Note any examples shared.",
       placeholder:
         "E.g., Asked about our design process, mentioned enjoying craftsmanship, shared a creative hobby...",
@@ -97,7 +97,7 @@ const configs: Record<Department, DisciplineConfig> = {
       },
     },
     aestheticsProcess: {
-      title: "Process of Design / Creation",
+      title: "Running Notes for this Section:",
       hint: "Did they show curiosity about how things are designed or created? Note any examples shared.",
       placeholder:
         "E.g., Asked about our design process, mentioned enjoying craftsmanship, shared a creative hobby...",
