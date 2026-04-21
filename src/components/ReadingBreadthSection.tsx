@@ -26,7 +26,7 @@ const ReadingBreadthSection = ({
         </Label>
       </div>
       <p className="text-xs text-muted-foreground">
-        Non-work reading — diverse intellectual diet
+        We're looking for a diverse intellectual diet.
       </p>
 
       <div className="space-y-3">
