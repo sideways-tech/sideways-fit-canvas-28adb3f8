@@ -436,6 +436,7 @@ export function useTranscription(): UseTranscriptionReturn {
     return () => {
       stoppingRef.current = true;
       clearFinalizeTimer();
+      clearReconnectTimer();
       const ws = wsRef.current;
       if (ws) {
         try {
@@ -446,7 +447,7 @@ export function useTranscription(): UseTranscriptionReturn {
       }
       teardownAudio();
     };
-  }, [clearFinalizeTimer, teardownAudio]);
+  }, [clearFinalizeTimer, clearReconnectTimer, teardownAudio]);
 
   return {
     status,
