@@ -20,28 +20,28 @@ const engagementOptions = [
   {
     value: "surface-generic" as SidewaysEngagement,
     label: "Surface-Level / Generic",
-    description: "Vague praise or no specific take — could be about any agency",
+    description: "No real take. Vague comments that could apply to any agency.",
     icon: Shuffle,
     color: "text-reject",
   },
   {
     value: "informed-safe" as SidewaysEngagement,
     label: "Informed but Safe",
-    description: "Knows our work, can name projects, but offers no real opinion or POV",
+    description: "Knows our work, can name projects — but withholds any real opinion.",
     icon: Eye,
     color: "text-highlighter",
   },
   {
     value: "genuine-fan" as SidewaysEngagement,
     label: "Genuine Admiration",
-    description: "Specific, detailed, authentic praise — clearly did their homework and means it",
+    description: "Specific and authentic engagement with our work — clearly thought about it, even if mostly positive.",
     icon: Heart,
     color: "text-hire",
   },
   {
     value: "opinionated-engaged" as SidewaysEngagement,
     label: "Opinionated & Engaged",
-    description: "Has a clear POV on our work — offers critique, suggestions, or strong takes",
+    description: "Has a sharp POV — willing to dissect, push back, or offer a strong read on where we're headed.",
     icon: Sparkles,
     color: "text-hire",
   },
@@ -59,20 +59,23 @@ const SidewaysMotivationBlock = ({
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Building2 className="w-5 h-5 text-highlighter" />
-        <Label className="text-sm font-medium">Why Sideways?</Label>
+        <Label className="text-sm font-medium">Their POV on Sideways</Label>
       </div>
       <p className="text-xs text-muted-foreground">
-        Do they know who we are and why they want to be here specifically?
+        Do they just know about us, or do they have a clear point of view on us?
       </p>
 
       {/* All capture textareas first */}
       <div className="space-y-2">
         <Label htmlFor="sideways-reason" className="text-xs text-muted-foreground">
-          Have they explored our website sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?
+          What is their perspective on the work we do at Sideways?
         </Label>
+        <p className="text-[11px] text-muted-foreground/80 -mt-1">
+          Have they explored sideways.co.in? Listen for a sharp POV on our approach, specific projects, or where we sit in the industry — engagement over flattery.
+        </p>
         <Textarea
           id="sideways-reason"
-          placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section'..."
+          placeholder="E.g., 'Thinks our XYZ campaign nailed the insight but felt safe in execution', 'Sees us as the anti-template agency'..."
           value={sidewaysReason}
           onChange={(e) => onSidewaysReasonChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[100px] resize-none"
@@ -85,7 +88,7 @@ const SidewaysMotivationBlock = ({
           How would you rate the quality of their engagement with Sideways?
         </Label>
         <p className="text-xs text-muted-foreground">
-          This isn't about whether they praised or critiqued — it's about how deeply they engaged with who we are and what we do.
+          This isn't about praise or critique — it's about whether they have a real point of view on Sideways and the work we do.
         </p>
       </div>
 
