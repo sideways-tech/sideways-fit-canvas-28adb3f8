@@ -13,8 +13,6 @@ interface SidewaysMotivationBlockProps {
   sidewaysReason: string;
   onSidewaysLevelChange: (level: SidewaysEngagement) => void;
   onSidewaysReasonChange: (reason: string) => void;
-  campaignExamples: string;
-  onCampaignExamplesChange: (value: string) => void;
   department?: string;
 }
 
@@ -54,8 +52,6 @@ const SidewaysMotivationBlock = ({
   sidewaysReason,
   onSidewaysLevelChange,
   onSidewaysReasonChange,
-  campaignExamples,
-  onCampaignExamplesChange,
   department,
 }: SidewaysMotivationBlockProps) => {
   const config = getDisciplineConfig(department);
@@ -79,19 +75,6 @@ const SidewaysMotivationBlock = ({
           placeholder="E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section'..."
           value={sidewaysReason}
           onChange={(e) => onSidewaysReasonChange(e.target.value)}
-          className="sketch-border-light bg-background min-h-[100px] resize-none"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="campaign-examples" className="text-xs text-muted-foreground">
-          {config.campaignExamples.label}
-        </Label>
-        <Textarea
-          id="campaign-examples"
-          placeholder={config.campaignExamples.placeholder}
-          value={campaignExamples}
-          onChange={(e) => onCampaignExamplesChange(e.target.value)}
           className="sketch-border-light bg-background min-h-[100px] resize-none"
         />
       </div>
