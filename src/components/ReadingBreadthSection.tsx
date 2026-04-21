@@ -51,7 +51,7 @@ const ReadingBreadthSection = ({
 
       <div className="space-y-2 pt-2">
         <Label htmlFor="recent-read" className="text-xs text-muted-foreground">
-          Recent non-work read mentioned?
+          Recent books mentioned?
         </Label>
         <Input
           id="recent-read"
