@@ -47,6 +47,8 @@ export function useTranscription(): UseTranscriptionReturn {
   const interimTextRef = useRef("");
   const stopResolverRef = useRef<((value: string) => void) | null>(null);
   const finalizeTimerRef = useRef<number | null>(null);
+  const reconnectAttemptsRef = useRef<number>(0);
+  const reconnectTimerRef = useRef<number | null>(null);
 
   const updateStatus = useCallback((next: TranscriptionStatus) => {
     statusRef.current = next;
