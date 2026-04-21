@@ -61,9 +61,6 @@ const SidewaysMotivationBlock = ({
         <Building2 className="w-5 h-5 text-highlighter" />
         <Label className="text-sm font-medium">Their POV on Sideways</Label>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Do they just know about us, or do they have a clear point of view on us?
-      </p>
 
       {/* All capture textareas first */}
       <div className="space-y-2">
