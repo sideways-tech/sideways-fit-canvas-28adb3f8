@@ -28,18 +28,26 @@ Deno.serve((req) => {
   const url = new URL(req.url);
   // Allow client to override sample rate (AudioContext default varies by device)
   const sampleRate = url.searchParams.get("sample_rate") || "16000";
+  const sessionId = crypto.randomUUID().slice(0, 8);
+
+  const log = (...args: unknown[]) => console.log(`[dg ${sessionId}]`, ...args);
+  const warn = (...args: unknown[]) => console.warn(`[dg ${sessionId}]`, ...args);
+  const errorLog = (...args: unknown[]) => console.error(`[dg ${sessionId}]`, ...args);
 
   const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
 
   let deepgramSocket: WebSocket | null = null;
   let keepAliveTimer: number | null = null;
   let dgReady = false;
+  let clientClosedFirst = false;
+  let totalAudioBytes = 0;
+  let totalAudioChunks = 0;
   // Buffer audio that arrives before Deepgram socket is open
   const pendingAudio: ArrayBuffer[] = [];
 
   const safeClientSend = (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
     if (clientSocket.readyState === WebSocket.OPEN) {
-      try { clientSocket.send(data); } catch (e) { console.error("client send failed", e); }
+      try { clientSocket.send(data); } catch (e) { errorLog("client send failed", e); }
     }
   };
 
@@ -51,7 +59,7 @@ Deno.serve((req) => {
         try {
           deepgramSocket.send(JSON.stringify({ type: "KeepAlive" }));
         } catch (e) {
-          console.error("KeepAlive send failed", e);
+          errorLog("KeepAlive send failed", e);
         }
       }
     }, 5000) as unknown as number;
@@ -76,6 +84,7 @@ Deno.serve((req) => {
   };
 
   clientSocket.onopen = () => {
+    log("client connected, sample_rate=", sampleRate);
     const dgUrl = new URL("wss://api.deepgram.com/v1/listen");
     dgUrl.searchParams.set("model", "nova-3");
     // Nova-3 supports code-switching across languages (English + Hindi)
@@ -93,20 +102,21 @@ Deno.serve((req) => {
     try {
       deepgramSocket = new WebSocket(dgUrl.toString(), ["token", DEEPGRAM_API_KEY!]);
     } catch (e) {
-      console.error("Failed to create Deepgram socket:", e);
-      safeClientSend(JSON.stringify({ type: "error", message: "Failed to create Deepgram socket" }));
+      errorLog("Failed to create Deepgram socket:", e);
+      safeClientSend(JSON.stringify({ type: "error", message: "Failed to create Deepgram socket", fatal: true }));
       try { clientSocket.close(1011, "dg create failed"); } catch { /* ignore */ }
       return;
     }
 
     deepgramSocket.onopen = () => {
       dgReady = true;
+      log("deepgram open, flushing", pendingAudio.length, "buffered chunks");
       safeClientSend(JSON.stringify({ type: "connected" }));
       // Flush buffered audio that arrived before Deepgram was ready
       while (pendingAudio.length > 0) {
         const chunk = pendingAudio.shift();
         if (chunk && deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
-          try { deepgramSocket.send(chunk); } catch (e) { console.error("flush send failed", e); }
+          try { deepgramSocket.send(chunk); } catch (e) { errorLog("flush send failed", e); }
         }
       }
       startKeepAlive();
@@ -117,27 +127,30 @@ Deno.serve((req) => {
     };
 
     deepgramSocket.onerror = (event) => {
-      console.error("Deepgram WebSocket error:", event);
-      safeClientSend(JSON.stringify({ type: "error", message: "Deepgram connection error" }));
+      errorLog("Deepgram WebSocket error:", event);
+      safeClientSend(JSON.stringify({ type: "error", message: "Deepgram connection error", source: "provider" }));
     };
 
     deepgramSocket.onclose = (event) => {
       stopKeepAlive();
-      console.log("Deepgram closed", event.code, event.reason);
+      log("deepgram closed code=", event.code, "reason=", event.reason || "(none)", "audio chunks sent=", totalAudioChunks, "bytes=", totalAudioBytes);
       safeClientSend(JSON.stringify({
         type: "dgClosed",
         code: event.code,
         reason: event.reason || "",
+        wasClientInitiated: clientClosedFirst,
       }));
-      // Tell the client so it can stop capturing
+      // Tell the client so it can stop capturing (client will auto-reconnect if appropriate)
       try { clientSocket.close(1000, "dg closed"); } catch { /* ignore */ }
     };
   };
 
   clientSocket.onmessage = (event) => {
     if (event.data instanceof ArrayBuffer) {
+      totalAudioChunks++;
+      totalAudioBytes += event.data.byteLength;
       if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN && dgReady) {
-        try { deepgramSocket.send(event.data); } catch (e) { console.error("dg audio send failed", e); }
+        try { deepgramSocket.send(event.data); } catch (e) { errorLog("dg audio send failed", e); }
       } else {
         // Buffer briefly; cap to ~5s of 16kHz/16-bit mono to avoid runaway memory
         if (pendingAudio.length < 50) pendingAudio.push(event.data);
@@ -145,13 +158,15 @@ Deno.serve((req) => {
     } else if (event.data instanceof Blob) {
       event.data.arrayBuffer().then((buf) => {
         if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN && dgReady) {
-          try { deepgramSocket.send(buf); } catch (e) { console.error("dg blob send failed", e); }
+          try { deepgramSocket.send(buf); } catch (e) { errorLog("dg blob send failed", e); }
         }
       });
     } else if (typeof event.data === "string") {
       try {
         const msg = JSON.parse(event.data);
         if (msg.type === "close" || msg.type === "CloseStream") {
+          log("client requested close");
+          clientClosedFirst = true;
           cleanup("client requested close");
         } else if (msg.type === "Finalize") {
           if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
@@ -162,12 +177,14 @@ Deno.serve((req) => {
     }
   };
 
-  clientSocket.onclose = () => {
+  clientSocket.onclose = (event) => {
+    log("client closed code=", event.code, "reason=", event.reason || "(none)");
+    clientClosedFirst = true;
     cleanup("client closed");
   };
 
   clientSocket.onerror = (event) => {
-    console.error("Client WebSocket error:", event);
+    warn("Client WebSocket error:", event);
     cleanup("client error");
   };
 

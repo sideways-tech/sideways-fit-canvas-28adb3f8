@@ -301,10 +301,28 @@ const SidewaysInterviewCanvas = () => {
   const transcriptRef = useRef<string>("");
 
   const handleSubmitAssessment = async () => {
-    let finalizedTranscript = (transcriptRef.current || formState.transcript || "").trim();
+    // Resolve the best-available transcript regardless of mic state.
+    // Order of preference:
+    //   1. If actively recording → stop & finalize
+    //   2. Mic ref's draft (covers errored / disconnected state with in-memory text)
+    //   3. transcriptRef / formState (already-pushed live drafts)
+    let finalizedTranscript = "";
 
     if (transcriptMicRef.current?.isRecording()) {
-      finalizedTranscript = (await transcriptMicRef.current.stopRecording()).trim();
+      try {
+        finalizedTranscript = (await transcriptMicRef.current.stopRecording()).trim();
+      } catch (e) {
+        console.error("stopRecording failed, falling back to draft", e);
+      }
+    }
+
+    if (!finalizedTranscript) {
+      // Pull the best draft from the mic component (includes interim text)
+      const micDraft = transcriptMicRef.current?.getTranscriptDraft?.() || "";
+      finalizedTranscript = (micDraft || transcriptRef.current || formState.transcript || "").trim();
+    }
+
+    if (finalizedTranscript) {
       transcriptRef.current = finalizedTranscript;
       setFormState((prev) => ({ ...prev, transcript: finalizedTranscript }));
     }
@@ -425,6 +443,9 @@ const SidewaysInterviewCanvas = () => {
       }).select("*").single();
 
       if (aErr) throw aErr;
+
+      // Save succeeded — clear the persisted local transcript draft
+      try { transcriptMicRef.current?.clearDraft?.(); } catch { /* ignore */ }
 
       // Send email report if interviewer email provided
       if (formState.interviewerEmail.trim()) {

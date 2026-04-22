@@ -6,17 +6,24 @@ export interface UseTranscriptionReturn {
   status: TranscriptionStatus;
   transcript: string;
   interimText: string;
+  /** Combined finalized + current interim text — best-available draft. */
+  draftTranscript: string;
   start: () => Promise<void>;
   pause: () => void;
   resume: () => void;
   stop: () => Promise<string>;
+  /** Returns the best available transcript (finalized + interim), even when not recording. */
+  getTranscriptDraft: () => string;
+  /** Clears in-memory + persisted draft. Call after a successful save. */
+  clearDraft: () => void;
   error: string | null;
 }
 
 const TARGET_SAMPLE_RATE = 16000;
 const FINALIZE_TIMEOUT_MS = 1800;
-const MAX_RECONNECT_ATTEMPTS = 3;
+const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY_MS = 800;
+const DRAFT_STORAGE_KEY = "sideways:transcript-draft";
 
 const friendlyCloseReason = (code?: number, reason?: string): string => {
   if (code === 1011) return "the transcription server hit an error";
@@ -27,9 +34,33 @@ const friendlyCloseReason = (code?: number, reason?: string): string => {
   return "the connection was closed";
 };
 
+const composeDraft = (finalized: string, interim: string): string => {
+  const f = finalized || "";
+  const i = (interim || "").trim();
+  if (!i) return f;
+  const spacer = f && !f.endsWith(" ") && !f.endsWith("\n") ? " " : "";
+  return `${f}${spacer}${i}`;
+};
+
+const loadPersistedDraft = (): string => {
+  try {
+    return localStorage.getItem(DRAFT_STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+};
+
+const persistDraft = (value: string) => {
+  try {
+    if (value && value.trim()) localStorage.setItem(DRAFT_STORAGE_KEY, value);
+    else localStorage.removeItem(DRAFT_STORAGE_KEY);
+  } catch { /* ignore quota */ }
+};
+
 export function useTranscription(): UseTranscriptionReturn {
   const [status, setStatus] = useState<TranscriptionStatus>("idle");
-  const [transcript, setTranscript] = useState("");
+  const initialDraft = typeof window !== "undefined" ? loadPersistedDraft() : "";
+  const [transcript, setTranscript] = useState(initialDraft);
   const [interimText, setInterimText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -43,12 +74,14 @@ export function useTranscription(): UseTranscriptionReturn {
   const pausedRef = useRef<boolean>(false);
   const statusRef = useRef<TranscriptionStatus>("idle");
   const stoppingRef = useRef<boolean>(false);
-  const transcriptRef = useRef("");
+  const transcriptRef = useRef(initialDraft);
   const interimTextRef = useRef("");
   const stopResolverRef = useRef<((value: string) => void) | null>(null);
   const finalizeTimerRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef<number>(0);
   const reconnectTimerRef = useRef<number | null>(null);
+  /** True once the user has started a session in this hook instance. */
+  const hasEverStartedRef = useRef<boolean>(false);
 
   const updateStatus = useCallback((next: TranscriptionStatus) => {
     statusRef.current = next;
@@ -58,11 +91,14 @@ export function useTranscription(): UseTranscriptionReturn {
   const setTranscriptValue = useCallback((value: string) => {
     transcriptRef.current = value;
     setTranscript(value);
+    persistDraft(composeDraft(value, interimTextRef.current));
   }, []);
 
   const setInterimValue = useCallback((value: string) => {
     interimTextRef.current = value;
     setInterimText(value);
+    // Persist combined draft so refreshes never lose visible text
+    persistDraft(composeDraft(transcriptRef.current, value));
   }, []);
 
   const appendTranscript = useCallback((chunk: string) => {
@@ -74,6 +110,7 @@ export function useTranscription(): UseTranscriptionReturn {
     lastSpeakerRef.current = -1;
     setTranscriptValue("");
     setInterimValue("");
+    persistDraft("");
   }, [setInterimValue, setTranscriptValue]);
 
   const getWsUrl = () => {
@@ -245,6 +282,7 @@ export function useTranscription(): UseTranscriptionReturn {
     try {
       ws = new WebSocket(getWsUrl());
     } catch (err: any) {
+      // Preserve any draft transcript before surfacing error
       setError(err?.message || "Failed to open transcription connection");
       updateStatus("error");
       teardownAudio();
@@ -273,14 +311,13 @@ export function useTranscription(): UseTranscriptionReturn {
         }
 
         if (data.type === "error") {
+          // Don't wipe the draft — just surface the error
           setError(data.message || "Transcription error");
           updateStatus("error");
           return;
         }
 
         if (data.type === "dgClosed") {
-          // Don't surface a toast here — the ws.onclose handler will decide
-          // whether to silently reconnect or show a final error message.
           if (data.code) {
             console.warn("Deepgram closed", data.code, data.reason || "");
           }
@@ -322,24 +359,30 @@ export function useTranscription(): UseTranscriptionReturn {
       const wasActive = ["recording", "paused", "connecting"].includes(statusRef.current);
       if (!wasActive) return;
 
-      if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS && mediaStreamRef.current) {
+      // Don't retry on auth/config failures — they will keep failing
+      const isAuthFailure = event.code === 1008 || event.code === 4001 || event.code === 4003;
+
+      if (!isAuthFailure && reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS && mediaStreamRef.current) {
         reconnectAttemptsRef.current += 1;
         const attempt = reconnectAttemptsRef.current;
-        console.warn(`Transcription dropped — reconnecting (attempt ${attempt}/${MAX_RECONNECT_ATTEMPTS})`);
+        console.warn(`Transcription dropped (code ${event.code}) — reconnecting (attempt ${attempt}/${MAX_RECONNECT_ATTEMPTS})`);
         updateStatus("connecting");
         clearReconnectTimer();
+        // Exponential backoff capped at ~5s
+        const delay = Math.min(RECONNECT_DELAY_MS * Math.pow(1.5, attempt - 1), 5000);
         reconnectTimerRef.current = window.setTimeout(() => {
           if (stoppingRef.current || !mediaStreamRef.current) return;
           connectWebSocket(mediaStreamRef.current, true);
-        }, RECONNECT_DELAY_MS * attempt);
+        }, delay);
         return;
       }
 
-      // Out of retries — tear down and surface a friendly error.
+      // Out of retries — preserve draft, tear down audio, surface friendly error.
+      // CRITICAL: do NOT clear transcriptRef — it stays available for save/recovery.
       teardownAudio();
       updateStatus("error");
       const reason = friendlyCloseReason(event.code, event.reason);
-      setError(`Transcription stopped — ${reason}. Tap the mic to retry.`);
+      setError(`Transcription stopped — ${reason}. Tap the mic to retry — your text is preserved.`);
     };
   }, [appendTranscript, clearReconnectTimer, formatFinalTranscriptChunk, resolveStop, setInterimValue, startAudioPipeline, teardownAudio, updateStatus]);
 
@@ -351,7 +394,27 @@ export function useTranscription(): UseTranscriptionReturn {
     stoppingRef.current = false;
     pausedRef.current = false;
     reconnectAttemptsRef.current = 0;
-    resetTranscriptState();
+
+    // Only reset the transcript on the *first* start of this hook instance.
+    // Subsequent starts (after error/disconnect) preserve the existing draft
+    // and continue appending — protects interviewers from losing prior content.
+    if (!hasEverStartedRef.current) {
+      // Don't wipe a persisted draft restored from a previous page load.
+      // If the user explicitly wants a fresh start, they can clear via clearDraft().
+      if (!transcriptRef.current.trim()) {
+        resetTranscriptState();
+      } else {
+        // Reset only interim state, keep the restored draft
+        lastSpeakerRef.current = -1;
+        setInterimValue("");
+      }
+      hasEverStartedRef.current = true;
+    } else {
+      // Retry / resume — keep transcript, only reset interim + speaker
+      lastSpeakerRef.current = -1;
+      setInterimValue("");
+    }
+
     updateStatus("connecting");
 
     let stream: MediaStream;
@@ -375,7 +438,7 @@ export function useTranscription(): UseTranscriptionReturn {
     mediaStreamRef.current = stream;
 
     connectWebSocket(stream, false);
-  }, [clearFinalizeTimer, clearReconnectTimer, connectWebSocket, resetTranscriptState, updateStatus]);
+  }, [clearFinalizeTimer, clearReconnectTimer, connectWebSocket, resetTranscriptState, setInterimValue, updateStatus]);
 
   const pause = useCallback(() => {
     pausedRef.current = true;
@@ -430,7 +493,20 @@ export function useTranscription(): UseTranscriptionReturn {
         resolveStop();
       }
     });
-  }, [clearFinalizeTimer, resolveStop, teardownAudio]);
+  }, [clearFinalizeTimer, clearReconnectTimer, resolveStop, teardownAudio]);
+
+  const getTranscriptDraft = useCallback(() => {
+    return composeDraft(transcriptRef.current, interimTextRef.current).trim();
+  }, []);
+
+  const clearDraft = useCallback(() => {
+    persistDraft("");
+    transcriptRef.current = "";
+    interimTextRef.current = "";
+    setTranscript("");
+    setInterimText("");
+    hasEverStartedRef.current = false;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -449,14 +525,19 @@ export function useTranscription(): UseTranscriptionReturn {
     };
   }, [clearFinalizeTimer, clearReconnectTimer, teardownAudio]);
 
+  const draftTranscript = composeDraft(transcript, interimText);
+
   return {
     status,
     transcript,
     interimText,
+    draftTranscript,
     start,
     pause,
     resume,
     stop,
+    getTranscriptDraft,
+    clearDraft,
     error,
   };
 }

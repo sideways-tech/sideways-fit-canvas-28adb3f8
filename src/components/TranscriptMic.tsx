@@ -1,5 +1,5 @@
-import { useEffect, useImperativeHandle, forwardRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Mic, Pause } from "lucide-react";
 import { useTranscription, TranscriptionStatus } from "@/hooks/useTranscription";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -12,28 +12,42 @@ interface TranscriptMicProps {
 export interface TranscriptMicHandle {
   stopRecording: () => Promise<string>;
   isRecording: () => boolean;
+  /** Returns best available transcript draft (finalized + interim), even when stopped/errored. */
+  getTranscriptDraft: () => string;
+  /** Clears in-memory + persisted draft. Call after a successful save. */
+  clearDraft: () => void;
 }
 
 const statusConfig: Record<TranscriptionStatus, { color: string; label: string }> = {
   idle: { color: "bg-muted", label: "Start Recording" },
-  connecting: { color: "bg-[hsl(48,60%,80%)]/70", label: "Connecting..." },
+  connecting: { color: "bg-[hsl(48,60%,80%)]/70", label: "Reconnecting..." },
   recording: { color: "bg-[hsl(142,40%,75%)]", label: "Recording" },
   paused: { color: "bg-[hsl(48,60%,80%)]", label: "Paused" },
   error: { color: "bg-destructive", label: "Error" },
 };
 
 const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onTranscriptChange }, ref) => {
-  const { status, transcript, interimText, start, pause, resume, stop, error } = useTranscription();
+  const { status, draftTranscript, transcript, interimText, start, pause, resume, stop, getTranscriptDraft, clearDraft, error } = useTranscription();
   const isMobile = useIsMobile();
+  const onTranscriptChangeRef = useRef(onTranscriptChange);
+  onTranscriptChangeRef.current = onTranscriptChange;
 
   useImperativeHandle(ref, () => ({
-    stopRecording: () => stop(),
+    stopRecording: async () => {
+      const finalized = await stop();
+      // Prefer the finalized return; fall back to draft if empty (edge case)
+      return finalized.trim() || getTranscriptDraft();
+    },
     isRecording: () => status === "recording" || status === "paused" || status === "connecting",
-  }), [stop, status]);
+    getTranscriptDraft,
+    clearDraft,
+  }), [stop, getTranscriptDraft, clearDraft, status]);
 
+  // Push the combined draft (finalized + interim) up to the parent on every change,
+  // so the form always has the best-available text — even if connection drops.
   useEffect(() => {
-    onTranscriptChange(transcript);
-  }, [transcript, onTranscriptChange]);
+    onTranscriptChangeRef.current(draftTranscript);
+  }, [draftTranscript]);
 
   const handleMainAction = async () => {
     switch (status) {
@@ -91,7 +105,7 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
         <div className="relative w-14 h-[76px]">
           <Tooltip>
             <TooltipTrigger asChild>
-              <motion.button
+              <button
                 onClick={handleMainAction}
                 disabled={status === "connecting"}
                 className={`absolute top-0 left-0 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-colors ${config.color} ${
@@ -104,24 +118,20 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
                   />
                 )}
                 <MainIcon className={`w-6 h-6 relative z-10 ${
-                  status === "recording" ? "text-background" : 
-                  status === "paused" ? "text-background" : 
+                  status === "recording" ? "text-background" :
+                  status === "paused" ? "text-background" :
                   "text-foreground"
                 }`} />
-              </motion.button>
+              </button>
             </TooltipTrigger>
             <TooltipContent side="left">{config.label}</TooltipContent>
           </Tooltip>
 
           <div className="absolute top-[60px] left-1/2 flex h-4 -translate-x-1/2 items-center justify-center">
             {isActive && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="whitespace-nowrap text-xs text-muted-foreground"
-              >
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
                 {config.label}
-              </motion.span>
+              </span>
             )}
           </div>
         </div>
