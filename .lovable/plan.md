@@ -1,47 +1,61 @@
 
 
-# Reframe Block E — From "Appeal vs. Critique" to "Their POV on Sideways"
+# Performance Cleanup — Stop the Browser Energy Warning
 
-Shift the framing of Block E away from whether the candidate likes or dislikes Sideways' work, and toward whether they have a sharp, articulated point of view on it. The grading scale already supports this (Surface → Informed → Genuine → Opinionated), so this is primarily a copy + framing refresh, plus a couple of small label tweaks for consistency.
+The browser is flagging this page because **every keystroke in the form re-renders the whole canvas** (FormState lives at the top), which re-runs Framer Motion animations on dozens of children, on top of two compounding paint costs (a fractal-noise SVG on `body` + a striped `paper-texture` background on the main wrapper). Combined with two **infinite-loop** mic ripple animations and a 12-particle confetti burst on a watched value, this is exactly the workload Chromium throttles as "high energy use."
 
-## What changes (user-facing copy)
+Fixes are **surgical** — no visual identity change, no behaviour change. Just stop animating things that don't need to animate, and stop re-animating things on every keystroke.
 
-**Card header (in `SidewaysInterviewCanvas.tsx`, Block E section)**
-- Title stays: `E. Why Sideways`
-- Subtitle: from *"Do they know who we are — and can they be honest about it?"*
-  → **"What's their point of view on us — and on the work we do?"**
+## Fixes (in priority order)
 
-**Block heading (in `SidewaysMotivationBlock.tsx`)**
-- Section label: from *"Why Sideways?"* → **"Their POV on Sideways"**
-- Helper line: from *"Do they know who we are and why they want to be here specifically?"*
-  → **"Do they just know about us, or do they have a clear point of view on us?"**
+### 1. Stop ScoresSummary bars from re-animating on every keystroke
+`ScoresSummary` is rendered live in the right column and receives `formState.*` values. Each of the ~10 score bars uses `<motion.div animate={{ width: ... }}>`. Every input change → React re-render → every bar re-runs its width transition. Replace with a plain `<div>` whose width is set via `style={{ width: '${val}%' }}` plus a CSS `transition: width 300ms ease-out`. Same visual, ~zero JS animation cost.
 
-**Capture textarea**
-- Label: from *"Have they explored our website sideways.co.in? What appeals to them about Sideways? What would they change or critique about our work?"*
-  → **"What is their perspective on the work we do at Sideways?"**
-- Helper hint (new small line under label): **"Have they explored sideways.co.in? Listen for a sharp POV on our approach, specific projects, or where we sit in the industry — engagement over flattery."**
-- Placeholder: from *"E.g., 'Loved the XYZ campaign', 'Would redesign the portfolio section'..."*
-  → **"E.g., 'Thinks our XYZ campaign nailed the insight but felt safe in execution', 'Sees us as the anti-template agency'..."**
+### 2. Stop TShapeVisualizer from spring-animating on every keystroke
+Same problem — `motion.div` with spring transitions on `width`/`height` re-fires constantly. Switch to plain divs with `transition-[width,height] duration-300 ease-out` Tailwind classes.
 
-**Grading scale (radio options)** — keep the 4 tiers, refine descriptions to reinforce POV (not praise/critique):
-- Surface-Level / Generic — *"No real take. Vague comments that could apply to any agency."*
-- Informed but Safe — *"Knows our work, can name projects — but withholds any real opinion."*
-- Genuine Admiration — *"Specific and authentic engagement with our work — clearly thought about it, even if mostly positive."*
-- Opinionated & Engaged — *"Has a sharp POV — willing to dissect, push back, or offer a strong read on where we're headed."*
+### 3. Kill the infinite mic ripple animations
+`TranscriptMic.tsx` runs **two** `repeat: Infinity` ripple animations the entire time recording is active (often the whole interview). This alone keeps the GPU busy for 30–60 minutes. Replace with a single CSS `animate-ping`-style pulse OR remove ripples entirely and rely on the green background colour to indicate "recording." (Recommend: keep one subtle CSS pulse, remove the second ripple.)
 
-**Grading helper line**
-- From *"This isn't about whether they praised or critiqued — it's about how deeply they engaged with who we are and what we do."*
-  → **"This isn't about praise or critique — it's about whether they have a real point of view on Sideways and the work we do."**
+### 4. Replace the body's fractal-noise SVG texture with a static, lighter one
+`src/index.css` line 100 sets a `feTurbulence` SVG as the body background with `background-blend-mode: soft-light`. SVG filter blending forces the compositor to re-paint a large surface on every scroll/resize. Replace with either (a) a one-time generated PNG noise data-URI (cheap to paint, no filter), or (b) just remove the noise blend and rely on the `paper-texture` lines on the canvas wrapper. Recommend (b) — the line-grid already gives the paper feel.
 
-**Reporting label (in `AssessmentReport.tsx`)**
-- Section title: *"Why Sideways / Work Critique"* → **"POV on Sideways"**
+### 5. Memoize ScoresSummary + TShapeVisualizer
+Wrap both in `React.memo` so they only re-render when their actual props change (not on every parent re-render from typing in unrelated text fields). Pair with a tiny refactor: pull `ScoresSummary`'s prop list into a `useMemo` in the parent so its identity is stable.
 
-## Files to edit
-1. `src/components/SidewaysMotivationBlock.tsx` — heading, helper, textarea label/placeholder, radio descriptions, grading helper line.
-2. `src/components/SidewaysInterviewCanvas.tsx` — Block E card subtitle (line ~784).
-3. `src/pages/AssessmentReport.tsx` — `NoteBlock` title for the Sideways section (line 294).
+### 6. Debounce the candidate-email auto-round-detect Supabase query
+Already debounced (500ms) — leave as-is. ✅
 
-## Out of scope
-- No data model / column changes — `sideways_motivation_reason`, `sidewaysMotivationLevel`, and the 4 enum values stay as-is, so no migration and no impact on stored assessments.
-- The duplicate `IndustryMotivationSection.tsx` (no longer wired into the canvas) is left untouched to avoid scope creep; can be cleaned up separately if desired.
+### 7. Tone down the confetti burst
+`DiagnosticSection`'s `<Confetti />` mounts 12 motion divs every time the user picks "Diagnostician." It's brief (0.8s) so low-impact, but combined with everything else it adds up. Reduce to 6 particles. (Optional, low priority.)
+
+### 8. Remove `whileHover={{ x: 4 }}` / `whileTap={{ scale: 0.98 }}` on radio cards
+Three sections (`DiagnosticSection`, `IndustryMotivationBlock`, `SidewaysMotivationBlock`) wrap each radio option in a `motion.div` with hover+tap micro-animations. These mount Framer's gesture listeners on ~10 elements. Replace with Tailwind `hover:translate-x-1 active:scale-[0.98] transition-transform` — same effect, near-zero JS cost.
+
+## Files I'll edit
+
+1. `src/components/ScoresSummary.tsx` — replace `motion.div` width bars with plain CSS transitions; wrap in `React.memo`.
+2. `src/components/TShapeVisualizer.tsx` — replace spring `motion.div` with CSS-transitioned divs; wrap in `React.memo`.
+3. `src/components/TranscriptMic.tsx` — remove second ripple, convert remaining one to CSS animation.
+4. `src/index.css` — remove the `feTurbulence` body background + blend mode (keep `paper-texture` on the canvas).
+5. `src/components/DiagnosticSection.tsx` — drop confetti to 6 particles; swap radio-card `motion.div` for Tailwind hover/active classes.
+6. `src/components/IndustryMotivationBlock.tsx` — same radio-card swap.
+7. `src/components/SidewaysMotivationBlock.tsx` — same radio-card swap.
+
+## What stays exactly the same
+
+- All copy, all field logic, all validation, all submission flow.
+- The "digital sketchpad" aesthetic — sketch borders, handwritten font, yellow highlighter, paper feel.
+- Card entry animations (`SketchCard` fade-in on mount runs **once** — fine).
+- Header fade-in, footer fade-in, KRA reference accordion expand — all one-shot, fine.
+- The confetti celebration still fires, just lighter.
+
+## Expected impact
+
+- ~10× drop in continuous JS animation work during typing.
+- No more infinite GPU work during long recording sessions.
+- Body paint surface drops from "filter blend across viewport" to "static colour."
+- Browser energy/responsiveness warning should disappear.
+
+Want me to proceed with all 7 file edits, or would you like to drop any of them (e.g. keep both mic ripples, keep the body noise)?
 
