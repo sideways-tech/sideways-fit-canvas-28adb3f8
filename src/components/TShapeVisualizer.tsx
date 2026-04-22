@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { memo } from "react";
 import HandwrittenLabel from "./HandwrittenLabel";
 
 interface TShapeVisualizerProps {
@@ -20,24 +20,20 @@ const TShapeVisualizer = ({
         <div className="relative w-72 h-56">
           {/* Center point marker */}
           <div className="absolute left-1/2 top-8 w-2 h-2 bg-muted-foreground/30 rounded-full -translate-x-1/2" />
-          
+
           {/* Horizontal Bar (Breadth) - Yellow */}
-          <motion.div
-            className="absolute top-4 left-1/2 h-4 bg-highlighter rounded-sm"
+          <div
+            className="absolute top-4 left-1/2 h-4 bg-highlighter rounded-sm transition-[width,margin] duration-300 ease-out"
             style={{
+              width: horizontalWidth,
               marginLeft: -horizontalWidth / 2,
             }}
-            initial={{ width: 40 }}
-            animate={{ width: horizontalWidth }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
           />
-          
+
           {/* Vertical Bar (Depth) - Black */}
-          <motion.div
-            className="absolute top-4 left-1/2 w-4 bg-ink rounded-sm -translate-x-1/2"
-            initial={{ height: 20 }}
-            animate={{ height: verticalHeight }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          <div
+            className="absolute top-4 left-1/2 w-4 bg-ink rounded-sm -translate-x-1/2 transition-[height] duration-300 ease-out"
+            style={{ height: verticalHeight }}
           />
 
           {/* Labels with scores */}
@@ -54,19 +50,19 @@ const TShapeVisualizer = ({
       <div className="pt-4 border-t border-border/50">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">T-Shaped Status:</span>
-          <HandwrittenLabel 
+          <HandwrittenLabel
             className={`text-3xl ${
-              depthScore >= 60 && breadthScore >= 60 
-                ? "text-hire" 
-                : depthScore >= 40 && breadthScore >= 40 
-                  ? "text-highlighter" 
+              depthScore >= 60 && breadthScore >= 60
+                ? "text-hire"
+                : depthScore >= 40 && breadthScore >= 40
+                  ? "text-highlighter"
                   : "text-muted-foreground"
             }`}
           >
-            {depthScore >= 60 && breadthScore >= 60 
-              ? "Strong T! ✓" 
-              : depthScore >= 40 && breadthScore >= 40 
-                ? "Emerging T" 
+            {depthScore >= 60 && breadthScore >= 60
+              ? "Strong T! ✓"
+              : depthScore >= 40 && breadthScore >= 40
+                ? "Emerging T"
                 : "Needs development"}
           </HandwrittenLabel>
         </div>
@@ -75,4 +71,4 @@ const TShapeVisualizer = ({
   );
 };
 
-export default TShapeVisualizer;
+export default memo(TShapeVisualizer);

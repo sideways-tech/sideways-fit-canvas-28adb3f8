@@ -38,7 +38,7 @@ const options = [
 
 const Confetti = () => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden">
-    {[...Array(12)].map((_, i) => (
+    {[...Array(6)].map((_, i) => (
       <motion.div
         key={i}
         className="absolute w-2 h-2 rounded-full"
@@ -78,14 +78,10 @@ const DiagnosticSection = ({ value, onChange }: DiagnosticSectionProps) => {
           const isSelected = value === option.value;
           
           return (
-            <motion.div
-              key={option.value}
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <div key={option.value}>
               <Label
                 htmlFor={option.value}
-                className={`flex items-start gap-4 p-4 cursor-pointer sketch-border-light transition-all duration-200 ${
+                className={`flex items-start gap-4 p-4 cursor-pointer sketch-border-light transition-transform duration-200 hover:translate-x-1 active:scale-[0.98] ${
                   isSelected
                     ? "bg-muted shadow-[2px_2px_0px_0px_hsl(var(--ink))]"
                     : "bg-background hover:bg-muted/50"
@@ -106,7 +102,7 @@ const DiagnosticSection = ({ value, onChange }: DiagnosticSectionProps) => {
                   </p>
                 </div>
               </Label>
-            </motion.div>
+            </div>
           );
         })}
       </RadioGroup>

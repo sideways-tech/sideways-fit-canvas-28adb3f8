@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { memo } from "react";
 import HandwrittenLabel from "./HandwrittenLabel";
 import TShapeVisualizer from "./TShapeVisualizer";
 import {
@@ -204,17 +204,15 @@ const ScoresSummary = ({
                   <span className="text-sm flex-1">{item.label}</span>
                   {item.sliderValue !== undefined && (
                     <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <motion.div
-                        className={`h-full rounded-full ${
+                      <div
+                        className={`h-full rounded-full transition-[width] duration-300 ease-out ${
                           item.status === "excellent"
                             ? "bg-hire"
                             : item.status === "good"
                             ? "bg-highlighter"
                             : "bg-reject"
                         }`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${item.sliderValue}%` }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        style={{ width: `${item.sliderValue}%` }}
                       />
                     </div>
                   )}
@@ -245,4 +243,4 @@ const ScoresSummary = ({
   );
 };
 
-export default ScoresSummary;
+export default memo(ScoresSummary);
