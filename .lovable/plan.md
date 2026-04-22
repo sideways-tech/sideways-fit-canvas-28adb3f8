@@ -1,61 +1,155 @@
 
+# Investigate and Fix Deepgram Disconnects + Missing Transcript Saves
 
-# Performance Cleanup — Stop the Browser Energy Warning
+## Diagnosis
 
-The browser is flagging this page because **every keystroke in the form re-renders the whole canvas** (FormState lives at the top), which re-runs Framer Motion animations on dozens of children, on top of two compounding paint costs (a fractal-noise SVG on `body` + a striped `paper-texture` background on the main wrapper). Combined with two **infinite-loop** mic ripple animations and a 12-particle confetti burst on a watched value, this is exactly the workload Chromium throttles as "high energy use."
+The transcript loss is happening in the client state flow, not just the speech provider connection itself.
 
-Fixes are **surgical** — no visual identity change, no behaviour change. Just stop animating things that don't need to animate, and stop re-animating things on every keystroke.
+### What is breaking
+1. **Only finalized transcript text is being passed up to the form.**
+   - `TranscriptMic` only sends `transcript` upward.
+   - `interimText` is shown in the floating preview, but not persisted to the parent form state.
 
-## Fixes (in priority order)
+2. **If the connection drops before Deepgram emits final chunks, the assessment save sees an empty transcript.**
+   - On submit, the archive save uses `transcriptRef.current` / `formState.transcript`.
+   - If the session dies while there is only interim text, the backend row is saved with `transcript = null`.
+   - That is why the archive shows **no transcript icon**.
 
-### 1. Stop ScoresSummary bars from re-animating on every keystroke
-`ScoresSummary` is rendered live in the right column and receives `formState.*` values. Each of the ~10 score bars uses `<motion.div animate={{ width: ... }}>`. Every input change → React re-render → every bar re-runs its width transition. Replace with a plain `<div>` whose width is set via `style={{ width: '${val}%' }}` plus a CSS `transition: width 300ms ease-out`. Same visual, ~zero JS animation cost.
+3. **Retrying after an error currently risks wiping already-captured text.**
+   - `start()` resets transcript state every time.
+   - So if the recorder hits error and the interviewer taps the mic again, the previous draft transcript can be cleared.
 
-### 2. Stop TShapeVisualizer from spring-animating on every keystroke
-Same problem — `motion.div` with spring transitions on `width`/`height` re-fires constantly. Switch to plain divs with `transition-[width,height] duration-300 ease-out` Tailwind classes.
+4. **The reconnect logic is present, but not durable enough.**
+   - It retries the socket, but when retries are exhausted the draft transcript is not explicitly preserved for submit/recovery.
+   - There is also no local draft persistence if the page refreshes or the recorder crashes.
 
-### 3. Kill the infinite mic ripple animations
-`TranscriptMic.tsx` runs **two** `repeat: Infinity` ripple animations the entire time recording is active (often the whole interview). This alone keeps the GPU busy for 30–60 minutes. Replace with a single CSS `animate-ping`-style pulse OR remove ripples entirely and rely on the green background colour to indicate "recording." (Recommend: keep one subtle CSS pulse, remove the second ripple.)
+5. **The disconnect path needs better observability.**
+   - The current proxy forwards close/error signals, but there is not enough structured logging around close reasons and client recovery paths.
 
-### 4. Replace the body's fractal-noise SVG texture with a static, lighter one
-`src/index.css` line 100 sets a `feTurbulence` SVG as the body background with `background-blend-mode: soft-light`. SVG filter blending forces the compositor to re-paint a large surface on every scroll/resize. Replace with either (a) a one-time generated PNG noise data-URI (cheap to paint, no filter), or (b) just remove the noise blend and rely on the `paper-texture` lines on the canvas wrapper. Recommend (b) — the line-grid already gives the paper feel.
+## Implementation Plan
 
-### 5. Memoize ScoresSummary + TShapeVisualizer
-Wrap both in `React.memo` so they only re-render when their actual props change (not on every parent re-render from typing in unrelated text fields). Pair with a tiny refactor: pull `ScoresSummary`'s prop list into a `useMemo` in the parent so its identity is stable.
+### 1. Preserve the full visible transcript, not just finalized chunks
+Update the transcription hook and mic component so the parent form always receives the **best available transcript draft**:
 
-### 6. Debounce the candidate-email auto-round-detect Supabase query
-Already debounced (500ms) — leave as-is. ✅
+- Build a combined value:
+  - `final transcript`
+  - plus current `interimText`
+- Expose that combined draft continuously to the parent.
+- Make the save flow use the combined draft when recording is in error/closed state.
 
-### 7. Tone down the confetti burst
-`DiagnosticSection`'s `<Confetti />` mounts 12 motion divs every time the user picks "Diagnostician." It's brief (0.8s) so low-impact, but combined with everything else it adds up. Reduce to 6 particles. (Optional, low priority.)
+This ensures that if the connection dies mid-sentence, the text already visible on screen is still saved with the assessment.
 
-### 8. Remove `whileHover={{ x: 4 }}` / `whileTap={{ scale: 0.98 }}` on radio cards
-Three sections (`DiagnosticSection`, `IndustryMotivationBlock`, `SidewaysMotivationBlock`) wrap each radio option in a `motion.div` with hover+tap micro-animations. These mount Framer's gesture listeners on ~10 elements. Replace with Tailwind `hover:translate-x-1 active:scale-[0.98] transition-transform` — same effect, near-zero JS cost.
+### 2. Add an explicit “get current transcript draft” recovery path
+Extend the mic handle so the submit flow can fetch the best transcript even if recording is no longer active:
 
-## Files I'll edit
+- Add something like `getTranscriptDraft()`
+- Use it in `handleSubmitAssessment()` before insert
+- Fall back in this order:
+  1. stopped/finalized transcript
+  2. current draft from hook
+  3. form state draft
+  4. local draft cache
 
-1. `src/components/ScoresSummary.tsx` — replace `motion.div` width bars with plain CSS transitions; wrap in `React.memo`.
-2. `src/components/TShapeVisualizer.tsx` — replace spring `motion.div` with CSS-transitioned divs; wrap in `React.memo`.
-3. `src/components/TranscriptMic.tsx` — remove second ripple, convert remaining one to CSS animation.
-4. `src/index.css` — remove the `feTurbulence` body background + blend mode (keep `paper-texture` on the canvas).
-5. `src/components/DiagnosticSection.tsx` — drop confetti to 6 particles; swap radio-card `motion.div` for Tailwind hover/active classes.
-6. `src/components/IndustryMotivationBlock.tsx` — same radio-card swap.
-7. `src/components/SidewaysMotivationBlock.tsx` — same radio-card swap.
+This fixes the case where `isRecording()` is false because the recorder errored, but useful transcript text still exists in memory.
 
-## What stays exactly the same
+### 3. Stop wiping transcript on retry after an error
+Refactor `useTranscription.start()` so transcript reset only happens for a genuinely new session, not for reconnect/retry.
 
-- All copy, all field logic, all validation, all submission flow.
-- The "digital sketchpad" aesthetic — sketch borders, handwritten font, yellow highlighter, paper feel.
-- Card entry animations (`SketchCard` fade-in on mount runs **once** — fine).
-- Header fade-in, footer fade-in, KRA reference accordion expand — all one-shot, fine.
-- The confetti celebration still fires, just lighter.
+Planned behavior:
+- **Fresh recording**: clear transcript
+- **Retry after disconnect/error**: keep existing draft and continue appending
+- Optional explicit “discard transcript and restart” can remain internal, but default retry should preserve text
 
-## Expected impact
+This prevents interviewers from losing prior captured content just by tapping the mic again.
 
-- ~10× drop in continuous JS animation work during typing.
-- No more infinite GPU work during long recording sessions.
-- Body paint surface drops from "filter blend across viewport" to "static colour."
-- Browser energy/responsiveness warning should disappear.
+### 4. Persist transcript draft locally until assessment save succeeds
+Add lightweight local persistence for the draft transcript during the interview session:
 
-Want me to proceed with all 7 file edits, or would you like to drop any of them (e.g. keep both mic ripples, keep the body noise)?
+- Persist draft transcript in browser storage
+- Keep it keyed to the in-progress assessment context (at minimum candidate email + interviewer email + round)
+- Restore it if the recorder disconnects or the page reloads
+- Clear it only after successful assessment save
 
+This adds a second safety net beyond in-memory state.
+
+### 5. Harden the Deepgram disconnect path
+Update the proxy and client error handling so disconnects are treated more gracefully:
+
+#### Client (`useTranscription.ts`)
+- Preserve draft transcript before switching to `error`
+- Differentiate:
+  - temporary socket drop
+  - provider close
+  - auth/config failure
+  - service busy / throttling
+- Keep retries silent, but surface a clearer final message when retries are exhausted
+
+#### Proxy (`deepgram-proxy`)
+- Forward more structured close info to the client
+- Improve logging around:
+  - Deepgram open failure
+  - close code / close reason
+  - client close vs provider close
+- Keep responses/WS events graceful so the UI can recover instead of dropping state
+
+### 6. Make archive save deterministic
+Update `SidewaysInterviewCanvas.tsx` submission logic so transcript saving does not depend on the recorder still being “healthy” at submit time.
+
+Specifically:
+- If mic is active, stop and finalize as today
+- If mic is errored/disconnected, do **not** skip transcript save
+- Save the recovered draft transcript into `assessments.transcript`
+- Preserve existing archive icon behavior automatically once transcript is non-null
+
+## Files to Update
+
+1. `src/hooks/useTranscription.ts`
+   - preserve combined draft
+   - add recovery getter
+   - avoid reset-on-retry
+   - improve disconnect/error behavior
+   - add local draft persistence
+
+2. `src/components/TranscriptMic.tsx`
+   - expose draft transcript through ref
+   - pass combined transcript upward instead of finalized-only text
+
+3. `src/components/SidewaysInterviewCanvas.tsx`
+   - use recovered transcript draft during submit
+   - clear local draft after successful save
+
+4. `supabase/functions/deepgram-proxy/index.ts`
+   - improve close/error forwarding and logging for disconnect diagnosis
+
+## Validation / QA
+
+After implementation, verify these exact cases:
+
+1. **Normal recording**
+   - speak, stop, save
+   - transcript icon appears in archive
+
+2. **Disconnect mid-sentence**
+   - speak enough to generate visible interim text
+   - force disconnect
+   - save assessment
+   - transcript still appears in archive
+
+3. **Disconnect → retry**
+   - speak, disconnect, retry recording
+   - confirm earlier text is preserved and new text appends
+
+4. **Disconnect with no manual retry**
+   - let recorder fail
+   - save immediately
+   - confirm recovered draft still persists
+
+5. **Page refresh during in-progress transcript**
+   - confirm local draft restores
+   - save succeeds with transcript
+
+## Technical Notes
+
+- No database migration is required.
+- The core bug is not that transcript storage is missing; it is that the app only stores finalized chunks and loses interim/draft text during failure states.
+- The missing archive mic icon is a downstream symptom of `assessments.transcript` being saved as `null`.
