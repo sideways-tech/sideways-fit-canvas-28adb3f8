@@ -38,6 +38,8 @@ type MotivationLevel = "unclear" | "practical" | "passionate";
 type SidewaysEngagement = "surface-generic" | "informed-safe" | "genuine-fan" | "opinionated-engaged";
 type Verdict = "strong-no" | "lean-no" | "lean-yes" | "strong-yes";
 
+const STOP_RECORDING_TIMEOUT_MS = 2800;
+
 interface FormState {
   candidateName: string;
   candidateEmail: string;
@@ -310,7 +312,14 @@ const SidewaysInterviewCanvas = () => {
 
     if (transcriptMicRef.current?.isRecording()) {
       try {
-        finalizedTranscript = (await transcriptMicRef.current.stopRecording()).trim();
+        finalizedTranscript = (await Promise.race<string>([
+          transcriptMicRef.current.stopRecording(),
+          new Promise<string>((resolve) => {
+            window.setTimeout(() => {
+              resolve(transcriptMicRef.current?.getTranscriptDraft?.() || "");
+            }, STOP_RECORDING_TIMEOUT_MS);
+          }),
+        ])).trim();
       } catch (e) {
         console.error("stopRecording failed, falling back to draft", e);
       }

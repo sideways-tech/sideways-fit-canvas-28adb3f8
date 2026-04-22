@@ -21,6 +21,7 @@ export interface UseTranscriptionReturn {
 
 const TARGET_SAMPLE_RATE = 16000;
 const FINALIZE_TIMEOUT_MS = 1800;
+const STOP_RESOLVE_TIMEOUT_MS = 2600;
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY_MS = 800;
 const DRAFT_STORAGE_KEY = "sideways:transcript-draft";
@@ -78,6 +79,7 @@ export function useTranscription(): UseTranscriptionReturn {
   const interimTextRef = useRef("");
   const stopResolverRef = useRef<((value: string) => void) | null>(null);
   const finalizeTimerRef = useRef<number | null>(null);
+  const stopTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef<number>(0);
   const reconnectTimerRef = useRef<number | null>(null);
   /** True once the user has started a session in this hook instance. */
@@ -125,6 +127,13 @@ export function useTranscription(): UseTranscriptionReturn {
     }
   }, []);
 
+  const clearStopTimeout = useCallback(() => {
+    if (stopTimeoutRef.current !== null) {
+      window.clearTimeout(stopTimeoutRef.current);
+      stopTimeoutRef.current = null;
+    }
+  }, []);
+
   const teardownAudio = useCallback(() => {
     try {
       if (workletNodeRef.current) {
@@ -166,11 +175,12 @@ export function useTranscription(): UseTranscriptionReturn {
     stopResolverRef.current?.(finalTranscript);
     stopResolverRef.current = null;
     clearFinalizeTimer();
+    clearStopTimeout();
     wsRef.current = null;
     lastSpeakerRef.current = -1;
     stoppingRef.current = false;
     updateStatus("idle");
-  }, [clearFinalizeTimer, setInterimValue, setTranscriptValue, updateStatus]);
+  }, [clearFinalizeTimer, clearStopTimeout, setInterimValue, setTranscriptValue, updateStatus]);
 
   const sendAudio = useCallback((buffer: ArrayBuffer) => {
     if (pausedRef.current) return;
@@ -464,6 +474,11 @@ export function useTranscription(): UseTranscriptionReturn {
       stopResolverRef.current = resolve;
       const ws = wsRef.current;
 
+       clearStopTimeout();
+       stopTimeoutRef.current = window.setTimeout(() => {
+         resolveStop();
+       }, STOP_RESOLVE_TIMEOUT_MS);
+
       if (!ws) {
         resolveStop();
         return;
@@ -484,16 +499,17 @@ export function useTranscription(): UseTranscriptionReturn {
           }, FINALIZE_TIMEOUT_MS);
         } else {
           try {
-            ws.close();
+            ws.close(1000, "client stop without open socket");
           } catch {
-            resolveStop();
+            undefined;
           }
+          resolveStop();
         }
       } catch {
         resolveStop();
       }
     });
-  }, [clearFinalizeTimer, clearReconnectTimer, resolveStop, teardownAudio]);
+  }, [clearFinalizeTimer, clearReconnectTimer, clearStopTimeout, resolveStop, teardownAudio]);
 
   const getTranscriptDraft = useCallback(() => {
     return composeDraft(transcriptRef.current, interimTextRef.current).trim();
@@ -512,6 +528,7 @@ export function useTranscription(): UseTranscriptionReturn {
     return () => {
       stoppingRef.current = true;
       clearFinalizeTimer();
+      clearStopTimeout();
       clearReconnectTimer();
       const ws = wsRef.current;
       if (ws) {
@@ -523,7 +540,7 @@ export function useTranscription(): UseTranscriptionReturn {
       }
       teardownAudio();
     };
-  }, [clearFinalizeTimer, clearReconnectTimer, teardownAudio]);
+  }, [clearFinalizeTimer, clearReconnectTimer, clearStopTimeout, teardownAudio]);
 
   const draftTranscript = composeDraft(transcript, interimText);
 
