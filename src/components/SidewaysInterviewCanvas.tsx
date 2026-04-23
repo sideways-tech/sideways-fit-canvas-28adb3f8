@@ -304,10 +304,8 @@ const SidewaysInterviewCanvas = () => {
 
   const handleSubmitAssessment = async () => {
     // Resolve the best-available transcript regardless of mic state.
-    // Order of preference:
-    //   1. If actively recording → stop & finalize
-    //   2. Mic ref's draft (covers errored / disconnected state with in-memory text)
-    //   3. transcriptRef / formState (already-pushed live drafts)
+    // We ALWAYS prefer whichever source has the most text — never trust a single source.
+    // Sources in priority order: stop()-finalized → mic draft → live transcriptRef → formState.
     let finalizedTranscript = "";
 
     if (transcriptMicRef.current?.isRecording()) {
@@ -325,11 +323,17 @@ const SidewaysInterviewCanvas = () => {
       }
     }
 
-    if (!finalizedTranscript) {
-      // Pull the best draft from the mic component (includes interim text)
-      const micDraft = transcriptMicRef.current?.getTranscriptDraft?.() || "";
-      finalizedTranscript = (micDraft || transcriptRef.current || formState.transcript || "").trim();
-    }
+    // Always cross-check against every other available source — pick the longest.
+    // This protects against edge cases where stop() resolved with an empty string
+    // (e.g. mid-reconnect) but the in-memory draft is fully populated.
+    const candidates = [
+      finalizedTranscript,
+      transcriptMicRef.current?.getTranscriptDraft?.() || "",
+      transcriptRef.current || "",
+      formState.transcript || "",
+    ].map((t) => (t || "").trim());
+
+    finalizedTranscript = candidates.reduce((best, cur) => (cur.length > best.length ? cur : best), "");
 
     if (finalizedTranscript) {
       transcriptRef.current = finalizedTranscript;

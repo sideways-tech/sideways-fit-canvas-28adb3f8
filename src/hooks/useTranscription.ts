@@ -171,6 +171,9 @@ export function useTranscription(): UseTranscriptionReturn {
       setInterimValue("");
     }
 
+    // CRITICAL: always return the best-available draft, never an empty string
+    // if any text exists. Protects against mid-reconnect stops where the
+    // socket close arrives before the finalize round-trip completes.
     const finalTranscript = transcriptRef.current.trim();
     stopResolverRef.current?.(finalTranscript);
     stopResolverRef.current = null;
