@@ -1,155 +1,132 @@
 
-# Investigate and Fix Deepgram Disconnects + Missing Transcript Saves
+## What the evidence shows
 
-## Diagnosis
+This is not an Archive UI bug.
 
-The transcript loss is happening in the client state flow, not just the speech provider connection itself.
+- The latest saved assessment (`6ac85796-7b88-414d-91e8-a9a55e0d064c`) was inserted with `transcript: null`.
+- The save request body itself already contained `transcript: null`.
+- In the same window, the transcription proxy logged a full recording session with `4037` audio chunks and `4,472,996` bytes sent to Deepgram before a clean close.
 
-### What is breaking
-1. **Only finalized transcript text is being passed up to the form.**
-   - `TranscriptMic` only sends `transcript` upward.
-   - `interimText` is shown in the floating preview, but not persisted to the parent form state.
+So the failure is: audio reaches the provider, but the app still sends an empty transcript into the assessment insert.
 
-2. **If the connection drops before Deepgram emits final chunks, the assessment save sees an empty transcript.**
-   - On submit, the archive save uses `transcriptRef.current` / `formState.transcript`.
-   - If the session dies while there is only interim text, the backend row is saved with `transcript = null`.
-   - That is why the archive shows **no transcript icon**.
+## Implementation plan
 
-3. **Retrying after an error currently risks wiping already-captured text.**
-   - `start()` resets transcript state every time.
-   - So if the recorder hits error and the interviewer taps the mic again, the previous draft transcript can be cleared.
+### 1. Stop treating transcript text as browser-only state
+The current flow is still too fragile because the only durable source is the page state/local draft. I will move transcript durability into the backend path.
 
-4. **The reconnect logic is present, but not durable enough.**
-   - It retries the socket, but when retries are exhausted the draft transcript is not explicitly preserved for submit/recovery.
-   - There is also no local draft persistence if the page refreshes or the recorder crashes.
+Build a dedicated `transcription_sessions` table to store:
+- session id
+- interviewer identity
+- latest draft transcript
+- final transcript
+- Deepgram request/session metadata
+- status (`recording`, `reconnecting`, `completed`, `errored`)
+- optional linked assessment id after save
 
-5. **The disconnect path needs better observability.**
-   - The current proxy forwards close/error signals, but there is not enough structured logging around close reasons and client recovery paths.
+This makes transcript recovery independent of whether the React state is stale at save time.
 
-## Implementation Plan
+### 2. Make the proxy accumulate transcript text server-side
+Update `deepgram-proxy` so it no longer acts as a dumb pass-through only.
 
-### 1. Preserve the full visible transcript, not just finalized chunks
-Update the transcription hook and mic component so the parent form always receives the **best available transcript draft**:
+The proxy will:
+- generate/use a stable transcription session id
+- parse Deepgram result messages
+- maintain the latest combined transcript draft server-side
+- persist draft/final transcript updates for that session
+- log close reason + provider metadata against the same session
 
-- Build a combined value:
-  - `final transcript`
-  - plus current `interimText`
-- Expose that combined draft continuously to the parent.
-- Make the save flow use the combined draft when recording is in error/closed state.
+That gives a backend source of truth even when the browser reconnects, reloads, or submits with stale local state.
 
-This ensures that if the connection dies mid-sentence, the text already visible on screen is still saved with the assessment.
+### 3. Pass a stable session id from the client
+Update `useTranscription` and `TranscriptMic` so each recording session has a durable id.
 
-### 2. Add an explicit “get current transcript draft” recovery path
-Extend the mic handle so the submit flow can fetch the best transcript even if recording is no longer active:
+The client will:
+- create a session id when recording starts
+- reconnect using the same session id
+- expose that session id to the assessment form
+- keep local draft as a secondary fallback, not the primary one
 
-- Add something like `getTranscriptDraft()`
-- Use it in `handleSubmitAssessment()` before insert
-- Fall back in this order:
-  1. stopped/finalized transcript
-  2. current draft from hook
-  3. form state draft
-  4. local draft cache
+### 4. Make save recover from backend before inserting the assessment
+Update `SidewaysInterviewCanvas` save logic so transcript resolution becomes:
 
-This fixes the case where `isRecording()` is false because the recorder errored, but useful transcript text still exists in memory.
+1. finalized stop result  
+2. mic draft in memory  
+3. form draft / local persisted draft  
+4. backend `transcription_sessions.latest_transcript` for the active session
 
-### 3. Stop wiping transcript on retry after an error
-Refactor `useTranscription.start()` so transcript reset only happens for a genuinely new session, not for reconnect/retry.
+If any of those contain text, `assessments.transcript` will be populated before insert.
 
-Planned behavior:
-- **Fresh recording**: clear transcript
-- **Retry after disconnect/error**: keep existing draft and continue appending
-- Optional explicit “discard transcript and restart” can remain internal, but default retry should preserve text
+### 5. Link saved assessments to their transcript session
+After a successful insert:
+- attach the new assessment id to the transcription session
+- mark the session as completed
+- clear only local client draft state
+- keep backend transcript intact for audit/recovery
 
-This prevents interviewers from losing prior captured content just by tapping the mic again.
+This prevents “successful save, missing transcript icon” even if the page had bad timing during stop/finalize.
 
-### 4. Persist transcript draft locally until assessment save succeeds
-Add lightweight local persistence for the draft transcript during the interview session:
+### 6. Add targeted diagnostics so this doesn’t become guesswork again
+Add lightweight end-to-end correlation fields/logs:
+- client transcription session id
+- proxy session id
+- Deepgram request id / close metadata when available
+- assessment id linked to that session
 
-- Persist draft transcript in browser storage
-- Keep it keyed to the in-progress assessment context (at minimum candidate email + interviewer email + round)
-- Restore it if the recorder disconnects or the page reloads
-- Clear it only after successful assessment save
+This will let future failures be traced from recording -> provider -> save -> archive row.
 
-This adds a second safety net beyond in-memory state.
+## Files / backend work
 
-### 5. Harden the Deepgram disconnect path
-Update the proxy and client error handling so disconnects are treated more gracefully:
+### Database
+Create a new table, likely `transcription_sessions`, with RLS scoped to:
+- authenticated users reading only their own sessions
+- super admins reading all sessions
+- service/backend writes allowed for proxy persistence
 
-#### Client (`useTranscription.ts`)
-- Preserve draft transcript before switching to `error`
-- Differentiate:
-  - temporary socket drop
-  - provider close
-  - auth/config failure
-  - service busy / throttling
-- Keep retries silent, but surface a clearer final message when retries are exhausted
+### App files
+- `src/hooks/useTranscription.ts`
+  - generate/preserve session id
+  - expose session id + backend recovery hooks
+  - keep local draft as secondary fallback
 
-#### Proxy (`deepgram-proxy`)
-- Forward more structured close info to the client
-- Improve logging around:
-  - Deepgram open failure
-  - close code / close reason
-  - client close vs provider close
-- Keep responses/WS events graceful so the UI can recover instead of dropping state
+- `src/components/TranscriptMic.tsx`
+  - expose session metadata through the ref
+  - continue sending best-available draft upward
 
-### 6. Make archive save deterministic
-Update `SidewaysInterviewCanvas.tsx` submission logic so transcript saving does not depend on the recorder still being “healthy” at submit time.
+- `src/components/SidewaysInterviewCanvas.tsx`
+  - fetch backend transcript fallback before assessment insert
+  - link assessment id to transcript session after save
 
-Specifically:
-- If mic is active, stop and finalize as today
-- If mic is errored/disconnected, do **not** skip transcript save
-- Save the recovered draft transcript into `assessments.transcript`
-- Preserve existing archive icon behavior automatically once transcript is non-null
+### Backend function
+- `supabase/functions/deepgram-proxy/index.ts`
+  - persist transcript state server-side
+  - store structured close/finalize metadata
+  - correlate each stream with one durable session id
 
-## Files to Update
+## Validation
 
-1. `src/hooks/useTranscription.ts`
-   - preserve combined draft
-   - add recovery getter
-   - avoid reset-on-retry
-   - improve disconnect/error behavior
-   - add local draft persistence
+I will verify these exact cases:
 
-2. `src/components/TranscriptMic.tsx`
-   - expose draft transcript through ref
-   - pass combined transcript upward instead of finalized-only text
+1. Full interview, no interruption  
+   - save succeeds  
+   - archive shows the mic icon  
+   - transcript opens correctly
 
-3. `src/components/SidewaysInterviewCanvas.tsx`
-   - use recovered transcript draft during submit
-   - clear local draft after successful save
+2. Internet drop for a few seconds, then restore  
+   - save still works  
+   - transcript is recovered from session storage if browser state is empty
 
-4. `supabase/functions/deepgram-proxy/index.ts`
-   - improve close/error forwarding and logging for disconnect diagnosis
+3. Disconnect during active speech  
+   - partial transcript is still saved
 
-## Validation / QA
+4. Long interview with multiple reconnects  
+   - transcript continues accumulating into one session  
+   - final archive row is not null
 
-After implementation, verify these exact cases:
+5. Post-save archive check  
+   - the inserted assessment row has non-null transcript text, not just the UI icon
 
-1. **Normal recording**
-   - speak, stop, save
-   - transcript icon appears in archive
+## Technical details
 
-2. **Disconnect mid-sentence**
-   - speak enough to generate visible interim text
-   - force disconnect
-   - save assessment
-   - transcript still appears in archive
-
-3. **Disconnect → retry**
-   - speak, disconnect, retry recording
-   - confirm earlier text is preserved and new text appends
-
-4. **Disconnect with no manual retry**
-   - let recorder fail
-   - save immediately
-   - confirm recovered draft still persists
-
-5. **Page refresh during in-progress transcript**
-   - confirm local draft restores
-   - save succeeds with transcript
-
-## Technical Notes
-
-- No database migration is required.
-- The core bug is not that transcript storage is missing; it is that the app only stores finalized chunks and loses interim/draft text during failure states.
-- The missing archive mic icon is a downstream symptom of `assessments.transcript` being saved as `null`.
+- I am intentionally changing the architecture because the current browser-only recovery strategy has already failed in production data.
+- No change is needed to the Archive icon logic itself; it already renders correctly when `assessments.transcript` is non-null.
+- The critical fix is to introduce a backend transcript source of truth so the final assessment insert cannot silently go out with `transcript: null` after a real recording.
