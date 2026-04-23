@@ -335,6 +335,28 @@ const SidewaysInterviewCanvas = () => {
 
     finalizedTranscript = candidates.reduce((best, cur) => (cur.length > best.length ? cur : best), "");
 
+    // FINAL FALLBACK: if every browser-side source is empty, recover from the
+    // backend `transcription_sessions` row that the proxy has been writing to
+    // throughout the recording. This catches the case where React state was
+    // wiped/stale at submit time but audio actually reached Deepgram.
+    const transcriptionSessionId = transcriptMicRef.current?.getSessionId?.() || null;
+    if (!finalizedTranscript && transcriptionSessionId) {
+      try {
+        const { data: sessionRow } = await supabase
+          .from("transcription_sessions")
+          .select("final_transcript, latest_transcript")
+          .eq("id", transcriptionSessionId)
+          .maybeSingle();
+        const recovered = (sessionRow?.final_transcript || sessionRow?.latest_transcript || "").trim();
+        if (recovered) {
+          console.info("[transcript] recovered from backend session", transcriptionSessionId);
+          finalizedTranscript = recovered;
+        }
+      } catch (e) {
+        console.warn("backend transcript recovery failed", e);
+      }
+    }
+
     if (finalizedTranscript) {
       transcriptRef.current = finalizedTranscript;
       setFormState((prev) => ({ ...prev, transcript: finalizedTranscript }));
@@ -456,6 +478,18 @@ const SidewaysInterviewCanvas = () => {
       }).select("*").single();
 
       if (aErr) throw aErr;
+
+      // Link the transcription session to the saved assessment for audit/recovery.
+      if (transcriptionSessionId) {
+        try {
+          await supabase
+            .from("transcription_sessions")
+            .update({ assessment_id: savedAssessment.id, status: "completed" })
+            .eq("id", transcriptionSessionId);
+        } catch (e) {
+          console.warn("link transcription session failed", e);
+        }
+      }
 
       // Save succeeded — clear the persisted local transcript draft
       try { transcriptMicRef.current?.clearDraft?.(); } catch { /* ignore */ }
@@ -911,6 +945,7 @@ const SidewaysInterviewCanvas = () => {
         {/* Sticky Transcript Mic */}
         <TranscriptMic
           ref={transcriptMicRef}
+          interviewerEmail={formState.interviewerEmail}
           onTranscriptChange={(t) => {
             transcriptRef.current = t;
             updateField("transcript", t);

@@ -8,7 +8,7 @@ export interface UseTranscriptionReturn {
   interimText: string;
   /** Combined finalized + current interim text — best-available draft. */
   draftTranscript: string;
-  start: () => Promise<void>;
+  start: (opts?: { interviewerEmail?: string }) => Promise<void>;
   pause: () => void;
   resume: () => void;
   stop: () => Promise<string>;
@@ -16,6 +16,8 @@ export interface UseTranscriptionReturn {
   getTranscriptDraft: () => string;
   /** Clears in-memory + persisted draft. Call after a successful save. */
   clearDraft: () => void;
+  /** Stable session id correlating client → proxy → backend `transcription_sessions` row. */
+  getSessionId: () => string | null;
   error: string | null;
 }
 
@@ -84,6 +86,10 @@ export function useTranscription(): UseTranscriptionReturn {
   const reconnectTimerRef = useRef<number | null>(null);
   /** True once the user has started a session in this hook instance. */
   const hasEverStartedRef = useRef<boolean>(false);
+  /** Stable transcription session id passed to proxy + persisted on backend. */
+  const sessionIdRef = useRef<string | null>(null);
+  /** Interviewer email captured at start, included in WS query for backend RLS. */
+  const interviewerEmailRef = useRef<string | null>(null);
 
   const updateStatus = useCallback((next: TranscriptionStatus) => {
     statusRef.current = next;
@@ -117,7 +123,10 @@ export function useTranscription(): UseTranscriptionReturn {
 
   const getWsUrl = () => {
     const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy?sample_rate=${TARGET_SAMPLE_RATE}`;
+    const params = new URLSearchParams({ sample_rate: String(TARGET_SAMPLE_RATE) });
+    if (sessionIdRef.current) params.set("session_id", sessionIdRef.current);
+    if (interviewerEmailRef.current) params.set("interviewer_email", interviewerEmailRef.current);
+    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy?${params.toString()}`;
   };
 
   const clearFinalizeTimer = useCallback(() => {
@@ -399,7 +408,7 @@ export function useTranscription(): UseTranscriptionReturn {
     };
   }, [appendTranscript, clearReconnectTimer, formatFinalTranscriptChunk, resolveStop, setInterimValue, startAudioPipeline, teardownAudio, updateStatus]);
 
-  const start = useCallback(async () => {
+  const start = useCallback(async (opts?: { interviewerEmail?: string }) => {
     setError(null);
     clearFinalizeTimer();
     clearReconnectTimer();
@@ -407,6 +416,19 @@ export function useTranscription(): UseTranscriptionReturn {
     stoppingRef.current = false;
     pausedRef.current = false;
     reconnectAttemptsRef.current = 0;
+
+    // Capture interviewer email for backend correlation/RLS.
+    if (opts?.interviewerEmail) {
+      interviewerEmailRef.current = opts.interviewerEmail.trim() || null;
+    }
+
+    // Only mint a new session id for a genuinely fresh recording.
+    // Reconnects/retries reuse the same id so the backend keeps appending.
+    if (!sessionIdRef.current) {
+      sessionIdRef.current = (typeof crypto !== "undefined" && "randomUUID" in crypto)
+        ? crypto.randomUUID()
+        : `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    }
 
     // Only reset the transcript on the *first* start of this hook instance.
     // Subsequent starts (after error/disconnect) preserve the existing draft
@@ -525,7 +547,10 @@ export function useTranscription(): UseTranscriptionReturn {
     setTranscript("");
     setInterimText("");
     hasEverStartedRef.current = false;
+    sessionIdRef.current = null;
   }, []);
+
+  const getSessionId = useCallback(() => sessionIdRef.current, []);
 
   useEffect(() => {
     return () => {
@@ -558,6 +583,7 @@ export function useTranscription(): UseTranscriptionReturn {
     stop,
     getTranscriptDraft,
     clearDraft,
+    getSessionId,
     error,
   };
 }
