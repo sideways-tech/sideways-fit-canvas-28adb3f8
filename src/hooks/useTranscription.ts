@@ -86,6 +86,10 @@ export function useTranscription(): UseTranscriptionReturn {
   const reconnectTimerRef = useRef<number | null>(null);
   /** True once the user has started a session in this hook instance. */
   const hasEverStartedRef = useRef<boolean>(false);
+  /** Stable transcription session id passed to proxy + persisted on backend. */
+  const sessionIdRef = useRef<string | null>(null);
+  /** Interviewer email captured at start, included in WS query for backend RLS. */
+  const interviewerEmailRef = useRef<string | null>(null);
 
   const updateStatus = useCallback((next: TranscriptionStatus) => {
     statusRef.current = next;
@@ -119,7 +123,10 @@ export function useTranscription(): UseTranscriptionReturn {
 
   const getWsUrl = () => {
     const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy?sample_rate=${TARGET_SAMPLE_RATE}`;
+    const params = new URLSearchParams({ sample_rate: String(TARGET_SAMPLE_RATE) });
+    if (sessionIdRef.current) params.set("session_id", sessionIdRef.current);
+    if (interviewerEmailRef.current) params.set("interviewer_email", interviewerEmailRef.current);
+    return `wss://${projectId}.supabase.co/functions/v1/deepgram-proxy?${params.toString()}`;
   };
 
   const clearFinalizeTimer = useCallback(() => {
