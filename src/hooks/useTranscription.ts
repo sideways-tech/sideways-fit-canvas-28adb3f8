@@ -8,7 +8,7 @@ export interface UseTranscriptionReturn {
   interimText: string;
   /** Combined finalized + current interim text — best-available draft. */
   draftTranscript: string;
-  start: () => Promise<void>;
+  start: (opts?: { interviewerEmail?: string }) => Promise<void>;
   pause: () => void;
   resume: () => void;
   stop: () => Promise<string>;
@@ -16,6 +16,8 @@ export interface UseTranscriptionReturn {
   getTranscriptDraft: () => string;
   /** Clears in-memory + persisted draft. Call after a successful save. */
   clearDraft: () => void;
+  /** Stable session id correlating client → proxy → backend `transcription_sessions` row. */
+  getSessionId: () => string | null;
   error: string | null;
 }
 
