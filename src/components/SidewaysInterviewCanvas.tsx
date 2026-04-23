@@ -479,6 +479,18 @@ const SidewaysInterviewCanvas = () => {
 
       if (aErr) throw aErr;
 
+      // Link the transcription session to the saved assessment for audit/recovery.
+      if (transcriptionSessionId) {
+        try {
+          await supabase
+            .from("transcription_sessions")
+            .update({ assessment_id: savedAssessment.id, status: "completed" })
+            .eq("id", transcriptionSessionId);
+        } catch (e) {
+          console.warn("link transcription session failed", e);
+        }
+      }
+
       // Save succeeded — clear the persisted local transcript draft
       try { transcriptMicRef.current?.clearDraft?.(); } catch { /* ignore */ }
 
