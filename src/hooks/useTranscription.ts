@@ -408,7 +408,7 @@ export function useTranscription(): UseTranscriptionReturn {
     };
   }, [appendTranscript, clearReconnectTimer, formatFinalTranscriptChunk, resolveStop, setInterimValue, startAudioPipeline, teardownAudio, updateStatus]);
 
-  const start = useCallback(async () => {
+  const start = useCallback(async (opts?: { interviewerEmail?: string }) => {
     setError(null);
     clearFinalizeTimer();
     clearReconnectTimer();
@@ -416,6 +416,19 @@ export function useTranscription(): UseTranscriptionReturn {
     stoppingRef.current = false;
     pausedRef.current = false;
     reconnectAttemptsRef.current = 0;
+
+    // Capture interviewer email for backend correlation/RLS.
+    if (opts?.interviewerEmail) {
+      interviewerEmailRef.current = opts.interviewerEmail.trim() || null;
+    }
+
+    // Only mint a new session id for a genuinely fresh recording.
+    // Reconnects/retries reuse the same id so the backend keeps appending.
+    if (!sessionIdRef.current) {
+      sessionIdRef.current = (typeof crypto !== "undefined" && "randomUUID" in crypto)
+        ? crypto.randomUUID()
+        : `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    }
 
     // Only reset the transcript on the *first* start of this hook instance.
     // Subsequent starts (after error/disconnect) preserve the existing draft
