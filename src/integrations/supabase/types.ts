@@ -346,6 +346,57 @@ export type Database = {
         }
         Relationships: []
       }
+      transcription_sessions: {
+        Row: {
+          assessment_id: string | null
+          audio_bytes: number
+          audio_chunks: number
+          close_code: number | null
+          close_reason: string | null
+          created_at: string
+          deepgram_request_id: string | null
+          final_transcript: string | null
+          id: string
+          interviewer_email: string | null
+          latest_transcript: string | null
+          metadata: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_id?: string | null
+          audio_bytes?: number
+          audio_chunks?: number
+          close_code?: number | null
+          close_reason?: string | null
+          created_at?: string
+          deepgram_request_id?: string | null
+          final_transcript?: string | null
+          id?: string
+          interviewer_email?: string | null
+          latest_transcript?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string | null
+          audio_bytes?: number
+          audio_chunks?: number
+          close_code?: number | null
+          close_reason?: string | null
+          created_at?: string
+          deepgram_request_id?: string | null
+          final_transcript?: string | null
+          id?: string
+          interviewer_email?: string | null
+          latest_transcript?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
