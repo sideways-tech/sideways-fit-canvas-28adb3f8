@@ -7,6 +7,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TranscriptMicProps {
   onTranscriptChange: (transcript: string) => void;
+  /** Interviewer email captured for backend session correlation. */
+  interviewerEmail?: string;
 }
 
 export interface TranscriptMicHandle {
@@ -16,6 +18,8 @@ export interface TranscriptMicHandle {
   getTranscriptDraft: () => string;
   /** Clears in-memory + persisted draft. Call after a successful save. */
   clearDraft: () => void;
+  /** Returns the active transcription session id (server-side row key), if any. */
+  getSessionId: () => string | null;
 }
 
 const statusConfig: Record<TranscriptionStatus, { color: string; label: string }> = {
@@ -26,11 +30,13 @@ const statusConfig: Record<TranscriptionStatus, { color: string; label: string }
   error: { color: "bg-destructive", label: "Error" },
 };
 
-const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onTranscriptChange }, ref) => {
-  const { status, draftTranscript, transcript, interimText, start, pause, resume, stop, getTranscriptDraft, clearDraft, error } = useTranscription();
+const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onTranscriptChange, interviewerEmail }, ref) => {
+  const { status, draftTranscript, transcript, interimText, start, pause, resume, stop, getTranscriptDraft, clearDraft, getSessionId, error } = useTranscription();
   const isMobile = useIsMobile();
   const onTranscriptChangeRef = useRef(onTranscriptChange);
   onTranscriptChangeRef.current = onTranscriptChange;
+  const interviewerEmailRef = useRef(interviewerEmail);
+  interviewerEmailRef.current = interviewerEmail;
 
   useImperativeHandle(ref, () => ({
     stopRecording: async () => {
@@ -41,7 +47,8 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
     isRecording: () => status === "recording" || status === "paused" || status === "connecting",
     getTranscriptDraft,
     clearDraft,
-  }), [stop, getTranscriptDraft, clearDraft, status]);
+    getSessionId,
+  }), [stop, getTranscriptDraft, clearDraft, getSessionId, status]);
 
   // Push the combined draft (finalized + interim) up to the parent on every change,
   // so the form always has the best-available text — even if connection drops.
@@ -53,7 +60,7 @@ const TranscriptMic = forwardRef<TranscriptMicHandle, TranscriptMicProps>(({ onT
     switch (status) {
       case "idle":
       case "error":
-        await start();
+        await start({ interviewerEmail: interviewerEmailRef.current });
         break;
       case "recording":
         pause();
