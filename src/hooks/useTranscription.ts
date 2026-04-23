@@ -547,7 +547,10 @@ export function useTranscription(): UseTranscriptionReturn {
     setTranscript("");
     setInterimText("");
     hasEverStartedRef.current = false;
+    sessionIdRef.current = null;
   }, []);
+
+  const getSessionId = useCallback(() => sessionIdRef.current, []);
 
   useEffect(() => {
     return () => {
@@ -580,6 +583,7 @@ export function useTranscription(): UseTranscriptionReturn {
     stop,
     getTranscriptDraft,
     clearDraft,
+    getSessionId,
     error,
   };
 }
