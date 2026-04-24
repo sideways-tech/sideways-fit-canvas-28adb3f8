@@ -865,7 +865,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.5}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">F. Diagnostic Mindset</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">F. Diagnostic Mindset (Retrospectively)</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">Looking back at the full conversation — did they ask 'Why' before 'How'?</p>
             </div>
             <DiagnosticSection
@@ -879,7 +879,7 @@ const SidewaysInterviewCanvas = () => {
         <SketchCard className="mb-8" delay={0.65}>
           <div className="space-y-4">
             <div className="space-y-1">
-              <HandwrittenLabel as="h3" className="text-4xl">Assessment Summary</HandwrittenLabel>
+              <HandwrittenLabel as="h3" className="text-4xl">Assessment Summary (</HandwrittenLabel>
               <p className="text-sm text-muted-foreground">All scores at a glance</p>
             </div>
             <ScoresSummary
