@@ -644,7 +644,7 @@ const SidewaysInterviewCanvas = () => {
 
             {/* Row 3 */}
             <div className="space-y-1.5">
-              <Label className={formState.hiringLevel !== "L1" ? "text-muted-foreground" : ""}>Education</Label>
+              <Label className={formState.hiringLevel !== "L1" ? "text-muted-foreground" : ""}>Education (only for AM - L1)</Label>
               <Select
                 value={formState.education}
                 onValueChange={(value) => updateField("education", value)}
