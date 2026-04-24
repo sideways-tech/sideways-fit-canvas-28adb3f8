@@ -919,7 +919,7 @@ const SidewaysInterviewCanvas = () => {
           className="mt-12 text-center text-sm text-muted-foreground"
         >
           <img src={sidewaysLogo} alt="Sideways" className="h-8 mx-auto mb-2 opacity-50" />
-          <p>Creative Problem Solving Outfit</p>
+          <p>The Brand Adoption Agency</p>
           <div className="flex items-center justify-center gap-4 mt-4">
             {isSuperAdmin && (
               <>
