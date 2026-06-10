@@ -839,8 +839,8 @@ const SidewaysInterviewCanvas = () => {
               />
               <TShapeVisualizer
                 title="Personal"
-                depthScore={personalDepth}
-                breadthScore={personalBreadth}
+                depthScore={derivePersonalT(formState).personalDepth}
+                breadthScore={derivePersonalT(formState).personalBreadth}
                 size="tiny"
               />
             </div>
