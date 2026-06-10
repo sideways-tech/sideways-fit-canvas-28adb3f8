@@ -830,10 +830,20 @@ const SidewaysInterviewCanvas = () => {
               onProfessionalBreadthChange={(value) => updateField("professionalBreadth", value)}
               onNotesChange={(value) => updateField("professionalDiveNotes", value)}
             />
-            <TShapeVisualizer
-              depthScore={formState.depthOfCraft}
-              breadthScore={formState.professionalBreadth}
-            />
+            <div className="flex items-start justify-center gap-6 py-2">
+              <TShapeVisualizer
+                title="Professional"
+                depthScore={formState.depthOfCraft}
+                breadthScore={formState.professionalBreadth}
+                size="tiny"
+              />
+              <TShapeVisualizer
+                title="Personal"
+                depthScore={personalDepth}
+                breadthScore={personalBreadth}
+                size="tiny"
+              />
+            </div>
             <ResilienceRating
               value={formState.resilienceScore}
               onChange={(value) => updateField("resilienceScore", value)}
