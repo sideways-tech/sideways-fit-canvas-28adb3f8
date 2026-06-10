@@ -1,6 +1,6 @@
 import { memo } from "react";
 import HandwrittenLabel from "./HandwrittenLabel";
-import TShapeVisualizer from "./TShapeVisualizer";
+
 import {
   Lightbulb,
   Users,
