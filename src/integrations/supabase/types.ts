@@ -38,6 +38,8 @@ export type Database = {
           motivation_reason: string | null
           overall_score: number | null
           person_score: number | null
+          personal_breadth_score: number
+          personal_depth_score: number
           portfolio_quality: number | null
           problem_solving_approach: number | null
           professional_breadth: number | null
@@ -77,6 +79,8 @@ export type Database = {
           motivation_reason?: string | null
           overall_score?: number | null
           person_score?: number | null
+          personal_breadth_score?: number
+          personal_depth_score?: number
           portfolio_quality?: number | null
           problem_solving_approach?: number | null
           professional_breadth?: number | null
@@ -116,6 +120,8 @@ export type Database = {
           motivation_reason?: string | null
           overall_score?: number | null
           person_score?: number | null
+          personal_breadth_score?: number
+          personal_depth_score?: number
           portfolio_quality?: number | null
           problem_solving_approach?: number | null
           professional_breadth?: number | null
