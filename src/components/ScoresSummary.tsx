@@ -181,32 +181,8 @@ const ScoresSummary = ({
   const excellentCount = allItems.filter((s) => s.status === "excellent").length;
   const needsWorkCount = allItems.filter((s) => s.status === "needs-work").length;
 
-  const personalDepth = depthTopic ? depthScore : 0;
-  const personalBreadth = Math.round(
-    (readsWidely + interestedInOthers + aestheticsInterest) / 3
-  );
-
   return (
     <div className="space-y-6">
-      {/* T-Shape Visuals: Professional + Personal */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-3 rounded-lg sketch-border-light bg-background">
-          <TShapeVisualizer
-            title="Professional"
-            depthScore={depthOfCraft}
-            breadthScore={professionalBreadth}
-            compact
-          />
-        </div>
-        <div className="p-3 rounded-lg sketch-border-light bg-background">
-          <TShapeVisualizer
-            title="Personal"
-            depthScore={personalDepth}
-            breadthScore={personalBreadth}
-            compact
-          />
-        </div>
-      </div>
 
       {/* Section Groups */}
       {sections.map((section) => (
