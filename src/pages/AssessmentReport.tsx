@@ -269,6 +269,15 @@ const AssessmentReport = () => {
         <NoteBlock title="Interests & Passions" text={a.interests_passions_notes} icon="✨" />
         <NoteBlock title="Background Notes" text={a.background_notes} icon="📝" />
 
+        {/* T-Shape Scores */}
+        <Card>
+          <SectionTitle icon="📐" title="T-Shape Scores" />
+          <SliderRow icon="🧠" label="Personal Depth" value={a.personal_depth_score ?? 0} />
+          <SliderRow icon="🌱" label="Personal Breadth" value={a.personal_breadth_score ?? 0} />
+          <SliderRow icon="⚒️" label="Professional Depth (Craft)" value={a.depth_of_craft} />
+          <SliderRow icon="🌐" label="Professional Breadth" value={a.professional_breadth} />
+        </Card>
+
         {/* Act 2: The Professional */}
         <Card>
           <SectionTitle icon="💼" title="Act 2 · The Professional" />

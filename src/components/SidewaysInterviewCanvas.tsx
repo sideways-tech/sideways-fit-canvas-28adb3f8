@@ -89,14 +89,18 @@ const normalizeCategorical = (value: string, map: Record<string, number>): numbe
   return map[value] ?? 0;
 };
 
-const calculateCategoryScores = (state: FormState): CategoryScores => {
-  // ACT 1: The Person (4 dimensions, equal weight)
-  const person = Math.round(
-    (state.interestedInOthers +
-      state.readsWidely +
-      state.aestheticsInterest +
-      state.depthScore) / 4
+export const derivePersonalT = (state: Pick<FormState, "depthScore" | "depthTopic" | "readsWidely" | "interestedInOthers" | "aestheticsInterest">) => {
+  const personalDepth = state.depthTopic ? state.depthScore : 0;
+  const personalBreadth = Math.round(
+    (state.readsWidely + state.interestedInOthers + state.aestheticsInterest) / 3
   );
+  return { personalDepth, personalBreadth };
+};
+
+const calculateCategoryScores = (state: FormState): CategoryScores => {
+  // ACT 1: The Person — Personal T-Shape (depth + breadth from Section B)
+  const { personalDepth, personalBreadth } = derivePersonalT(state);
+  const person = Math.round((personalDepth + personalBreadth) / 2);
 
   // ACT 2: The Professional (5 dimensions, weighted)
   const resilienceNormalized = state.resilienceScore > 0 ? ((state.resilienceScore - 1) / 4) * 100 : 0; // 1-5 → 0-100, 0 = not rated
@@ -153,6 +157,18 @@ const calculateVerdict = (state: FormState): { verdict: Verdict; scores: Categor
 
   // T-Shape floor: Professional Breadth minimum
   if (state.professionalBreadth < 20) {
+    return { verdict: "lean-no", scores };
+  }
+
+  // Personal T-Shape floors: mirror professional floors so both Ts gate positive verdicts
+  const { personalDepth, personalBreadth } = derivePersonalT(state);
+  if (personalDepth < 15) {
+    return { verdict: "strong-no", scores };
+  }
+  if (personalDepth < 30) {
+    return { verdict: "lean-no", scores };
+  }
+  if (personalBreadth < 20) {
     return { verdict: "lean-no", scores };
   }
 
@@ -473,6 +489,8 @@ const SidewaysInterviewCanvas = () => {
         professional_score: categoryScores.professional,
         mindset_score: categoryScores.mindset,
         overall_score: categoryScores.overall,
+        personal_depth_score: derivePersonalT(formState).personalDepth,
+        personal_breadth_score: derivePersonalT(formState).personalBreadth,
         verdict,
         transcript: transcriptToSave,
       }).select("*").single();
