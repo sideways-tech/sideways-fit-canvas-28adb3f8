@@ -1,39 +1,63 @@
-## Goal
-Produce a single downloadable `backup.zip` containing a full snapshot of your Lovable Cloud backend — database and storage files — without modifying or deleting anything.
+# Personal T-Shape: persist & feed into downstream scoring
 
-## What the backup will include
+We already capture every input needed for a Personal T-Shape — we just don't derive, persist, or use it. This plan adds a Personal T alongside the Professional T, stores its components on the assessment row, and threads both Ts through the scoring and verdict logic.
 
-1. **Database dump** (`database/`)
-   - `schema.sql` — full schema (tables, functions, policies, triggers, enums) for the `public` schema
-   - `data/<table>.csv` — one CSV per public table (assessments, candidates, super_admins, kra_definitions, etc.)
-   - `data/<table>.json` — same data as JSON for easier re-import
-   - `manifest.json` — table list, row counts, timestamp
+## Rubric
 
-2. **Storage files** (`storage/`)
-   - `cvs/` — every object in the `cvs` bucket, preserving folder structure and original filenames
-   - `manifest.json` — list of objects with sizes, content-types, and original paths
+Both Ts use the same 0–100 scale and the same status thresholds (≥60 strong, ≥40 emerging) so they read consistently.
 
-3. **Top-level**
-   - `README.md` — what's inside, how to restore, timestamp, project ref
-   - `backup.zip` delivered as a downloadable artifact
+**Professional T** (unchanged values):
+- Depth = `depth_of_craft`
+- Breadth = `professional_breadth`
 
-## How it will run (read-only)
+**Personal T** (derived from Section B inputs we already capture):
+- Personal Depth = `depth_score` (Non-Work Obsession Level). If `depth_topic` is blank, treat as 0 — mirrors current Scores Summary gating.
+- Personal Breadth = rounded average of `reads_widely`, `interested_in_others`, `aesthetics_interest`. These three already represent breadth-of-life signals (range of curiosity, empathy for others, aesthetic range).
 
-- Use `psql` via the existing `PG*` env vars to `\copy` each public table to CSV — no writes, no locks beyond a read transaction.
-- List tables via `information_schema` and iterate; skip `auth`, `storage`, `pgmq`, and other managed schemas.
-- For storage, list objects in the `cvs` bucket via the Supabase storage API using the anon/service context already available to the sandbox, then download each via signed URLs. No deletes, no uploads.
-- Zip everything into `/mnt/documents/backup-YYYYMMDD-HHMM.zip` and surface it with a `presentation-artifact` tag.
+These are deterministic from existing fields, so no new interviewer inputs are required.
+
+## Backend changes (single migration)
+
+Add two stored columns on `public.assessments` so the Personal T travels with the record and can be queried/reported on:
+
+- `personal_depth_score integer` — copy of `depth_score` at save time (kept as its own column for symmetry with `depth_of_craft` and to avoid joining logic elsewhere).
+- `personal_breadth_score integer` — computed average of the three Section B sliders at save time.
+
+Both default to 0, nullable false. Backfill existing rows in the same migration:
+
+```sql
+UPDATE public.assessments
+SET personal_depth_score = COALESCE(depth_score, 0),
+    personal_breadth_score = ROUND(
+      (COALESCE(reads_widely,0) + COALESCE(interested_in_others,0) + COALESCE(aesthetics_interest,0)) / 3.0
+    );
+```
+
+No new tables, no RLS/GRANT changes (existing assessment policies cover the new columns).
+
+## Frontend / scoring changes
+
+1. **`TShapeVisualizer.tsx`** — add an optional `title` prop ("Professional" / "Personal") shown as a small label above the T. Same bars/status.
+
+2. **`ScoresSummary.tsx`** — compute personal depth/breadth from props and render the two Ts in a side-by-side grid (`grid-cols-1 md:grid-cols-2 gap-4`, stack on mobile). Container shrunk so both fit.
+
+3. **`SidewaysInterviewCanvas.tsx`**
+   - Derive `personalDepth` and `personalBreadth` in `calculateCategoryScores` and `calculateVerdict`.
+   - **Score change**: today `person` is the simple average of 4 Section B fields. Replace it with `round((personalDepth + personalBreadth) / 2)` so the Person score and the Personal T agree by construction. (Same inputs, just grouped through the T rubric — overall weighting stays 25/40/35.)
+   - **Verdict floors** — add Personal T floors mirroring the existing Professional T floors so both Ts gate positive verdicts:
+     - `personalDepth < 15` → `strong-no`
+     - `personalDepth < 30` → `lean-no`
+     - `personalBreadth < 20` → `lean-no`
+   - On save, write `personal_depth_score` and `personal_breadth_score` alongside the existing fields.
+
+4. **`AssessmentReport.tsx`** — render the Personal T next to the Professional T using the stored columns, and add a "Personal T-Shape" status line so reports reflect both.
+
+## Downstream consistency
+
+Because personal scores are derived from already-captured inputs and stored on the row, every downstream surface (verdict, reporting, future analytics/exports) reads the same numbers the interviewer saw at save time. No data migration risk: backfill formula matches the live derivation.
 
 ## Out of scope
 
-- Auth users (`auth.users`) — managed schema, not exportable from the app side. If you need these, do it from the Cloud dashboard.
-- Edge function source code — already in your repo under `supabase/functions/`.
-- Secrets — never exported.
-
-## Notes
-
-- Backup is a point-in-time snapshot; long-running writes during export may not be captured.
-- For very large `cvs` buckets, the zip may be sizable; I'll report the final size.
-- Re-running creates a new timestamped zip, never overwriting prior ones.
-
-Approve and I'll generate it.
+- No new interviewer inputs or sliders.
+- No changes to email templates or KRA logic.
+- No change to the Mindset act or its weights.
